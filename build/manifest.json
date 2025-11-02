@@ -1,0 +1,23 @@
+{
+  "resources/fonts/JetBrainsMono-Italic[wght].ttf": {
+    "file": "assets/JetBrainsMono-Italic_wght_-CUprl_tr.ttf",
+    "src": "resources/fonts/JetBrainsMono-Italic[wght].ttf"
+  },
+  "resources/fonts/JetBrainsMono[wght].ttf": {
+    "file": "assets/JetBrainsMono_wght_-Ho3HWDri.ttf",
+    "src": "resources/fonts/JetBrainsMono[wght].ttf"
+  },
+  "resources/js/toolbar.prod.ts": {
+    "file": "assets/toolbar.prod-OI0lqgkk.js",
+    "name": "toolbar.prod",
+    "src": "resources/js/toolbar.prod.ts",
+    "isEntry": true,
+    "css": [
+      "assets/toolbar-DZO4B5I7.css"
+    ],
+    "assets": [
+      "assets/JetBrainsMono_wght_-Ho3HWDri.ttf",
+      "assets/JetBrainsMono-Italic_wght_-CUprl_tr.ttf"
+    ]
+  }
+}

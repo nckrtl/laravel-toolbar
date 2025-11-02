@@ -1,0 +1,11 @@
+{
+  "plugins": {
+    "marketplace": "hardimpactdev/claude-plugins",
+    "installed": [
+      "liftoff-laravel",
+      "php-quality",
+      "git-workflow",
+      "dev-environment"
+    ]
+  }
+}

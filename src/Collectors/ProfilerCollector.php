@@ -1,0 +1,240 @@
+<?php
+
+namespace NckRtl\Toolbar\Collectors;
+
+use NckRtl\Toolbar\CollectorManager;
+use NckRtl\Toolbar\Data\Configurations\ProfilerConfig;
+use NckRtl\Toolbar\Data\ProfileMarkerData;
+use NckRtl\Toolbar\Data\ProfilerData;
+use NckRtl\Toolbar\Data\RequestStageData;
+use NckRtl\Toolbar\Data\SubstageData;
+use NckRtl\Toolbar\Enums\DataSizeUnit;
+use NckRtl\Toolbar\Enums\TimeUnit;
+use NckRtl\Toolbar\Measurement;
+use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+
+class ProfilerCollector extends Collector implements CollectorInterface
+{
+    public function key(): string
+    {
+        return 'profiler';
+    }
+
+    public function configClass(): string
+    {
+        return ProfilerConfig::class;
+    }
+
+    public function collectData(CollectorManager $collectorManager): ProfilerData
+    {
+        [$requestStages, $profileMarkers] = Profiler::getRequestStages();
+
+        $this->assignSubstagesToStages($requestStages, $profileMarkers);
+
+        [$totalWallTime, $totalRealMemory, $totalAllocatedMemory] = $this->getTotals($requestStages);
+
+        foreach ($requestStages as $requestStageData) {
+            $requestStageData->calculatePercentages(
+                totalWallTime: $totalWallTime,
+                totalRealMemory: $totalRealMemory,
+                totalAllocatedMemory: $totalAllocatedMemory
+            );
+
+            $this->calculateSubstagePercentages($requestStageData);
+        }
+
+        return new ProfilerData(
+            total_wall_time: $totalWallTime,
+            total_real_memory: $totalRealMemory,
+            total_allocated_memory: $totalAllocatedMemory,
+            stages: $requestStages
+        );
+    }
+
+    /**
+     * Assign profile markers as substages to the appropriate stages based on timing.
+     *
+     * @param  RequestStageData[]  $requestStages
+     * @param  ProfileMarkerData[]  $profileMarkers
+     */
+    private function assignSubstagesToStages(array $requestStages, array $profileMarkers): void
+    {
+        if (count($profileMarkers) < 2) {
+            return;
+        }
+
+        $substages = $this->convertMarkersToSubstages($profileMarkers);
+
+        foreach ($substages as $substage) {
+            $stage = $this->findStageForSubstage($requestStages, $substage);
+            if ($stage) {
+                $stage->substages[] = $substage;
+            }
+        }
+    }
+
+    /**
+     * Convert consecutive profile markers into substages.
+     *
+     * @param  ProfileMarkerData[]  $profileMarkers
+     * @return SubstageData[]
+     */
+    private function convertMarkersToSubstages(array $profileMarkers): array
+    {
+        $substages = [];
+
+        for ($i = 0; $i < count($profileMarkers) - 1; $i++) {
+            $startMarker = $profileMarkers[$i];
+            $endMarker = $profileMarkers[$i + 1];
+
+            $substages[] = new SubstageData(
+                label: $startMarker->label,
+                start: $startMarker,
+                end: $endMarker,
+            );
+        }
+
+        return $substages;
+    }
+
+    /**
+     * Find the stage that contains a substage based on timing.
+     *
+     * @param  RequestStageData[]  $requestStages
+     */
+    private function findStageForSubstage(array $requestStages, SubstageData $substage): ?RequestStageData
+    {
+        $substageStartTime = $substage->start->time->value;
+
+        foreach ($requestStages as $stage) {
+            if (! $stage->recordedStart || ! $stage->recordedEnd) {
+                continue;
+            }
+
+            $stageStartTime = $stage->start->time->value;
+            $stageEndTime = $stage->end->time->value;
+
+            if ($substageStartTime >= $stageStartTime && $substageStartTime < $stageEndTime) {
+                return $stage;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Calculate percentages for substages within a stage.
+     */
+    private function calculateSubstagePercentages(RequestStageData $stage): void
+    {
+        if (empty($stage->substages)) {
+            return;
+        }
+
+        foreach ($stage->substages as $substage) {
+            $substage->calculatePercentages(
+                $stage->wall_time->measurement,
+                $stage->memory_real_delta->measurement
+            );
+        }
+    }
+
+    private function getTotals(array $requestStages): array
+    {
+        $requestStages = $this->prepareRequestStagesForTotalsCalculation($requestStages);
+
+        if (empty($requestStages)) {
+            return [
+                new Measurement(0, TimeUnit::MILLISECONDS)->decimals(0),
+                new Measurement(0, DataSizeUnit::BYTES),
+                new Measurement(memory_get_peak_usage(), DataSizeUnit::BYTES),
+            ];
+        }
+
+        $totalWallTime = 0;
+        $totalRealMemory = 0;
+
+        $firstStage = $requestStages[0];
+
+        foreach ($requestStages as $requestStage) {
+            $totalWallTime += $requestStage->wall_time->measurement->value;
+
+            if ($requestStage->memory_real_delta) {
+                $totalRealMemory += $requestStage->memory_real_delta->measurement->value;
+            }
+
+            $startTime = $firstStage->start->time->value;
+            $requestStageEndTime = $requestStage->end->time->value;
+
+            $differenceFromStartToCurrentRequestStageEnd = new Measurement($requestStageEndTime - $startTime, TimeUnit::SECONDS)->convertTo(TimeUnit::MILLISECONDS)->value;
+
+            if ($differenceFromStartToCurrentRequestStageEnd > $totalWallTime) {
+                throw new \Exception('Wall time overlap detected at stage "'.$requestStage->label.'" discrepancy: '.(new Measurement($differenceFromStartToCurrentRequestStageEnd - $totalWallTime, TimeUnit::MILLISECONDS))->formattedValue);
+            }
+
+            if ($totalWallTime > 0 && $differenceFromStartToCurrentRequestStageEnd < $totalWallTime) {
+                throw new \Exception('Wall time gap detected at stage "'.$requestStage->label.'" discrepancy: '.(new Measurement($totalWallTime - $differenceFromStartToCurrentRequestStageEnd, TimeUnit::MILLISECONDS))->formattedValue);
+            }
+        }
+
+        return [
+            new Measurement($totalWallTime, TimeUnit::MILLISECONDS)->decimals(0),
+            new Measurement($totalRealMemory, DataSizeUnit::BYTES),
+            new Measurement(memory_get_peak_usage(), DataSizeUnit::BYTES),
+        ];
+    }
+
+    private function prepareRequestStagesForTotalsCalculation(array $requestStages): array
+    {
+        $stagesWithStartOrEnd = array_values(
+            array_filter($requestStages, function (RequestStageData $requestStage) {
+                return $requestStage->recordedEnd || $requestStage->recordedStart;
+            })
+        );
+
+        return $this->fillInMissingStartAndEnd($stagesWithStartOrEnd);
+    }
+
+    private function fillInMissingStartAndEnd(array $stagesWithStartOrEnd): array
+    {
+        // Make sure each stage has a start and end
+        foreach ($stagesWithStartOrEnd as $index => $requestStage) {
+            if (! $requestStage->recordedEnd && ! $requestStage->recordedStart) {
+                throw new \Exception('Stage "'.$requestStage->label.'" has no start or end.');
+            }
+
+            if (! $requestStage->recordedEnd) {
+                $requestStage->end = $this->findNextStageWithEnd($requestStage, $stagesWithStartOrEnd, $index)->end;
+            }
+
+            if (! $requestStage->recordedStart) {
+                $requestStage->start = $requestStage->end;
+            }
+
+            $requestStage->calculateWallTime();
+            $requestStage->calculateMemoryDeltas();
+        }
+
+        return $stagesWithStartOrEnd;
+    }
+
+    private function findNextStageWithEnd(RequestStageData $requestStage, array $stagesWithStartOrEnd, int $currentIndex): RequestStageData
+    {
+        $nextStages = array_slice($stagesWithStartOrEnd, $currentIndex + 1);
+
+        $nextStageWithEnd = array_values(
+            array_filter($nextStages, function (RequestStageData $requestStage) {
+                return $requestStage->recordedEnd;
+            })
+        );
+
+        if (empty($nextStageWithEnd)) {
+            throw new \Exception('No next stage with a end time found for stage "'.$requestStage->label.'". This is probably due to a missing request checkpoint.');
+        }
+
+        $nextStageWithEnd = $nextStageWithEnd[0];
+        $requestStage->end = $nextStageWithEnd->end;
+
+        return $requestStage;
+    }
+}
