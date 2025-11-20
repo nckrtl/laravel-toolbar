@@ -15,9 +15,7 @@ class RequestStageData extends Data
 
     public RequestStagePropertyData $wall_time;
 
-    public RequestStagePropertyData $memory_real_delta;
-
-    public RequestStagePropertyData $memory_allocated_delta;
+    public ?RequestStagePropertyData $memory_real_delta = null;
 
     public function __construct(
         public string $label,
@@ -38,13 +36,11 @@ class RequestStageData extends Data
         if (! $this->recordedStart || ! $this->recordedEnd) {
             $this->wall_time = new RequestStagePropertyData(0, TimeUnit::SECONDS);
             $this->memory_real_delta = new RequestStagePropertyData(0, DataSizeUnit::BYTES);
-            $this->memory_allocated_delta = new RequestStagePropertyData(0, DataSizeUnit::BYTES);
 
             return;
         }
 
-        $this->calculateWallTime()
-            ->calculateMemoryDeltas();
+        $this->calculateWallTime()->calculateMemoryDeltas();
     }
 
     public function calculateWallTime(): self
@@ -59,8 +55,12 @@ class RequestStageData extends Data
 
     public function calculateMemoryDeltas(): self
     {
+        if (! $this->start->measureMemory || ! $this->end->measureMemory) {
+            $this->memory_real_delta = new RequestStagePropertyData(0, DataSizeUnit::BYTES);
+            return $this;
+        }
+
         $this->memory_real_delta = new RequestStagePropertyData($this->end->memory_real->value - $this->start->memory_real->value, $this->end->memory_real->unit);
-        $this->memory_allocated_delta = new RequestStagePropertyData($this->end->memory_allocated->value - $this->start->memory_allocated->value, $this->end->memory_allocated->unit);
 
         return $this;
     }
@@ -68,8 +68,8 @@ class RequestStageData extends Data
     public function calculatePercentages(Measurement $totalWallTime, Measurement $totalRealMemory, Measurement $totalAllocatedMemory): self
     {
         $this->wall_time->calculatePercentage($totalWallTime);
+
         $this->memory_real_delta->calculatePercentage($totalRealMemory);
-        $this->memory_allocated_delta->calculatePercentage($totalAllocatedMemory);
 
         return $this;
     }
@@ -78,7 +78,6 @@ class RequestStageData extends Data
     {
         $this->wall_time->convertTo(TimeUnit::MILLISECONDS);
         $this->memory_real_delta->convertTo(DataSizeUnit::MEGABYTES);
-        $this->memory_allocated_delta->convertTo(DataSizeUnit::MEGABYTES);
 
         return $this;
     }

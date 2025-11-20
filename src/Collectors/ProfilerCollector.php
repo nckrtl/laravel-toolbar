@@ -51,14 +51,15 @@ class ProfilerCollector extends Collector implements CollectorInterface
 
         $totalWallTime = 0;
         $totalRealMemory = 0;
-        $totalAllocatedMemory = 0;
 
         $firstStage = $requestStages[0];
 
         foreach ($requestStages as $requestStage) {
             $totalWallTime += $requestStage->wall_time->measurement->value;
-            $totalRealMemory += $requestStage->memory_real_delta->measurement->value;
-            $totalAllocatedMemory += $requestStage->memory_allocated_delta->measurement->value;
+
+            if ($requestStage->memory_real_delta) {
+                $totalRealMemory += $requestStage->memory_real_delta->measurement->value;
+            }
 
             $startTime = $firstStage->start->time->value;
             $requestStageEndTime = $requestStage->end->time->value;
@@ -77,7 +78,7 @@ class ProfilerCollector extends Collector implements CollectorInterface
         return [
             new Measurement($totalWallTime, TimeUnit::MILLISECONDS),
             new Measurement($totalRealMemory, DataSizeUnit::BYTES),
-            new Measurement($totalAllocatedMemory, DataSizeUnit::BYTES),
+            new Measurement(memory_get_peak_usage(), DataSizeUnit::BYTES),
         ];
     }
 

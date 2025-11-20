@@ -36,9 +36,7 @@
           <div class=" px-1  flex w-full" v-if="data.profiler?.stages">
             <template v-for="(requestStage, index) in data.profiler?.stages" :key="index">
               <div @mouseenter="hoverIndex = index" @mouseleave="hoverIndex = null" class="flex min-w-2 py-1.5" :style="{ width: requestStage.wall_time.percentage + '%' }">
-
                 <div  class="h-1 rounded-full" :style="{ backgroundColor: requestStage.color, width: 'calc(100% - 4px)' }"></div>
-
               </div>
             </template>
           </div>

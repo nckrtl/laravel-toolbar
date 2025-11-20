@@ -32,10 +32,7 @@ class ToolbarServiceProvider extends PackageServiceProvider
     {
         app()->singleton(Toolbar::class);
         app()->make(Toolbar::class);
-    }
 
-    public function packageBooted(): void
-    {
         if(!Toolbar::isEnabled()) {
             return;
         }

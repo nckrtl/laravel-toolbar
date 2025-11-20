@@ -23,8 +23,8 @@ const { data } = useToolbar()
           <Request />
           <Timings v-if="data.profiler" />
           <MemoryUsage v-if="data.profiler" />
-          <Queries />
-          <Models />
+          <!-- <Queries />
+          <Models /> -->
       </Group>
     </div>
     <div class="flex gap-1 items-center">

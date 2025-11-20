@@ -67,11 +67,17 @@ enum DataSizeUnit: string implements Unit
 
     public function formatMaxFractionDigits(int $maxFractionDigits, int|float $value, ?Unit $formatToUnit = null): string
     {
-        if ($formatToUnit) {
-            return round($formatToUnit->convertValueTo($value, $formatToUnit), $maxFractionDigits).$formatToUnit->abbreviation();
+        $isNegative = $value < 0;
+
+        if ($isNegative) {
+            $value = abs($value);
         }
 
-        if ($value < 1) {
+        if ($formatToUnit) {
+            return ($isNegative ? '-' : '').round($formatToUnit->convertValueTo($value, $formatToUnit), $maxFractionDigits).$formatToUnit->abbreviation();
+        }
+
+        if ($value > 0 && $value < 1) {
             $value = $value * $this->factor();
         }
 
@@ -81,6 +87,6 @@ enum DataSizeUnit: string implements Unit
 
         $pow = min($pow, count($abbreviations) - 1);
 
-        return round($value / pow(1024, $pow), $maxFractionDigits).' '.$abbreviations[$pow];
+        return ($isNegative ? '-' : '').round($value / pow(1024, $pow), $maxFractionDigits).' '.$abbreviations[$pow];
     }
 }

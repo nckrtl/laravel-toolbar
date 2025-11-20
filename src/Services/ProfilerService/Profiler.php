@@ -36,9 +36,8 @@ class Profiler
             self::record(
                 id: RequestCheckpointId::LARAVEL_START,
                 data: new RequestCheckpointData(
-                    memory_real: new Measurement(0, DataSizeUnit::BYTES),
-                    memory_allocated: new Measurement(0, DataSizeUnit::BYTES),
-                    time: new Measurement(LARAVEL_START, TimeUnit::SECONDS)
+                    time: new Measurement(LARAVEL_START, TimeUnit::SECONDS),
+                    measureMemory: false,
                 )
             );
         }
