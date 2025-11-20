@@ -63,7 +63,7 @@ class ToolbarConfig extends Data
 
   private function validateCollector($collectorInstance): void
   {
-     if(!class_implements($collectorInstance, CollectorInterface::class)) {
+     if(!in_array(CollectorInterface::class, class_implements($collectorInstance) ?: [])) {
       throw new \Exception('Collector '.$collectorInstance.' must implement '.CollectorInterface::class.' interface');
      }
 

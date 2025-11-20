@@ -7,6 +7,9 @@ use NckRtl\Toolbar\Data\RequestData;
 use NckRtl\Toolbar\Enums\DataProvider;
 use NckRtl\Toolbar\Data\Configurations\RequestConfig;
 
+/**
+ * @property RequestConfig $config
+ */
 class RequestCollector extends Collector implements CollectorInterface
 {
     public array $request;
@@ -24,15 +27,11 @@ class RequestCollector extends Collector implements CollectorInterface
     public function collectData(CollectorManager $collectorManager): ?RequestData
     {
 
-        if($this->config->dataProvider && $this->config->dataProvider === DataProvider::Telescope && ! empty($collectorManager->telescopeEntries)) {
+        if($this->config->dataProvider && ! empty($collectorManager->telescopeEntries)) {
             return $this->telescopeProvidedRequestData($collectorManager);
         }
 
         $request = request();
-
-        if(! $request) {
-            return null;
-        }
 
         return new RequestData(
             uuid: null,

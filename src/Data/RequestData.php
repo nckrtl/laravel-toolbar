@@ -22,12 +22,12 @@ class RequestData extends Data
     private ?RoutingRoute $route = null;
 
     public function __construct(
-        public ?string $uuid = null,
         public string $method,
         public string $uri,
         public string $ip_address,
         public string $controller_action,
         public array $middleware,
+        public ?string $uuid = null,
         public ?int $memory = null,
         public ?int $duration = null,
     ) {
@@ -97,10 +97,12 @@ class RequestData extends Data
             base_path('routes'),
         ];
 
+        $routeFiles = [];
+
         foreach ($routesDirs as $routesDir) {
             if (is_dir($routesDir)) {
-                $routeFiles = glob($routesDir.'/*.php');
-                $routeFiles = array_merge($routeFiles);
+                $files = glob($routesDir.'/*.php');
+                $routeFiles = array_merge($routeFiles, $files);
                 $routeFiles = array_unique($routeFiles);
             }
         }

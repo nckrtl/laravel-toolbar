@@ -2,6 +2,8 @@
 
 namespace NckRtl\Toolbar\Data;
 
+use Spatie\LaravelData\Data;
+
 class BootProfileData extends Data
 {
     public function __construct(

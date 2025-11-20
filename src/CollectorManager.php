@@ -84,7 +84,7 @@ class CollectorManager
 
     protected function setTelescopeEntries(): bool
     {
-        $entries = Telescope::$entriesQueue ?? [];
+        $entries = Telescope::$entriesQueue;
 
         if (empty($entries)) {
             return false;

@@ -6,6 +6,9 @@ use NckRtl\Toolbar\CollectorManager;
 use NckRtl\Toolbar\Data\LaravelData;
 use NckRtl\Toolbar\Data\Configurations\LaravelConfig;
 
+/**
+ * @property LaravelConfig $config
+ */
 class LaravelCollector extends Collector implements CollectorInterface
 {
     public function key(): string

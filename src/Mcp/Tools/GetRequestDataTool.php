@@ -78,8 +78,7 @@ class GetRequestDataTool extends Tool
             return Response::error('No request data found for request id: '.$mcpRequestId);
         }
 
-        return Response::json($requestData)
-            ->withMeta(['source' => 'laravel-toolbar', 'cached' => true]);
+        return Response::json($requestData);
     }
 
     /**
@@ -104,7 +103,7 @@ class GetRequestDataTool extends Tool
         ];
     }
 
-    private function findRoute(string $route, string $type, string $method): ?Route
+    private function findRoute(string $route, string $type, ?string $method): ?Route
     {
         $routes = RouteFacade::getRoutes();
 
@@ -116,11 +115,11 @@ class GetRequestDataTool extends Tool
             $uri = explode(config('app.url'), $route);
             $uri = $uri[1];
 
-            return $routes->match(HttpRequest::create($uri, $method ?? 'GET')) ?? null;
+            return $routes->match(HttpRequest::create($uri, $method ?? 'GET'));
         }
 
         if ($type === 'uri') {
-            return $routes->match(HttpRequest::create($route, $method ?? 'GET')) ?? null;
+            return $routes->match(HttpRequest::create($route, $method ?? 'GET'));
         }
 
         return null;
