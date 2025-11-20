@@ -1,0 +1,34 @@
+<?php
+
+namespace NckRtl\Toolbar\Collectors;
+
+use NckRtl\Toolbar\Measurement;
+use NckRtl\Toolbar\CollectorManager;
+use NckRtl\Toolbar\Data\ResponseData;
+use NckRtl\Toolbar\Enums\DataSizeUnit;
+use NckRtl\Toolbar\Data\Configurations\ResponseConfig;
+
+class ResponseCollector extends Collector implements CollectorInterface
+{
+    public function key(): string
+    {
+        return 'response';
+    }
+
+    public function configClass(): string
+    {
+        return ResponseConfig::class;
+    }
+
+    public function collectData(CollectorManager $collectorManager): ?ResponseData
+    {
+        return new ResponseData(
+            status_code: $collectorManager->response->getStatusCode(),
+            headers: $collectorManager->response->headers->all(),
+            size: new Measurement(
+                value: strlen($collectorManager->response->getContent()),
+                unit: DataSizeUnit::BYTES
+            )->formatValue()
+        );
+    }
+}

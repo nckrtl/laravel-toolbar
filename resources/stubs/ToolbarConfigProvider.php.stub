@@ -1,0 +1,15 @@
+<?php
+
+namespace NckRtl\Toolbar\Providers;
+
+use NckRtl\Toolbar\Toolbar;
+use NckRtl\Toolbar\Data\ToolbarConfig;
+use NckRtl\Toolbar\Providers\ToolbarProvider;
+
+class ToolbarConfigProvider extends ToolbarProvider
+{
+    public function update(ToolbarConfig $toolbarConfig): void
+    {
+        $toolbarConfig;
+    }
+}
