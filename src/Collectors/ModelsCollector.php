@@ -2,6 +2,7 @@
 
 namespace NckRtl\Toolbar\Collectors;
 
+use NckRtl\Toolbar\Toolbar;
 use NckRtl\Toolbar\Data\ModelData;
 use NckRtl\Toolbar\CollectorManager;
 use NckRtl\Toolbar\Data\Configurations\ModelsConfig;
@@ -29,7 +30,9 @@ class ModelsCollector extends Collector implements CollectorInterface
 
     public function setEntries(CollectorManager $collectorManager): void
     {
-        if (!$collectorManager->telescopeIsInstalled || ! $collectorManager->telescopeEntries->has('model')) {
+        $toolbar = app(Toolbar::class);
+
+        if (!$toolbar->telescopeIsInstalled() || ! $collectorManager->telescopeEntries->has('model')) {
             return;
         }
 

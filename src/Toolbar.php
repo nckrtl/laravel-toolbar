@@ -99,4 +99,9 @@ class Toolbar extends Telescope
 
         return ! self::requestIsToApprovedUri($request);
     }
+
+    public function telescopeIsInstalled(): bool
+    {
+        return class_exists('Laravel\Telescope\Telescope');
+    }
 }

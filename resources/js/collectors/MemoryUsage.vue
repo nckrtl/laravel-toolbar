@@ -58,7 +58,7 @@
           </DataListItem>
       </Section>
     </Panel>
-    <ToolbarItem class="!border-x-0" >
+    <ToolbarItem class="!border-x-0" :isActive="isOpen">
       <div class="flex gap-1 items-center py-0.5">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4">
           <path d="M6 6v4h4V6H6Z" />

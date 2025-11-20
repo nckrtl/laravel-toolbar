@@ -17,7 +17,7 @@ class ToolbarInjector
      */
     public function inject(Request $request, $response): void
     {
-        if(!Toolbar::$enabled) {
+        if(!Toolbar::isEnabled()) {
             return;
         }
 

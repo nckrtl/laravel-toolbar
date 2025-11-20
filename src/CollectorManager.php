@@ -24,7 +24,6 @@ class CollectorManager
     public function __construct(public Response|JsonResponse|null $response = null)
     {
         $this->id = Str::uuid();
-        $this->telescopeIsInstalled = class_exists('Telescope');
     }
 
     /**
@@ -50,9 +49,11 @@ class CollectorManager
             ];
         }
 
-        if($this->telescopeIsInstalled) {
+        if($toolbar->telescopeIsInstalled()) {
             $this->setTelescopeEntries();
         }
+
+        ray($this->telescopeEntries);
 
         foreach ($collectors as $collector) {
             $startCollector = microtime(true);
@@ -84,19 +85,7 @@ class CollectorManager
 
     protected function setTelescopeEntries(): bool
     {
-        $entries = Telescope::$entriesQueue;
-
-        if (empty($entries)) {
-            return false;
-        }
-
-        $firstRequestEntry = array_first(
-            array_filter($entries, function ($entry) {
-                return $entry->type === 'request';
-            })
-        );
-
-        if (! $firstRequestEntry || $firstRequestEntry->content['uri'] !== request()->getPathInfo()) {
+        if (empty($entries = Telescope::$entriesQueue)) {
             return false;
         }
 
