@@ -2,10 +2,10 @@
 
 namespace NckRtl\Toolbar\Collectors;
 
-use NckRtl\Toolbar\Data\VueData;
 use Illuminate\Support\Facades\File;
 use NckRtl\Toolbar\CollectorManager;
 use NckRtl\Toolbar\Data\Configurations\VueConfig;
+use NckRtl\Toolbar\Data\VueData;
 
 class VueCollector extends Collector implements CollectorInterface
 {

@@ -2,21 +2,17 @@
 
 namespace NckRtl\Toolbar;
 
-use Illuminate\Http\Request;
-use Illuminate\Routing\Router;
-use Laravel\Telescope\Telescope;
-use NckRtl\Toolbar\ToolbarInjector;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Application;
-use Illuminate\Routing\Events\Routing;
-
-use NckRtl\Toolbar\Data\ToolbarConfig;
-
-use NckRtl\Toolbar\Http\Middleware\WebEnd;
-use Illuminate\Routing\Events\RouteMatched;
-use NckRtl\Toolbar\Http\Middleware\WebStart;
-use NckRtl\Toolbar\Enums\RequestCheckpointId;
 use Illuminate\Foundation\Http\Events\RequestHandled;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Events\RouteMatched;
+use Illuminate\Routing\Events\Routing;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Event;
+use Laravel\Telescope\Telescope;
+use NckRtl\Toolbar\Data\ToolbarConfig;
+use NckRtl\Toolbar\Enums\RequestCheckpointId;
+use NckRtl\Toolbar\Http\Middleware\WebEnd;
+use NckRtl\Toolbar\Http\Middleware\WebStart;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 
 class Toolbar extends Telescope
@@ -36,7 +32,7 @@ class Toolbar extends Telescope
 
     public function configure(): self
     {
-        $this->config = new ToolbarConfig();
+        $this->config = new ToolbarConfig;
 
         return $this;
     }
@@ -75,7 +71,7 @@ class Toolbar extends Telescope
             return false;
         }
 
-        if (!self::$enabled) {
+        if (! self::$enabled) {
             return false;
         }
 

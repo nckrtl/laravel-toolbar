@@ -57,6 +57,7 @@ class RequestStageData extends Data
     {
         if (! $this->start->measureMemory || ! $this->end->measureMemory) {
             $this->memory_real_delta = new RequestStagePropertyData(0, DataSizeUnit::BYTES);
+
             return $this;
         }
 

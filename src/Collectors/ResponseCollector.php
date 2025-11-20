@@ -2,11 +2,11 @@
 
 namespace NckRtl\Toolbar\Collectors;
 
-use NckRtl\Toolbar\Measurement;
 use NckRtl\Toolbar\CollectorManager;
+use NckRtl\Toolbar\Data\Configurations\ResponseConfig;
 use NckRtl\Toolbar\Data\ResponseData;
 use NckRtl\Toolbar\Enums\DataSizeUnit;
-use NckRtl\Toolbar\Data\Configurations\ResponseConfig;
+use NckRtl\Toolbar\Measurement;
 
 class ResponseCollector extends Collector implements CollectorInterface
 {

@@ -3,8 +3,8 @@
 namespace NckRtl\Toolbar\Collectors;
 
 use NckRtl\Toolbar\CollectorManager;
-use NckRtl\Toolbar\Data\LaravelData;
 use NckRtl\Toolbar\Data\Configurations\LaravelConfig;
+use NckRtl\Toolbar\Data\LaravelData;
 
 /**
  * @property LaravelConfig $config
@@ -23,7 +23,7 @@ class LaravelCollector extends Collector implements CollectorInterface
 
     public function collectData(CollectorManager $collectorManager): ?LaravelData
     {
-         return new LaravelData(
+        return new LaravelData(
             version: $this->config->version ? app()->version() : null,
             environment: $this->config->environment ? app()->environment() : null,
             timezone: $this->config->timezone ? config('app.timezone') : null,

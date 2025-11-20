@@ -2,14 +2,12 @@
 
 namespace NckRtl\Toolbar\Services\ProfilerService;
 
-use NckRtl\Toolbar\Measurement;
-
-use NckRtl\Toolbar\Enums\TimeUnit;
-use NckRtl\Toolbar\Enums\DataSizeUnit;
-use NckRtl\Toolbar\Data\RequestStageData;
 use Illuminate\View\Engines\CompilerEngine;
-use NckRtl\Toolbar\Enums\RequestCheckpointId;
 use NckRtl\Toolbar\Data\RequestCheckpointData;
+use NckRtl\Toolbar\Data\RequestStageData;
+use NckRtl\Toolbar\Enums\RequestCheckpointId;
+use NckRtl\Toolbar\Enums\TimeUnit;
+use NckRtl\Toolbar\Measurement;
 
 class Profiler
 {

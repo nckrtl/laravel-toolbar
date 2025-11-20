@@ -2,11 +2,10 @@
 
 namespace NckRtl\Toolbar;
 
-use Spatie\LaravelPackageTools\Package;
-use NckRtl\Toolbar\Console\StartMcpServerCommand;
 use NckRtl\Toolbar\Console\CustomizeToolbarCommand;
-use NckRtl\Toolbar\Providers\ToolbarConfigProvider;
+use NckRtl\Toolbar\Console\StartMcpServerCommand;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class ToolbarServiceProvider extends PackageServiceProvider
@@ -33,7 +32,7 @@ class ToolbarServiceProvider extends PackageServiceProvider
         app()->singleton(Toolbar::class);
         app()->make(Toolbar::class);
 
-        if(!Toolbar::isEnabled()) {
+        if (! Toolbar::isEnabled()) {
             return;
         }
 

@@ -4,7 +4,6 @@ namespace NckRtl\Toolbar\Mcp\Servers;
 
 use Laravel\Mcp\Server;
 use NckRtl\Toolbar\Mcp\Resources\ToolbarDataResource;
-use NckRtl\Toolbar\Mcp\Tools\GetCollectorIdsTool;
 use NckRtl\Toolbar\Mcp\Tools\GetRequestDataTool;
 
 class DataServer extends Server

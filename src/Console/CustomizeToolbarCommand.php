@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace NckRtl\Toolbar\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand('toolbar:customize', 'Customize Laravel Toolbar')]
@@ -56,6 +55,7 @@ class CustomizeToolbarCommand extends Command
 
         if (file_exists($this->laravel->bootstrapPath('providers.php'))) {
             ServiceProvider::addProviderToBootstrapFile("{$namespace}\\Providers\\ToolbarConfigProvider");
+
             return true;
         }
 
@@ -72,7 +72,7 @@ class CustomizeToolbarCommand extends Command
         ));
 
         file_put_contents(app_path('Providers/ToolbarConfigProvider.php'), str_replace(
-            "namespace App\\Providers;",
+            'namespace App\\Providers;',
             "namespace {$namespace}\\Providers;",
             file_get_contents(app_path('Providers/ToolbarConfigProvider.php'))
         ));

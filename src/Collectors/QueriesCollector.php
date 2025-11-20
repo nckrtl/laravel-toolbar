@@ -2,12 +2,11 @@
 
 namespace NckRtl\Toolbar\Collectors;
 
-
-use NckRtl\Toolbar\Toolbar;
-use NckRtl\Toolbar\Data\QueryData;
 use NckRtl\Toolbar\CollectorManager;
-use NckRtl\Toolbar\Data\QueriesData;
 use NckRtl\Toolbar\Data\Configurations\QueriesConfig;
+use NckRtl\Toolbar\Data\QueriesData;
+use NckRtl\Toolbar\Data\QueryData;
+use NckRtl\Toolbar\Toolbar;
 
 class QueriesCollector extends Collector implements CollectorInterface
 {
@@ -51,7 +50,7 @@ class QueriesCollector extends Collector implements CollectorInterface
 
         $toolbar = app(Toolbar::class);
 
-        if (!$toolbar->telescopeIsInstalled() || ! $collectorManager->telescopeEntries->has('query')) {
+        if (! $toolbar->telescopeIsInstalled() || ! $collectorManager->telescopeEntries->has('query')) {
             return;
         }
 

@@ -2,8 +2,6 @@
 
 namespace NckRtl\Toolbar\Enums;
 
-use NckRtl\Toolbar\Enums\Unit;
-
 enum TimeUnit: string implements Unit
 {
     case MICROSECONDS = 'microseconds';
@@ -115,7 +113,7 @@ enum TimeUnit: string implements Unit
 
         // The smallest time unit is in microseconds, when a value is smaller than 1 microsecond
         // the best unit index will be -1, so we need to set it to 0 to avoid an exception
-        if($valueInBaseUnit > 0 && $bestUnitIndex == -1) {
+        if ($valueInBaseUnit > 0 && $bestUnitIndex == -1) {
             $bestUnitIndex = 0;
         }
 

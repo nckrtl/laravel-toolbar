@@ -2,8 +2,6 @@
 
 namespace NckRtl\Toolbar\Enums;
 
-use NckRtl\Toolbar\Enums\Unit;
-
 enum DataSizeUnit: string implements Unit
 {
     case BYTES = 'bytes';

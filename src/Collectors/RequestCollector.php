@@ -3,9 +3,8 @@
 namespace NckRtl\Toolbar\Collectors;
 
 use NckRtl\Toolbar\CollectorManager;
-use NckRtl\Toolbar\Data\RequestData;
-use NckRtl\Toolbar\Enums\DataProvider;
 use NckRtl\Toolbar\Data\Configurations\RequestConfig;
+use NckRtl\Toolbar\Data\RequestData;
 
 /**
  * @property RequestConfig $config
@@ -27,7 +26,7 @@ class RequestCollector extends Collector implements CollectorInterface
     public function collectData(CollectorManager $collectorManager): ?RequestData
     {
 
-        if($this->config->dataProvider && ! empty($collectorManager->telescopeEntries)) {
+        if ($this->config->dataProvider && ! empty($collectorManager->telescopeEntries)) {
             return $this->telescopeProvidedRequestData($collectorManager);
         }
 

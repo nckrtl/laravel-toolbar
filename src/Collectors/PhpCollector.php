@@ -2,10 +2,9 @@
 
 namespace NckRtl\Toolbar\Collectors;
 
-
-use NckRtl\Toolbar\Data\PhpData;
 use NckRtl\Toolbar\CollectorManager;
 use NckRtl\Toolbar\Data\Configurations\PhpConfig;
+use NckRtl\Toolbar\Data\PhpData;
 
 class PhpCollector extends Collector implements CollectorInterface
 {
