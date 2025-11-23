@@ -26,10 +26,10 @@ const toggleVueDevtools = () => {
 }
 </script>
 
-<style >
-#__vue-devtools-container__ {
-  opacity: 0;
-}
+<style>
+  #__vue-devtools-container__ {
+    opacity: 0;
+  }
 </style>
 
 <template>

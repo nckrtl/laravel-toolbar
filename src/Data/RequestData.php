@@ -2,16 +2,15 @@
 
 namespace NckRtl\Toolbar\Data;
 
-use Illuminate\Foundation\Concerns\ResolvesDumpSource;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route as RoutingRoute;
-use Illuminate\Support\Facades\Route;
-use ReflectionMethod;
 use Spatie\LaravelData\Data;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Route as RoutingRoute;
+use NckRtl\Toolbar\Traits\ControllerActionEditorUrl;
 
 class RequestData extends Data
 {
-    use ResolvesDumpSource;
+    use ControllerActionEditorUrl;
 
     public string $route_name;
 
@@ -33,7 +32,7 @@ class RequestData extends Data
     ) {
         $this->setRouteName();
         $this->setRouteEditorUrl();
-        $this->setControllerActionEditorUrl();
+        $this->setControllerActionEditorUrl($this->controller_action);
     }
 
     private function setRouteName(): void
@@ -61,6 +60,10 @@ class RequestData extends Data
 
     private function setRouteEditorUrl(): void
     {
+        if(! $this->route) {
+            return;
+        }
+
         $action = $this->route->getAction();
 
         // If the route uses a closure, we can get its location directly
@@ -135,22 +138,5 @@ class RequestData extends Data
         }
 
         return false;
-    }
-
-    private function setControllerActionEditorUrl(): void
-    {
-        $controllerAction = $this->controller_action;
-
-        [$controller, $method] = explode('@', $controllerAction);
-
-        $reflection = new ReflectionMethod($controller, $method);
-        $file = $reflection->getFileName();
-        $line = $reflection->getStartLine();
-
-        if (! $file || ! $line) {
-            return;
-        }
-
-        $this->controller_action_editor_url = $this->resolveSourceHref($file, $line);
     }
 }

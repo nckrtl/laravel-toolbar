@@ -3,6 +3,7 @@
 namespace NckRtl\Toolbar\Enums;
 
 use NckRtl\Toolbar\Enums\Unit;
+use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 
 enum TimeUnit: string implements Unit
 {
@@ -122,6 +123,6 @@ enum TimeUnit: string implements Unit
         $selectedUnit = $units[$bestUnitIndex];
         $convertedValue = $valueInBaseUnit / $selectedUnit->factor();
 
-        return round($convertedValue, $maxFractionDigits).' '.$abbreviations[$bestUnitIndex];
+        return round($convertedValue, $maxFractionDigits).$abbreviations[$bestUnitIndex];
     }
 }

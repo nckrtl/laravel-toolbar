@@ -7,6 +7,7 @@ use NckRtl\Toolbar\Toolbar;
 use NckRtl\Toolbar\Data\QueryData;
 use NckRtl\Toolbar\CollectorManager;
 use NckRtl\Toolbar\Data\QueriesData;
+use NckRtl\Toolbar\Observers\QueryObserver;
 use NckRtl\Toolbar\Data\Configurations\QueriesConfig;
 
 class QueriesCollector extends Collector implements CollectorInterface
@@ -34,7 +35,6 @@ class QueriesCollector extends Collector implements CollectorInterface
     public function collectData(CollectorManager $collectorManager): QueriesData
     {
         $this->setEntries($collectorManager);
-        $this->setTotalTime();
 
         return new QueriesData(
             totalTime: $this->totalTime,
@@ -47,25 +47,56 @@ class QueriesCollector extends Collector implements CollectorInterface
 
     public function setEntries(CollectorManager $collectorManager): void
     {
-        $hashes = [];
+
 
         $toolbar = app(Toolbar::class);
 
-        if (!$toolbar->telescopeIsInstalled() || ! $collectorManager->telescopeEntries->has('query')) {
+        // if ($toolbar->telescopeIsInstalled()) {
+        //     $this->handleTelescopeEntries($collectorManager, $toolbar);
+        //     return;
+        // }
+
+
+
+        $queryObserver = $toolbar->observers[QueryObserver::class];
+
+        $this->totalTime = $queryObserver->totalTime;
+
+        $this->queries = $toolbar->observers[QueryObserver::class]->queries;
+
+        $offset = 0;
+
+        foreach($this->queries as $query) {
+            $query->percentage = $query->duration / $this->totalTime;
+            $query->offset = $offset;
+            $offset += $query->percentage;
+        }
+    }
+
+    public function handleTelescopeEntries(CollectorManager $collectorManager): void
+    {
+        if($collectorManager->telescopeEntries->has('query'));
+        {
             return;
         }
 
         $this->queries = $collectorManager->telescopeEntries->get('query')->toArray() ?? [];
 
+        if(empty($this->queries)) {
+            return;
+        }
+
+        $this->totalTime = array_sum(array_column($this->queries, 'duration'));
+
         $this->queries = array_map(function ($entry) {
             return $entry['content'];
         }, $this->queries);
 
-        $this->setTotalTime();
-
         $offset = 0;
 
-        $this->queries = array_map(function ($entry) use (&$hashes, &$offset) {
+        $hashes = [];
+
+         $this->queries = array_map(function ($entry) use (&$hashes, &$offset) {
             $isDuplicateHash = in_array($entry['hash'], $hashes);
             if (! $isDuplicateHash) {
                 $hashes[] = $entry['hash'];
@@ -82,13 +113,17 @@ class QueriesCollector extends Collector implements CollectorInterface
                 driver: $entry['driver'],
                 file: $entry['file'],
                 line: $entry['line'],
-                isDuplicate: $isDuplicateHash,
-                isSlow: $entry['slow'],
+                is_duplicate: $isDuplicateHash,
+                is_slow: $entry['slow'],
                 percentage: $percentage,
                 offset: $offset,
             );
 
             $offset += $percentage;
+
+            $this->addConnection($entry['connection']);
+            $this->addDriver($entry['driver']);
+            $this->addDatabase($database);
 
             if (! in_array($entry['connection'], $this->connections)) {
                 $this->connections[] = $entry['connection'];
@@ -106,11 +141,5 @@ class QueriesCollector extends Collector implements CollectorInterface
 
             return $data;
         }, $this->queries);
-
-    }
-
-    public function setTotalTime(): void
-    {
-        $this->totalTime = array_sum(array_column($this->queries, 'duration'));
     }
 }

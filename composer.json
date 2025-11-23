@@ -20,7 +20,6 @@
         "php": "^8.4",
         "illuminate/contracts": "^11.0||^12.0",
         "laravel/mcp": "^0.3.3",
-        "laravel/telescope": "^5.15",
         "spatie/laravel-data": "*",
         "spatie/laravel-package-tools": "^1.16"
     },

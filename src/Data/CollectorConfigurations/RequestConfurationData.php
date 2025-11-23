@@ -16,7 +16,7 @@ class RequestConfurationData extends Data
       }
 
       // Only DataProvider::Telescope is supported
-      if(! class_exists('Telescope')) {
+      if(! class_exists('Laravel\Telescope\Telescope')) {
         throw new \Exception('Request collector is configured to use the Telescope provider, but Telescope is not installed.');
       }
   }

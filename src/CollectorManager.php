@@ -53,8 +53,6 @@ class CollectorManager
             $this->setTelescopeEntries();
         }
 
-        ray($this->telescopeEntries);
-
         foreach ($collectors as $collector) {
             $startCollector = microtime(true);
 

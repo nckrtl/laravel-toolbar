@@ -180,39 +180,46 @@ class ToolbarInjector
         return $this->toolbarHtmlWithProductionAssets(data: $data, nonceAttribute: $nonceAttribute);
     }
 
+    protected function toolbarHtmlWithProductionAssets(string $data, string $nonceAttribute): string
+    {
+        $assets = $this->getProductionManifestAssets();
+        $jsUrl = route('toolbar.assets', ['asset' => $assets['js']]);
+
+        // Read CSS content for template
+        $cssPath = __DIR__.'/../build/assets/'.$assets['css'];
+        $cssContent = file_exists($cssPath) ? file_get_contents($cssPath) : '';
+
+        return <<<HTML
+        <!-- Laravel Toolbar -->
+        <div id="laravel-toolbar-shadow-host">
+            <template id="laravel-toolbar-template">
+                <style{$nonceAttribute}>{$cssContent}</style>
+                <div id="laravel-toolbar-root"></div>
+            </template>
+        </div>
+        <script{$nonceAttribute}>
+            window.__LARAVEL_TOOLBAR_DATA__ = {$data};
+        </script>
+        <script src="{$jsUrl}"{$nonceAttribute}></script>
+        <!-- End Laravel Toolbar -->
+        HTML;
+    }
+
     protected function toolbarHtmlWithViteAssets(string $data, string $viteUrl, string $nonceAttribute): string
     {
         return <<<HTML
 
         <!-- Laravel Toolbar (Development Mode with HMR) -->
-        <script type="module" src="{$viteUrl}/@vite/client"{$nonceAttribute}></script>
-        <div id="laravel-toolbar-root"></div>
+        <div id="laravel-toolbar-shadow-host">
+            <template id="laravel-toolbar-template">
+                <div id="laravel-toolbar-root"></div>
+            </template>
+        </div>
         <script{$nonceAttribute}>
             window.__LARAVEL_TOOLBAR_DATA__ = {$data};
+            window.__LARAVEL_TOOLBAR_CSS_URL__ = "{$viteUrl}/resources/css/toolbar.css?inline";
         </script>
-        <script type="module" src="{$viteUrl}/resources/js/toolbar.js"{$nonceAttribute}></script>
-        <!-- End Laravel Toolbar -->
-        HTML;
-    }
-
-    protected function toolbarHtmlWithProductionAssets(string $data, string $nonceAttribute): string
-    {
-        $assets = $this->getManifestAssets();
-
-        // Production mode: use built assets
-        $jsUrl = route('toolbar.assets', ['asset' => $assets['js']]);
-        $cssUrl = route('toolbar.assets', ['asset' => $assets['css']]);
-
-        return <<<HTML
-
-        <!-- Laravel Toolbar -->
-        <link rel="stylesheet" href="{$cssUrl}"{$nonceAttribute}>
-        <div id="laravel-toolbar-root"></div>
-        <script{$nonceAttribute}>
-            window.__LARAVEL_TOOLBAR_DATA__ = {$data};
-            console.log('Laravel Toolbar: Data loaded', window.__LARAVEL_TOOLBAR_DATA__);
-        </script>
-        <script src="{$jsUrl}" defer{$nonceAttribute}></script>
+        <script type="module" src="{$viteUrl}/resources/js/toolbar.dev.js"{$nonceAttribute}></script>
         <!-- End Laravel Toolbar -->
         HTML;
     }
@@ -227,7 +234,7 @@ class ToolbarInjector
     /**
      * Get the built asset filenames from Vite's manifest
      */
-    protected function getManifestAssets(): array
+    protected function getProductionManifestAssets(): array
     {
         $manifestPath = __DIR__.'/../build/manifest.json';
 
@@ -236,7 +243,7 @@ class ToolbarInjector
         }
 
         $manifest = json_decode(file_get_contents($manifestPath), true);
-        $entry = $manifest['resources/js/toolbar.js'] ?? null;
+        $entry = $manifest['resources/js/toolbar.prod.js'] ?? null;
 
         if (! $entry) {
             return ['js' => '', 'css' => ''];

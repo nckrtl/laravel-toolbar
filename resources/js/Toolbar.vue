@@ -17,7 +17,7 @@ const { data } = useToolbar()
 </script>
 
 <template>
-  <div class="bottom-0 fixed flex left-0 z-[999999] font-mono justify-between p-1 w-full font-medium laravel-toolbar">
+  <div id="toolbar" class="bottom-0 fixed flex left-0 z-[999999] font-mono justify-between p-1 w-full font-medium">
     <div class="flex gap-1">
       <Group>
           <Request />

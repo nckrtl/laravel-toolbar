@@ -26,8 +26,7 @@ class RequestCollector extends Collector implements CollectorInterface
 
     public function collectData(CollectorManager $collectorManager): ?RequestData
     {
-
-        if($this->config->dataProvider && ! empty($collectorManager->telescopeEntries)) {
+        if($this->config->dataProvider && $this->config->dataProvider === DataProvider::Telescope && ! empty($collectorManager->telescopeEntries)) {
             return $this->telescopeProvidedRequestData($collectorManager);
         }
 
@@ -36,7 +35,7 @@ class RequestCollector extends Collector implements CollectorInterface
         return new RequestData(
             uuid: null,
             method: $request->method(),
-            uri: $request->uri(),
+            uri: $request->getPathInfo(),
             ip_address: $request->ip(),
             controller_action: $request->route()?->getActionName() ?? '-',
             middleware: array_values(optional($request->route())->gatherMiddleware() ?? []),

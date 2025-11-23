@@ -3,12 +3,11 @@
  * Completely isolated and self-contained - does not depend on host application's Tailwind
  */
 
-@layer theme, base, components, utilities;
-
-@import "tailwindcss/utilities.css" layer(base);
-@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss";
 
 @import "./fonts.css";
+
+@source "../**/*.vue";
 
 @theme inline {
     --font-sans: "JetBrains Mono", ui-monospace, monospace;
@@ -19,43 +18,52 @@
     --color-danger: oklch(0.65 0.26 12.93);
 }
 
-@layer utilities {
-  .laravel-toolbar {
-    @apply font-sans;
-    @tailwind utilities;
+#toolbar {
+    @apply font-sans antialiased;
+}
+
+.fade-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 1) 0%,   /* Exact same color */
+      rgba(255, 255, 255, 0) 100%    /* Fades to transparent */
+    );
+    mix-blend-mode: luminosity;
   }
 
-  .fade-overlay {
-      background: linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 1) 0%,   /* Exact same color */
-        rgba(255, 255, 255, 0) 100%    /* Fades to transparent */
-      );
-      mix-blend-mode: luminosity;
-    }
+  .fade-to-top-and-bottom {
+    -webkit-mask-image: -webkit-gradient(
+      linear,
+      left top,
+      left bottom,
+      from(rgba(0, 0, 0, 0)),              /* 0%: transparent */
+      color-stop(0.1, rgba(0, 0, 0, 1)),   /* 10%: fully visible */
+      color-stop(0.85, rgba(0, 0, 0, 1)),   /* 90%: fully visible */
+      to(rgba(0, 0, 0, 0))                 /* 100%: transparent */
+    );
+  }
 
-    .fade-to-top-and-bottom {
-      -webkit-mask-image: -webkit-gradient(
-        linear,
-        left top,
-        left bottom,
-        from(rgba(0, 0, 0, 0)),              /* 0%: transparent */
-        color-stop(0.1, rgba(0, 0, 0, 1)),   /* 10%: fully visible */
-        color-stop(0.85, rgba(0, 0, 0, 1)),   /* 90%: fully visible */
-        to(rgba(0, 0, 0, 0))                 /* 100%: transparent */
-      );
-    }
+  .fade-to-bottom {
+    -webkit-mask-image: -webkit-gradient(
+      linear,
+      left top,
+      left bottom,
+      from(rgba(0, 0, 0, 1)),              /* 0%: transparent */
+      color-stop(0.85, rgba(0, 0, 0, 1)),   /* 90%: fully visible */
+      to(rgba(0, 0, 0, 0))                 /* 100%: transparent */
+    );
+  }
 
-    .fade-to-bottom {
-      -webkit-mask-image: -webkit-gradient(
-        linear,
-        left top,
-        left bottom,
-        from(rgba(0, 0, 0, 1)),              /* 0%: transparent */
-        color-stop(0.85, rgba(0, 0, 0, 1)),   /* 90%: fully visible */
-        to(rgba(0, 0, 0, 0))                 /* 100%: transparent */
-      );
-    }
-}
+  .fade-to-top {
+    -webkit-mask-image: -webkit-gradient(
+      linear,
+      left top,
+      left bottom,
+      from(rgba(0, 0, 0, 0)),              /* 0%: transparent */
+      color-stop(0.1, rgba(0, 0, 0, 1)),   /* 10%: fully visible */
+      to(rgba(0, 0, 0, 1))                 /* 100%: transparent */
+    );
+  }
+
 
 

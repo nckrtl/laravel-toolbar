@@ -76,7 +76,7 @@ class ProfilerCollector extends Collector implements CollectorInterface
         }
 
         return [
-            new Measurement($totalWallTime, TimeUnit::MILLISECONDS),
+            new Measurement($totalWallTime, TimeUnit::MILLISECONDS)->decimals(0),
             new Measurement($totalRealMemory, DataSizeUnit::BYTES),
             new Measurement(memory_get_peak_usage(), DataSizeUnit::BYTES),
         ];

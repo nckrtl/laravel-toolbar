@@ -21,6 +21,7 @@ class AssetController extends Controller
         $mimeTypes = [
             'js' => 'application/javascript',
             'css' => 'text/css',
+            'ttf' => 'font/ttf',
         ];
 
         $extension = pathinfo($asset, PATHINFO_EXTENSION);

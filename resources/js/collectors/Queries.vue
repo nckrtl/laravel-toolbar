@@ -26,6 +26,7 @@ const filteredQueries = computed(() => {
 })
 
 const queriesTable = ref(null)
+const queriesTableInner = ref(null)
 
 watch(queriesTable, (newVal) => {
 
@@ -33,9 +34,13 @@ watch(queriesTable, (newVal) => {
 
     newVal.addEventListener('scroll', () => {
       const scrollTop = newVal.scrollTop
-      if (scrollTop > 1) {
+
+      if (scrollTop + queriesTable.value.clientHeight == queriesTableInner.value.clientHeight + 12) {
+        queriesTable.value.classList.remove('fade-to-top-and-bottom')
+        queriesTable.value.classList.add('fade-to-top')
+      } else if (scrollTop > 1) {
+        queriesTable.value.classList.remove('fade-to-bottom','fade-to-top')
         queriesTable.value.classList.add('fade-to-top-and-bottom')
-        queriesTable.value.classList.remove('fade-to-bottom')
       } else {
         queriesTable.value.classList.remove('fade-to-bottom-and-top')
         queriesTable.value.classList.add('fade-to-bottom')
@@ -48,83 +53,64 @@ watch(queriesTable, (newVal) => {
 
 <template>
   <div>
-    <Panel v-if="isOpen" @mouseenter="isOpen = true" @mouseleave="isOpen = false" size="full" minHeight="h-[300px]">
+    <Panel v-if="isOpen" @mouseenter="isOpen = true" @mouseleave="isOpen = false" size="full" minHeight="h-[280px]">
       <div class="flex justify-between items-center">
          <div class="flex items-center gap-3 p-1.5 min-w-64">
-          <div class="relative border border-white/8 bg-white/6 rounded-md w-7 h-7 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4">
-                <path d="M8 7c3.314 0 6-1.343 6-3s-2.686-3-6-3-6 1.343-6 3 2.686 3 6 3Z" />
-                <path d="M8 8.5c1.84 0 3.579-.37 4.914-1.037A6.33 6.33 0 0 0 14 6.78V8c0 1.657-2.686 3-6 3S2 9.657 2 8V6.78c.346.273.72.5 1.087.683C4.42 8.131 6.16 8.5 8 8.5Z" />
-                <path d="M8 12.5c1.84 0 3.579-.37 4.914-1.037.366-.183.74-.41 1.086-.684V12c0 1.657-2.686 3-6 3s-6-1.343-6-3v-1.22c.346.273.72.5 1.087.683C4.42 12.131 6.16 12.5 8 12.5Z" />
-              </svg>
+              <div class="relative border border-white/8 bg-white/6 rounded-md w-7 h-7 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4">
+                    <path d="M8 7c3.314 0 6-1.343 6-3s-2.686-3-6-3-6 1.343-6 3 2.686 3 6 3Z" />
+                    <path d="M8 8.5c1.84 0 3.579-.37 4.914-1.037A6.33 6.33 0 0 0 14 6.78V8c0 1.657-2.686 3-6 3S2 9.657 2 8V6.78c.346.273.72.5 1.087.683C4.42 8.131 6.16 8.5 8 8.5Z" />
+                    <path d="M8 12.5c1.84 0 3.579-.37 4.914-1.037.366-.183.74-.41 1.086-.684V12c0 1.657-2.686 3-6 3s-6-1.343-6-3v-1.22c.346.273.72.5 1.087.683C4.42 12.131 6.16 12.5 8 12.5Z" />
+                  </svg>
+              </div>
+              <span>Queries</span>
           </div>
-          <span>Queries</span>
-      </div>
-        <!-- <div class="p-[1px] rounded-md border border-[#2C2C2C] flex gap-2">
-          <div class="flex gap-1 items-center p-1 rounded-[6px] cursor-default" @click="filter = 'none'" :class="{ 'bg-[#2C2C2C]': filter === 'none' }">
-            <span class="pl-2 pr-1.5">All</span>
-            <div class="p-0.5 px-2  rounded " :class="{ 'bg-white text-[#171717]': filter === 'none', 'bg-[#2C2C2C] text-white/50': filter !== 'none' }">
-              {{ Object.keys(data.queries || {}).length }}
+
+          <div class="flex gap-10 items-center">
+            <div class="flex gap-2 items-center">
+              <span class="uppercase text-white/50 text-xxs font-medium">
+                Queries
+              </span>
+              <span>
+                {{ filteredQueries.length }}
+              </span>
+            </div>
+            <div class="flex gap-2 items-center">
+              <span class="uppercase text-white/50 text-xxs font-medium">
+                Duration
+              </span>
+              <span>
+                {{ Math.round(data.queries?.totalTime) }}ms
+              </span>
+            </div>
+            <div class="flex gap-2 items-center">
+              <span class="uppercase text-white/50 text-xxs font-medium">
+                Connection
+              </span>
+              <span>
+                {{ data.queries?.connections.join(', ') }}
+              </span>
+            </div>
+            <div class="flex gap-2 items-center">
+              <span class="uppercase text-white/50 text-xxs font-medium">
+                Driver
+              </span>
+              <span>
+                {{ data.queries?.drivers.join(', ') }}
+              </span>
+            </div>
+            <div class="flex gap-2 items-center">
+              <span class="uppercase text-white/50 text-xxs font-medium">
+                Database
+              </span>
+              <span>
+                {{ data.queries?.databases.join(', ') }}
+              </span>
             </div>
           </div>
-          <div class="flex gap-1 items-center p-1 rounded-[5px] cursor-default" @click="filter = 'duplicate'" :class="{ 'bg-[#2C2C2C]': filter === 'duplicate' }">
-            <span class="pl-2 pr-1.5 text-white/50">Duplicate</span>
-            <div class="p-0.5 px-2  rounded " :class="{ 'bg-white text-[#171717]': filter === 'duplicate', 'bg-[#2C2C2C] text-white/50': filter !== 'duplicate' }">
-             {{ data.queries?.queries.filter(query => query.isDuplicate).length }}
-            </div>
+          <div>
+            <input placeholder="Search" class="px-3 min-w-64 placeholder-white/40 py-2 rounded-md border border-white/10 bg-white/3  text-white/50 " type="text" v-model="searchPhrase" />
           </div>
-          <div class="flex gap-1 items-center p-1 rounded-[5px] cursor-default" @click="filter = 'slow'" :class="{ 'bg-[#2C2C2C]': filter === 'slow' }">
-            <span class="pl-2 pr-1.5 text-white/50">Slow</span>
-            <div class="p-0.5 px-2  rounded " :class="{ 'bg-white text-[#171717]': filter === 'slow', 'bg-[#2C2C2C] text-white/50': filter !== 'slow' }">
-              {{ data.queries?.queries.filter(query => query.isSlow).length }}
-            </div>
-          </div>
-        </div> -->
-        <div class="flex gap-10 items-center">
-          <div class="flex gap-2 items-center">
-            <span class="uppercase text-white/50 text-xxs font-medium">
-              Queries
-            </span>
-            <span>
-              {{ filteredQueries.length }}
-            </span>
-          </div>
-          <div class="flex gap-2 items-center">
-            <span class="uppercase text-white/50 text-xxs font-medium">
-              Duration
-            </span>
-            <span>
-              {{ Math.round(data.queries?.totalTime) }}ms
-            </span>
-          </div>
-          <div class="flex gap-2 items-center">
-            <span class="uppercase text-white/50 text-xxs font-medium">
-              Connection
-            </span>
-            <span>
-              {{ data.queries?.connections.join(', ') }}
-            </span>
-          </div>
-          <div class="flex gap-2 items-center">
-            <span class="uppercase text-white/50 text-xxs font-medium">
-              Driver
-            </span>
-            <span>
-              {{ data.queries?.drivers.join(', ') }}
-            </span>
-          </div>
-          <div class="flex gap-2 items-center">
-            <span class="uppercase text-white/50 text-xxs font-medium">
-              Database
-            </span>
-            <span>
-              {{ data.queries?.databases.join(', ') }}
-            </span>
-          </div>
-        </div>
-        <div>
-          <input placeholder="Search" class="px-3 min-w-64 placeholder-white/40 py-2 rounded-md border border-white/10 bg-white/3  text-white/50 " type="text" v-model="searchPhrase" />
-        </div>
       </div>
       <div class="w-full h-2"></div>
       <div class="relative">
@@ -162,8 +148,8 @@ watch(queriesTable, (newVal) => {
               </tr>
             </thead>
         </table>
-        <div ref="queriesTable" class="max-h-[208px] overflow-y-auto relative rounded-b-lg pb-2.5 fade-to-bottom">
-          <table class="w-full text-left table-fixed mt-0 relative">
+        <div ref="queriesTable" class="max-h-[190px] overflow-y-auto relative rounded-b-lg pb-3">
+          <table ref="queriesTableInner" class="w-full text-left table-fixed mt-0 relative">
             <tbody>
               <template v-if="filteredQueries.length === 0">
                 <tr>
@@ -229,7 +215,7 @@ watch(queriesTable, (newVal) => {
                       'bg-white/3 group-hover:bg-white/5 border-white/7.5': !query.isDuplicate && !query.isSlow
                     }">
                     <span class=" whitespace-nowrap">
-                      {{ query.file.split('/').pop() }}:{{ query.line }}
+                      <a class="cursor-pointer hover:underline" :href="query.controller_action_editor_url" target="_blank">{{ query.file.split('/').pop() }}:{{ query.line }}</a>
                     </span>
                     </div>
                   </div>
