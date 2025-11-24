@@ -2,14 +2,14 @@
 
 namespace NckRtl\Toolbar\Collectors;
 
-use NckRtl\Toolbar\Measurement;
-use NckRtl\Toolbar\Enums\TimeUnit;
 use NckRtl\Toolbar\CollectorManager;
-use NckRtl\Toolbar\Data\ProfilerData;
-use NckRtl\Toolbar\Enums\DataSizeUnit;
-use NckRtl\Toolbar\Data\RequestStageData;
-use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 use NckRtl\Toolbar\Data\Configurations\ProfilerConfig;
+use NckRtl\Toolbar\Data\ProfilerData;
+use NckRtl\Toolbar\Data\RequestStageData;
+use NckRtl\Toolbar\Enums\DataSizeUnit;
+use NckRtl\Toolbar\Enums\TimeUnit;
+use NckRtl\Toolbar\Measurement;
+use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 
 class ProfilerCollector extends Collector implements CollectorInterface
 {

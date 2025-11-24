@@ -2,14 +2,13 @@
 
 namespace NckRtl\Toolbar;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Response;
-use NckRtl\Toolbar\Measurement;
-use Laravel\Telescope\Telescope;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
-use NckRtl\Toolbar\Enums\TimeUnit;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+use Laravel\Telescope\Telescope;
+use NckRtl\Toolbar\Enums\TimeUnit;
 
 class CollectorManager
 {
@@ -37,19 +36,20 @@ class CollectorManager
 
         if (empty($collectors = $toolbar->config->enabledCollectors())) {
             $time = microtime(true);
+
             return [
                 'metadata' => [
                     'id' => $this->id,
                     'timestamp' => $time,
                     'collectors' => 'No collectors enabled in the toolbar configuration (toolbar.php)',
                     'wall_time' => [
-                        'total' =>new Measurement($startTime - $time, TimeUnit::SECONDS)->formattedValue,
+                        'total' => new Measurement($startTime - $time, TimeUnit::SECONDS)->formattedValue,
                     ],
                 ],
             ];
         }
 
-        if($toolbar->telescopeIsInstalled()) {
+        if ($toolbar->telescopeIsInstalled()) {
             $this->setTelescopeEntries();
         }
 
@@ -67,7 +67,7 @@ class CollectorManager
 
         $this->data['metadata']['id'] = $this->id;
 
-        if(app(Toolbar::class)->config->debug) {
+        if (app(Toolbar::class)->config->debug) {
             $endTime = microtime(true);
 
             $this->data['metadata']['debug'] = true;

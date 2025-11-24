@@ -2,10 +2,10 @@
 
 namespace NckRtl\Toolbar;
 
-use Illuminate\Http\Request;
+
 use NckRtl\Toolbar\ToolbarInjector;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Routing\Events\Routing;
+
 use NckRtl\Toolbar\Data\ToolbarConfig;
 use NckRtl\Toolbar\Http\Middleware\WebEnd;
 use Illuminate\Routing\Events\RouteMatched;
@@ -13,6 +13,8 @@ use NckRtl\Toolbar\Observers\QueryObserver;
 use NckRtl\Toolbar\Http\Middleware\WebStart;
 use NckRtl\Toolbar\Enums\RequestCheckpointId;
 use Illuminate\Foundation\Http\Events\RequestHandled;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Events\Routing;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 
 class Toolbar
@@ -38,7 +40,7 @@ class Toolbar
 
     public function configure(): self
     {
-        $this->config = new ToolbarConfig();
+        $this->config = new ToolbarConfig;
 
         return $this;
     }
@@ -161,7 +163,7 @@ class Toolbar
             return false;
         }
 
-        if (!self::$enabled) {
+        if (! self::$enabled) {
             return false;
         }
 

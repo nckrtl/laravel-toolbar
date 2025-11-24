@@ -2,18 +2,18 @@
 
 namespace NckRtl\Toolbar\Data\CollectorConfigurations;
 
-use Spatie\LaravelData\Data;
 use NckRtl\Toolbar\Enums\DataProvider;
+use Spatie\LaravelData\Data;
 
 class RequestConfurationData extends Data
 {
-  public function __construct(
-    public bool $enabled = true,
-    public ?DataProvider $provider = null,
-  ) {
-      if(! $this->enabled || ! $this->provider) {
-        return;
-      }
+    public function __construct(
+        public bool $enabled = true,
+        public ?DataProvider $provider = null,
+    ) {
+        if (! $this->enabled || ! $this->provider) {
+            return;
+        }
 
       // Only DataProvider::Telescope is supported
       if(! class_exists('Laravel\Telescope\Telescope')) {

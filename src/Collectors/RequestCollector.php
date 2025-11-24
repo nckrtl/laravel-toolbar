@@ -3,9 +3,8 @@
 namespace NckRtl\Toolbar\Collectors;
 
 use NckRtl\Toolbar\CollectorManager;
-use NckRtl\Toolbar\Data\RequestData;
-use NckRtl\Toolbar\Enums\DataProvider;
 use NckRtl\Toolbar\Data\Configurations\RequestConfig;
+use NckRtl\Toolbar\Data\RequestData;
 
 /**
  * @property RequestConfig $config
