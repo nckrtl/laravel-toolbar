@@ -44,21 +44,21 @@ class Toolbar
         return true;
     }
 
-    public static function ignoreRequest(Request $request): bool
-    {
-        return false;
+    // public static function ignoreRequest(Request $request): bool
+    // {
+    //     return false;
 
-        $telescopIgnorePaths = config('telescope.ignore_paths', []);
+    //     $telescopIgnorePaths = config('telescope.ignore_paths', []);
 
-        $additionalIgnorePaths = [
-            'telescope*',
-            '_laravel-toolbar*',
-        ];
+    //     $additionalIgnorePaths = [
+    //         'telescope*',
+    //         '_laravel-toolbar*',
+    //     ];
 
-        config(['telescope.ignore_paths' => array_merge($telescopIgnorePaths, $additionalIgnorePaths)]);
+    //     config(['telescope.ignore_paths' => array_merge($telescopIgnorePaths, $additionalIgnorePaths)]);
 
-        return ! self::requestIsToApprovedUri($request);
-    }
+    //     return ! self::requestIsToApprovedUri($request);
+    // }
 
     public function telescopeIsInstalled(): bool
     {
