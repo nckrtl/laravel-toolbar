@@ -2,19 +2,16 @@
 
 namespace NckRtl\Toolbar;
 
-
-use NckRtl\Toolbar\ToolbarInjector;
-use Illuminate\Support\Facades\Event;
-
-use NckRtl\Toolbar\Data\ToolbarConfig;
-use NckRtl\Toolbar\Http\Middleware\WebEnd;
-use Illuminate\Routing\Events\RouteMatched;
-use NckRtl\Toolbar\Observers\QueryObserver;
-use NckRtl\Toolbar\Http\Middleware\WebStart;
-use NckRtl\Toolbar\Enums\RequestCheckpointId;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Events\Routing;
+use Illuminate\Support\Facades\Event;
+use NckRtl\Toolbar\Data\ToolbarConfig;
+use NckRtl\Toolbar\Enums\RequestCheckpointId;
+use NckRtl\Toolbar\Http\Middleware\WebEnd;
+use NckRtl\Toolbar\Http\Middleware\WebStart;
+use NckRtl\Toolbar\Observers\QueryObserver;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 
 class Toolbar
@@ -61,7 +58,7 @@ class Toolbar
         });
 
         $this->observers = [
-            QueryObserver::class => new QueryObserver(),
+            QueryObserver::class => new QueryObserver,
         ];
 
         return $this;
@@ -76,10 +73,10 @@ class Toolbar
         static $basePathLen;
         static $basePathSlash;
 
-        if (!$basePath) {
+        if (! $basePath) {
             $basePath = base_path();
             $basePathLen = strlen($basePath);
-            $basePathSlash = $basePath . '/';
+            $basePathSlash = $basePath.'/';
         }
 
         foreach ($trace as $frame) {
@@ -91,12 +88,12 @@ class Toolbar
 
             // Skip vendor code (fast prefix check instead of contains)
             // Using strpos is faster than str_contains
-            if (strpos($file, $basePathSlash . 'vendor/') !== false) {
+            if (strpos($file, $basePathSlash.'vendor/') !== false) {
                 continue;
             }
 
             // app/ folder or anything under project root
-            $isApp = strpos($file, $basePathSlash . 'app/') !== false;
+            $isApp = strpos($file, $basePathSlash.'app/') !== false;
             $isInsideProject = (strncmp($file, $basePathSlash, $basePathLen + 1) === 0);
 
             if ($isApp || $isInsideProject) {
@@ -110,7 +107,7 @@ class Toolbar
                     'file' => $file,
                     'line' => $frame['line'] ?? 0,
                     'caller' => isset($frame['class'])
-                        ? ($frame['class'] . ($frame['type'] ?? '') . ($frame['function'] ?? 'unknown'))
+                        ? ($frame['class'].($frame['type'] ?? '').($frame['function'] ?? 'unknown'))
                         : ($frame['function'] ?? 'unknown'),
                 ];
             }
@@ -118,6 +115,7 @@ class Toolbar
 
         // Fallback (no extra work)
         $first = $trace[0] ?? [];
+
         return [
             'file' => $first['file'] ?? 'unknown',
             'line' => $first['line'] ?? 0,
@@ -140,7 +138,7 @@ class Toolbar
 
                 // Get middleware groups in execution order
                 $activeGroups = collect($route->gatherMiddleware())
-                    ->filter(fn($m) => is_string($m) && array_key_exists($m, $router->getMiddlewareGroups()))
+                    ->filter(fn ($m) => is_string($m) && array_key_exists($m, $router->getMiddlewareGroups()))
                     ->unique()
                     ->values();
 

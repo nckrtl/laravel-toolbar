@@ -2,9 +2,9 @@
 
 namespace NckRtl\Toolbar\Data;
 
-use Spatie\LaravelData\Data;
 use NckRtl\Toolbar\Measurement;
 use NckRtl\Toolbar\Traits\ControllerActionEditorUrl;
+use Spatie\LaravelData\Data;
 
 class QueryData extends Data
 {

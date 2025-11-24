@@ -85,74 +85,73 @@ class Profiler
         $requestStages = [];
 
         $requestStages[] = new RequestStageData(
-                                label: 'Bootstrapping',
-                                start: Profiler::getCheckpoint(RequestCheckpointId::LARAVEL_START),
-                                end: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_SERVICES_PROVIDERS),
-                                color: '#FF3031',
-                                filesInvolved: [
-                                    'index.php',
-                                    'bootstrap/app.php',
-                                ]
-                            );
+            label: 'Bootstrapping',
+            start: Profiler::getCheckpoint(RequestCheckpointId::LARAVEL_START),
+            end: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_SERVICES_PROVIDERS),
+            color: '#FF3031',
+            filesInvolved: [
+                'index.php',
+                'bootstrap/app.php',
+            ]
+        );
 
         $requestStages[] = new RequestStageData(
-                                label: 'Booting services providers',
-                                start: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_SERVICES_PROVIDERS),
-                                end: Profiler::getCheckpoint(RequestCheckpointId::AFTER_SERVICES_PROVIDERS),
-                                color: '#FF3031',
-                                filesInvolved: [
-                                    'app/Providers/*.php',
-                                ]
-                            );
+            label: 'Booting services providers',
+            start: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_SERVICES_PROVIDERS),
+            end: Profiler::getCheckpoint(RequestCheckpointId::AFTER_SERVICES_PROVIDERS),
+            color: '#FF3031',
+            filesInvolved: [
+                'app/Providers/*.php',
+            ]
+        );
 
         $requestStages[] = new RequestStageData(
-                                label: 'Preparing request pipeline',
-                                start: Profiler::getCheckpoint(RequestCheckpointId::AFTER_SERVICES_PROVIDERS),
-                                end: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_MIDDLEWARE),
-                                color: '#FF7B4F'
-                            );
-
-
-        $requestStages[] = new RequestStageData(
-                                label: 'Middleware in',
-                                start: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_MIDDLEWARE),
-                                end: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_CONTROLLER),
-                                color: '#FFBE4F',
-                                filesInvolved: [
-                                    'app/Http/Middleware/*.php',
-                                ]
-                            );
+            label: 'Preparing request pipeline',
+            start: Profiler::getCheckpoint(RequestCheckpointId::AFTER_SERVICES_PROVIDERS),
+            end: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_MIDDLEWARE),
+            color: '#FF7B4F'
+        );
 
         $requestStages[] = new RequestStageData(
-                                label: 'Controller',
-                                start: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_CONTROLLER),
-                                end: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_VIEW_RENDERING),
-                                color: '#0BB981',
-                            );
+            label: 'Middleware in',
+            start: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_MIDDLEWARE),
+            end: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_CONTROLLER),
+            color: '#FFBE4F',
+            filesInvolved: [
+                'app/Http/Middleware/*.php',
+            ]
+        );
 
         $requestStages[] = new RequestStageData(
-                                label: 'View rendering',
-                                start: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_VIEW_RENDERING),
-                                end: Profiler::getCheckpoint(RequestCheckpointId::AFTER_VIEW_RENDERING),
-                                color: '#09ABF6'
-                            );
+            label: 'Controller',
+            start: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_CONTROLLER),
+            end: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_VIEW_RENDERING),
+            color: '#0BB981',
+        );
 
         $requestStages[] = new RequestStageData(
-                                label: 'Middleware out',
-                                start: Profiler::getCheckpoint(RequestCheckpointId::AFTER_VIEW_RENDERING),
-                                end: Profiler::getCheckpoint(RequestCheckpointId::AFTER_MIDDLEWARE),
-                                color: '#FFBE4F',
-                                filesInvolved: [
-                                    'app/Http/Middleware/*.php',
-                                ]
-                            );
+            label: 'View rendering',
+            start: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_VIEW_RENDERING),
+            end: Profiler::getCheckpoint(RequestCheckpointId::AFTER_VIEW_RENDERING),
+            color: '#09ABF6'
+        );
 
         $requestStages[] = new RequestStageData(
-                                label: 'Preparing response',
-                                start: Profiler::getCheckpoint(RequestCheckpointId::AFTER_MIDDLEWARE),
-                                end: Profiler::getCheckpoint(RequestCheckpointId::REQUEST_HANDLED),
-                                color: '#9879FF'
-                            );
+            label: 'Middleware out',
+            start: Profiler::getCheckpoint(RequestCheckpointId::AFTER_VIEW_RENDERING),
+            end: Profiler::getCheckpoint(RequestCheckpointId::AFTER_MIDDLEWARE),
+            color: '#FFBE4F',
+            filesInvolved: [
+                'app/Http/Middleware/*.php',
+            ]
+        );
+
+        $requestStages[] = new RequestStageData(
+            label: 'Preparing response',
+            start: Profiler::getCheckpoint(RequestCheckpointId::AFTER_MIDDLEWARE),
+            end: Profiler::getCheckpoint(RequestCheckpointId::REQUEST_HANDLED),
+            color: '#9879FF'
+        );
 
         self::$requestCheckpoints = [];
 
@@ -190,13 +189,13 @@ class Profiler
     {
         $latestRequestCheckpointWithMemory = array_reverse(
             array_values(
-                array_filter(self::$requestCheckpoints, function($checkpoint) {
+                array_filter(self::$requestCheckpoints, function ($checkpoint) {
                     return $checkpoint->measureMemory;
                 })
             )
         )[0];
 
-        if(empty($latestRequestCheckpointWithMemory)) {
+        if (empty($latestRequestCheckpointWithMemory)) {
             throw new \Exception('Current memory usage cant be shared as no checkpoints have been recorded yet.');
         }
 

@@ -2,10 +2,10 @@
 
 namespace NckRtl\Toolbar\Observers;
 
-use NckRtl\Toolbar\Measurement;
+use Illuminate\Database\Events\QueryExecuted;
 use NckRtl\Toolbar\Data\QueryData;
 use NckRtl\Toolbar\Enums\DataSizeUnit;
-use Illuminate\Database\Events\QueryExecuted;
+use NckRtl\Toolbar\Measurement;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 
 class QueryObserver
@@ -22,15 +22,16 @@ class QueryObserver
 
     private bool $lookUpCallerFromStackTrace;
 
-    public function __construct() {
-       $this->lookUpCallerFromStackTrace = !app()->isProduction();
+    public function __construct()
+    {
+        $this->lookUpCallerFromStackTrace = ! app()->isProduction();
 
-       app('events')->listen(QueryExecuted::class, [$this, 'recordQuery']);
+        app('events')->listen(QueryExecuted::class, [$this, 'recordQuery']);
     }
 
     public function recordQuery(QueryExecuted $event)
     {
-        if($this->queryMemory == 0) {
+        if ($this->queryMemory == 0) {
             $this->queryMemory = Profiler::getCurrentMemoryUsage()->value;
         }
 
@@ -45,17 +46,17 @@ class QueryObserver
         [$hash, $queryIsduplicate] = $this->hash($event->sql);
 
         $this->queries[] = new QueryData(
-          hash: $hash,
-          sql: $this->replaceBindings($event),
-          bindings: $this->formatBindings($event),
-          duration: $time,
-          connection: $event->connectionName,
-          driver: $event->connection->getDriverName(),
-          file: $caller ? $caller['file'] : null,
-          line: $caller ? $caller['line'] : null,
-          is_duplicate: $queryIsduplicate,
-          is_slow: $time >= 100,
-          memory_used: new Measurement($memoryAfter - $memoryBefore, DataSizeUnit::BYTES)->convertTo(DataSizeUnit::KILOBYTES),
+            hash: $hash,
+            sql: $this->replaceBindings($event),
+            bindings: $this->formatBindings($event),
+            duration: $time,
+            connection: $event->connectionName,
+            driver: $event->connection->getDriverName(),
+            file: $caller ? $caller['file'] : null,
+            line: $caller ? $caller['line'] : null,
+            is_duplicate: $queryIsduplicate,
+            is_slow: $time >= 100,
+            memory_used: new Measurement($memoryAfter - $memoryBefore, DataSizeUnit::BYTES)->convertTo(DataSizeUnit::KILOBYTES),
         );
     }
 
@@ -65,8 +66,8 @@ class QueryObserver
 
         $queryIsduplicate = in_array($hash, $this->hashes);
 
-        if(!$queryIsduplicate) {
-          $this->hashes[] = $hash;
+        if (! $queryIsduplicate) {
+            $this->hashes[] = $hash;
         }
 
         return [$hash, $queryIsduplicate];
@@ -119,7 +120,7 @@ class QueryObserver
                 return $pdo->quote($binding);
             }
         } catch (\PDOException $e) {
-            throw_if('IM001' !== $e->getCode(), $e);
+            throw_if($e->getCode() !== 'IM001', $e);
         }
 
         // Fallback when PDO::quote function is missing...

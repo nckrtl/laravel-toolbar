@@ -25,7 +25,7 @@ class RequestCollector extends Collector implements CollectorInterface
 
     public function collectData(CollectorManager $collectorManager): ?RequestData
     {
-        if($this->config->dataProvider && $this->config->dataProvider === DataProvider::Telescope && ! empty($collectorManager->telescopeEntries)) {
+        if ($this->config->dataProvider && $this->config->dataProvider === DataProvider::Telescope && ! empty($collectorManager->telescopeEntries)) {
             return $this->telescopeProvidedRequestData($collectorManager);
         }
 

@@ -2,10 +2,9 @@
 
 namespace NckRtl\Toolbar\Traits;
 
-use ReflectionClass;
-use ReflectionMethod;
-use Illuminate\Support\Str;
 use Illuminate\Foundation\Concerns\ResolvesDumpSource;
+use Illuminate\Support\Str;
+use ReflectionMethod;
 
 trait ControllerActionEditorUrl
 {
@@ -13,17 +12,16 @@ trait ControllerActionEditorUrl
 
     private function setControllerActionEditorUrl(?string $controllerActionOrfile = null, ?string $method = null, mixed $line = null): void
     {
-        if(!$controllerActionOrfile && !$line && !$method) {
+        if (! $controllerActionOrfile && ! $line && ! $method) {
             return;
         }
 
-        if(Str::contains($controllerActionOrfile, '@')) {
+        if (Str::contains($controllerActionOrfile, '@')) {
             [$controller, $method] = explode('@', $controllerActionOrfile);
             $reflection = new ReflectionMethod($controller, $method);
             $file = $reflection->getFileName();
             $line = $reflection->getStartLine();
-        }
-        else {
+        } else {
             $file = $controllerActionOrfile;
         }
 

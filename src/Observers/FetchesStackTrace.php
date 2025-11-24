@@ -10,7 +10,6 @@ trait FetchesStackTrace
      * Find the first frame in the stack trace outside of Telescope/Laravel.
      *
      * @param  string|array  $forgetLines
-     * @return array|null
      */
     protected function getCallerFromStackTrace($forgetLines = 0): ?array
     {
@@ -27,8 +26,6 @@ trait FetchesStackTrace
 
     /**
      * Get the file paths that should not be used by backtraces.
-     *
-     * @return array
      */
     protected function ignoredPaths(): array
     {
