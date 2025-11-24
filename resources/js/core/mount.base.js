@@ -1,35 +1,51 @@
 import { createApp } from 'vue'
 import Toolbar from '@/Toolbar.vue'
 import { log, logData } from '@/core/utils/logger'
-import { setShadowRoot } from '@/core/utils/hmr'
 
 let isToolbarMounted = false
+let shadowRootRef = null
+
+export function setShadowRoot(shadowRoot) {
+  log('Storing shadowRoot reference')
+  shadowRootRef = shadowRoot
+}
+
+export function getShadowRoot() {
+  return shadowRootRef
+}
 
 export function setupShadowDOM() {
-  log('📦 Setting up Shadow DOM from template')
+  log('📦 Setting up Shadow DOM')
 
   const shadowHost = document.getElementById('laravel-toolbar-shadow-host')
   if (!shadowHost) {
     throw new Error('Shadow host not found - toolbar HTML not injected?')
   }
 
-  const template = document.getElementById('laravel-toolbar-template')
-  if (!template) {
-    throw new Error('Toolbar template not found')
-  }
+  // Check if shadow was already created (from cache or template)
+  let shadowRoot = shadowHost.shadowRoot
 
-  // Attach shadow root and clone template content into it
-  const shadowRoot = shadowHost.attachShadow({ mode: 'open' })
-  shadowRoot.appendChild(template.content.cloneNode(true))
+  if (!shadowRoot) {
+    // No cache, no template - create fresh
+    log('Creating fresh Shadow DOM (first visit)')
+    shadowRoot = shadowHost.attachShadow({ mode: 'open' })
+
+    // Create the root container
+    const rootDiv = document.createElement('div')
+    rootDiv.id = 'laravel-toolbar-root'
+    shadowRoot.appendChild(rootDiv)
+  } else {
+    log('Shadow DOM already exists (from cache)')
+  }
 
   setShadowRoot(shadowRoot)
 
   const appContainer = shadowRoot.getElementById('laravel-toolbar-root')
   if (!appContainer) {
-    throw new Error('Toolbar root not found in template')
+    throw new Error('Toolbar root not found in shadow DOM')
   }
 
-  log('✅ Shadow DOM created from template (CSS already present)')
+  log('✅ Shadow DOM ready')
   return { shadowRoot, appContainer }
 }
 

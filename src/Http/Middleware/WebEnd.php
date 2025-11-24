@@ -11,11 +11,15 @@ class WebEnd
 {
     public function handle(Request $request, Closure $next)
     {
-        Profiler::record(RequestCheckpointId::BEFORE_CONTROLLER);
+        if(!Profiler::getCheckpoint(RequestCheckpointId::BEFORE_CONTROLLER)) {
+            Profiler::record(RequestCheckpointId::BEFORE_CONTROLLER);
+        }
 
         $response = $next($request);
 
-        Profiler::record(RequestCheckpointId::AFTER_VIEW_RENDERING);
+        if(!Profiler::getCheckpoint(RequestCheckpointId::AFTER_VIEW_RENDERING)) {
+            Profiler::record(RequestCheckpointId::AFTER_VIEW_RENDERING);
+        }
 
         return $response;
     }

@@ -184,42 +184,62 @@ class ToolbarInjector
     {
         $assets = $this->getProductionManifestAssets();
         $jsUrl = route('toolbar.assets', ['asset' => $assets['js']]);
+        $cssUrl = route('toolbar.assets', ['asset' => $assets['css']]);
 
-        // Read CSS content for template
-        $cssPath = __DIR__.'/../build/assets/'.$assets['css'];
-        $cssContent = file_exists($cssPath) ? file_get_contents($cssPath) : '';
+        $script = "<script src=\"{$jsUrl}\"{$nonceAttribute}></script>";
 
-        return <<<HTML
-        <!-- Laravel Toolbar -->
-        <div id="laravel-toolbar-shadow-host">
-            <template id="laravel-toolbar-template">
-                <style{$nonceAttribute}>{$cssContent}</style>
-                <div id="laravel-toolbar-root"></div>
-            </template>
-        </div>
-        <script{$nonceAttribute}>
-            window.__LARAVEL_TOOLBAR_DATA__ = {$data};
-        </script>
-        <script src="{$jsUrl}"{$nonceAttribute}></script>
-        <!-- End Laravel Toolbar -->
-        HTML;
+        return $this->toolbarHtml(
+            data: $data,
+            cssUrl: $cssUrl,
+            script: $script,
+            nonceAttribute: $nonceAttribute,
+            isDev: false
+        );
     }
 
     protected function toolbarHtmlWithViteAssets(string $data, string $viteUrl, string $nonceAttribute): string
     {
-        return <<<HTML
+        $cssUrl = "{$viteUrl}/resources/css/toolbar.css?inline";
+        $script = "<script type=\"module\" src=\"{$viteUrl}/resources/js/toolbar.dev.js\"{$nonceAttribute}></script>";
 
-        <!-- Laravel Toolbar (Development Mode with HMR) -->
-        <div id="laravel-toolbar-shadow-host">
-            <template id="laravel-toolbar-template">
-                <div id="laravel-toolbar-root"></div>
-            </template>
-        </div>
+        return $this->toolbarHtml(
+            data: $data,
+            cssUrl: $cssUrl,
+            script: $script,
+            nonceAttribute: $nonceAttribute,
+            isDev: true
+        );
+    }
+
+    protected function toolbarHtml(string $data, string $cssUrl, string $script, string $nonceAttribute, bool $isDev = false): string
+    {
+        $comment = $isDev ? '<!-- Laravel Toolbar (Development Mode with HMR) -->' : '<!-- Laravel Toolbar -->';
+
+        return <<<HTML
+        {$comment}
+        <div id="laravel-toolbar-shadow-host"></div>
         <script{$nonceAttribute}>
             window.__LARAVEL_TOOLBAR_DATA__ = {$data};
-            window.__LARAVEL_TOOLBAR_CSS_URL__ = "{$viteUrl}/resources/css/toolbar.css?inline";
+            window.__LARAVEL_TOOLBAR_CSS_URL__ = "{$cssUrl}";
+
+            (function() {
+                var cached = sessionStorage.getItem('laravel-toolbar-html-cache');
+                var cachedCss = sessionStorage.getItem('laravel-toolbar-css-cache');
+                if (cached && cachedCss) {
+                    var host = document.getElementById('laravel-toolbar-shadow-host');
+                    if (host) {
+                        var shadow = host.attachShadow({ mode: 'open' });
+                        var sheet = new CSSStyleSheet();
+                        sheet.replaceSync(cachedCss);
+                        shadow.adoptedStyleSheets = [sheet];
+                        shadow.innerHTML = '<div id="laravel-toolbar-root">' + cached + '</div>';
+                        window.__TOOLBAR_SHADOW_PRECREATED__ = shadow;
+                        window.__TOOLBAR_STYLESHEET__ = sheet;
+                    }
+                }
+            })();
         </script>
-        <script type="module" src="{$viteUrl}/resources/js/toolbar.dev.js"{$nonceAttribute}></script>
+        {$script}
         <!-- End Laravel Toolbar -->
         HTML;
     }

@@ -6,8 +6,10 @@ import {
   setupShadowDOM,
   mountVueApp,
   cleanupFailedMount,
-  mountSuccess
+  mountSuccess,
+  setShadowRoot
 } from '@/core/mount.base'
+import { setupCacheSaving } from '@/core/utils/cache'
 
 const mountToolbar = async () => {
   if (!guardMount()) return
@@ -15,13 +17,24 @@ const mountToolbar = async () => {
   log('🚀 mountToolbar() called (PROD)')
 
   try {
-    // Shadow DOM setup includes CSS from template
-    const { appContainer } = setupShadowDOM()
+    let shadowRoot, appContainer
 
-    log('✅ Styles already present in Shadow DOM (from template)')
+    if (window.__TOOLBAR_SHADOW_PRECREATED__) {
+      log('⚡ Using pre-created shadow DOM from cache')
+      shadowRoot = window.__TOOLBAR_SHADOW_PRECREATED__
+      appContainer = shadowRoot.getElementById('laravel-toolbar-root')
+      setShadowRoot(shadowRoot)
+    } else {
+      const result = setupShadowDOM()
+      shadowRoot = result.shadowRoot
+      appContainer = result.appContainer
 
-    // Mount Vue immediately
+      // First visit - need to load CSS
+      await loadProductionCSS(shadowRoot)
+    }
+
     mountVueApp(appContainer)
+    setupCacheSaving(shadowRoot)
     mountSuccess()
   } catch (error) {
     log('❌ Failed to mount toolbar:', error)
@@ -30,4 +43,15 @@ const mountToolbar = async () => {
   }
 }
 
-initToolbar(mountToolbar);
+async function loadProductionCSS(shadowRoot) {
+  const cssUrl = window.__LARAVEL_TOOLBAR_CSS_URL__
+  if (!cssUrl) return
+
+  const response = await fetch(cssUrl)
+  const css = await response.text()
+  const sheet = new CSSStyleSheet()
+  sheet.replaceSync(css)
+  shadowRoot.adoptedStyleSheets = [sheet]
+}
+
+initToolbar(mountToolbar)

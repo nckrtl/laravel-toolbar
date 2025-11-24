@@ -47,16 +47,12 @@ class QueriesCollector extends Collector implements CollectorInterface
 
     public function setEntries(CollectorManager $collectorManager): void
     {
-
-
         $toolbar = app(Toolbar::class);
 
         // if ($toolbar->telescopeIsInstalled()) {
         //     $this->handleTelescopeEntries($collectorManager, $toolbar);
         //     return;
         // }
-
-
 
         $queryObserver = $toolbar->observers[QueryObserver::class];
 

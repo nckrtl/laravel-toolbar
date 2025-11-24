@@ -11,11 +11,15 @@ class WebStart
 {
     public function handle(Request $request, Closure $next)
     {
-        Profiler::record(RequestCheckpointId::BEFORE_MIDDLEWARE);
+        if(!Profiler::getCheckpoint(RequestCheckpointId::BEFORE_MIDDLEWARE)) {
+            Profiler::record(RequestCheckpointId::BEFORE_MIDDLEWARE);
+        }
 
         $response = $next($request);
 
-        Profiler::record(RequestCheckpointId::AFTER_MIDDLEWARE);
+        if(!Profiler::getCheckpoint(RequestCheckpointId::AFTER_MIDDLEWARE)) {
+            Profiler::record(RequestCheckpointId::AFTER_MIDDLEWARE);
+        }
 
         return $response;
     }
