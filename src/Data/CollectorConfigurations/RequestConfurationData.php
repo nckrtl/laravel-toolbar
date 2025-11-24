@@ -15,9 +15,9 @@ class RequestConfurationData extends Data
             return;
         }
 
-      // Only DataProvider::Telescope is supported
-      if(! class_exists('Laravel\Telescope\Telescope')) {
-        throw new \Exception('Request collector is configured to use the Telescope provider, but Telescope is not installed.');
-      }
-  }
+        // Only DataProvider::Telescope is supported
+        if (! class_exists('Laravel\Telescope\Telescope')) {
+            throw new \Exception('Request collector is configured to use the Telescope provider, but Telescope is not installed.');
+        }
+    }
 }

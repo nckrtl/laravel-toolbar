@@ -2,9 +2,6 @@
 
 namespace NckRtl\Toolbar\Enums;
 
-use NckRtl\Toolbar\Enums\Unit;
-use NckRtl\Toolbar\Services\ProfilerService\Profiler;
-
 enum TimeUnit: string implements Unit
 {
     case MICROSECONDS = 'microseconds';

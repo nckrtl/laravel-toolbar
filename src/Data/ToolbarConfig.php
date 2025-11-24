@@ -12,6 +12,11 @@ use NckRtl\Toolbar\Collectors\RequestCollector;
 use NckRtl\Toolbar\Collectors\ResponseCollector;
 use NckRtl\Toolbar\Collectors\VueCollector;
 use NckRtl\Toolbar\Data\Configurations\CollectorConfig;
+use NckRtl\Toolbar\Http\Middleware\MiddlewareEnd;
+use NckRtl\Toolbar\Http\Middleware\MiddlewareStart;
+use NckRtl\Toolbar\Observers\QueryObserver;
+use NckRtl\Toolbar\Observers\RequestObserver;
+use NckRtl\Toolbar\Observers\RoutingObserver;
 use NckRtl\Toolbar\Toolbar;
 use Spatie\LaravelData\Data;
 
@@ -19,11 +24,26 @@ class ToolbarConfig extends Data
 {
     public bool $debug;
 
+    public array $observers;
+
     public array $collectors;
 
     public function __construct()
     {
         $this->debug(false)
+            ->middleware(
+                prepend: [
+                    MiddlewareStart::class,
+                ],
+                append: [
+                    MiddlewareEnd::class,
+                ],
+            )
+            ->observers([
+                new RequestObserver,
+                new RoutingObserver,
+                new QueryObserver,
+            ])
             ->collectors([
                 new ProfilerCollector,
                 new RequestCollector,
@@ -47,6 +67,51 @@ class ToolbarConfig extends Data
         $this->debug = $debug;
 
         return $this;
+    }
+
+    public function middleware(?array $prepend = [], ?array $append = [], ?bool $enable = true): self
+    {
+        if (! $enable || empty($prepend) && empty($append)) {
+            return $this;
+        }
+
+        app()->booted(function () use ($prepend, $append) {
+            $kernel = app()->make(\Illuminate\Contracts\Http\Kernel::class);
+            $router = app()->make(\Illuminate\Routing\Router::class);
+
+            if (! empty($prepend)) {
+                foreach ($prepend as $middleware) {
+
+                    $kernel->prependMiddleware($middleware);
+                }
+            }
+
+            if (! empty($append)) {
+                foreach (array_keys($router->getMiddlewareGroups()) as $group) {
+                    foreach ($append as $middleware) {
+                        $router->pushMiddlewareToGroup($group, $middleware);
+                    }
+                }
+            }
+        });
+
+        return $this;
+    }
+
+    public function observers(?array $observers = null): self
+    {
+        $this->observers = $observers;
+
+        return $this;
+    }
+
+    public function getObserver(string $observerClass): ?object
+    {
+        return array_values(
+            array_filter(
+                $this->observers, fn ($observer) => $observer instanceof $observerClass
+            )
+        )[0] ?? null;
     }
 
     public function collectors(?array $collectors = null): self

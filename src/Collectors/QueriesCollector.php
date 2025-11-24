@@ -2,13 +2,12 @@
 
 namespace NckRtl\Toolbar\Collectors;
 
-
-use NckRtl\Toolbar\Toolbar;
-use NckRtl\Toolbar\Data\QueryData;
 use NckRtl\Toolbar\CollectorManager;
-use NckRtl\Toolbar\Data\QueriesData;
-use NckRtl\Toolbar\Observers\QueryObserver;
 use NckRtl\Toolbar\Data\Configurations\QueriesConfig;
+use NckRtl\Toolbar\Data\QueriesData;
+use NckRtl\Toolbar\Data\QueryData;
+use NckRtl\Toolbar\Observers\QueryObserver;
+use NckRtl\Toolbar\Toolbar;
 
 class QueriesCollector extends Collector implements CollectorInterface
 {
@@ -54,15 +53,17 @@ class QueriesCollector extends Collector implements CollectorInterface
         //     return;
         // }
 
-        $queryObserver = $toolbar->observers[QueryObserver::class];
+        $queryObserver = $toolbar->config->getObserver(QueryObserver::class);
+
+        ray($queryObserver);
 
         $this->totalTime = $queryObserver->totalTime;
 
-        $this->queries = $toolbar->observers[QueryObserver::class]->queries;
+        $this->queries = $queryObserver->queries;
 
         $offset = 0;
 
-        foreach($this->queries as $query) {
+        foreach ($this->queries as $query) {
             $query->percentage = $query->duration / $this->totalTime;
             $query->offset = $offset;
             $offset += $query->percentage;
@@ -71,14 +72,13 @@ class QueriesCollector extends Collector implements CollectorInterface
 
     public function handleTelescopeEntries(CollectorManager $collectorManager): void
     {
-        if($collectorManager->telescopeEntries->has('query'));
-        {
-            return;
-        }
+        if ($collectorManager->telescopeEntries->has('query'));
+
+        return;
 
         $this->queries = $collectorManager->telescopeEntries->get('query')->toArray() ?? [];
 
-        if(empty($this->queries)) {
+        if (empty($this->queries)) {
             return;
         }
 
@@ -92,7 +92,7 @@ class QueriesCollector extends Collector implements CollectorInterface
 
         $hashes = [];
 
-         $this->queries = array_map(function ($entry) use (&$hashes, &$offset) {
+        $this->queries = array_map(function ($entry) use (&$hashes, &$offset) {
             $isDuplicateHash = in_array($entry['hash'], $hashes);
             if (! $isDuplicateHash) {
                 $hashes[] = $entry['hash'];

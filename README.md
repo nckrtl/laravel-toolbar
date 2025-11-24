@@ -5,7 +5,7 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/nckrtl/laravel-toolbar/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/nckrtl/laravel-toolbar/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/nckrtl/laravel-toolbar.svg?style=flat-square)](https://packagist.org/packages/nckrtl/laravel-toolbar)
 
-A powerful development toolbar for Laravel that sits at the bottom of your screen, providing real-time insights into your application's performance, database queries, request lifecycle, and more. Built with Vue.js and deeply integrated with Laravel Telescope for comprehensive data collection.
+A powerful development toolbar for Laravel that sits at the bottom of your screen, providing real-time insights into your application's performance, database queries, request lifecycle, and more. Built with Vue.js and works standalone with optional Laravel Telescope integration for enhanced data collection.
 
 ## Features
 
@@ -27,7 +27,6 @@ A powerful development toolbar for Laravel that sits at the bottom of your scree
 
 - PHP 8.4+
 - Laravel 11.x or 12.x
-- Laravel Telescope 5.15+
 
 ## Installation
 
@@ -38,6 +37,20 @@ composer require nckrtl/laravel-toolbar
 ```
 
 The package will automatically register itself via Laravel's auto-discovery.
+
+### Optional Dependencies
+
+While Laravel Toolbar works perfectly standalone, it includes optional integration with Laravel Telescope for enhanced data collection:
+
+```bash
+composer require laravel/telescope
+```
+
+**When Telescope is installed:**
+- The `ModelsCollector` can track Eloquent model operations
+- Additional request data can be sourced from Telescope entries
+
+**Note:** All other collectors work independently without Telescope. The toolbar will automatically detect if Telescope is installed and enable enhanced features accordingly.
 
 ## Configuration
 
@@ -73,6 +86,8 @@ use NckRtl\Toolbar\Collectors\LaravelCollector;
 use NckRtl\Toolbar\Collectors\QueriesCollector;
 use NckRtl\Toolbar\Collectors\RequestCollector;
 use NckRtl\Toolbar\Collectors\ProfilerCollector;
+use NckRtl\Toolbar\Collectors\ModelsCollector;
+use NckRtl\Toolbar\Collectors\ResponseCollector;
 
 class ToolbarConfigProvider extends ToolbarProvider
 {
@@ -88,8 +103,19 @@ class ToolbarConfigProvider extends ToolbarProvider
             new QueriesCollector,
             new LaravelCollector,
             new PhpCollector,
+            new ResponseCollector,
             // new VueCollector, // Disable Vue collector
+            // new ModelsCollector, // Requires Telescope
         ]);
+
+        // Granular collector configuration example
+        // Customize LaravelCollector to show only specific fields
+        $laravelCollector = new LaravelCollector;
+        $laravelCollector->config->version = true;
+        $laravelCollector->config->environment = true;
+        $laravelCollector->config->debug = true;
+        $laravelCollector->config->timezone = false; // Hide timezone
+        $laravelCollector->config->locale = false; // Hide locale
 
         // Disable the toolbar completely (useful for production)
         // $toolbarConfig->disable();
@@ -120,20 +146,24 @@ Collects HTTP request information:
 - Memory usage
 
 ### QueriesCollector
-Monitors database operations:
+Monitors database operations using Laravel's native query events:
 - All executed queries with SQL and bindings
 - Query execution time and percentage of total
-- Duplicate query detection
-- Slow query identification
+- Duplicate query detection (queries with identical SQL are automatically flagged)
+- Slow query identification (queries taking ≥100ms are marked as slow)
 - Database connections and drivers used
+- File and line number where query was executed (non-production environments)
+- Memory usage per query
 
 ### LaravelCollector
-Displays Laravel environment information:
+Displays Laravel environment information with granular configuration options:
 - Laravel version
 - Application environment (local, production, etc.)
 - Timezone configuration
 - Locale settings
 - Debug mode status
+
+Each field can be individually enabled or disabled in your configuration.
 
 ### PhpCollector
 Shows PHP runtime information:
@@ -144,7 +174,9 @@ Shows PHP runtime information:
 Tracks Vue.js related data in your application.
 
 ### ModelsCollector
-Monitors Eloquent model operations via Telescope integration.
+**Requires Laravel Telescope**
+
+Monitors Eloquent model operations via Telescope integration. This collector will automatically disable itself if Telescope is not installed.
 
 ### ResponseCollector
 Inspects response data including headers and content.
@@ -160,12 +192,40 @@ The MCP server is automatically registered and provides:
 
 ## How It Works
 
-1. **Middleware Integration**: The toolbar registers middleware at the beginning and end of the web middleware group to capture the entire request lifecycle
-2. **Event Listeners**: Hooks into Laravel events (routing, request handling) to record checkpoints
-3. **Telescope Integration**: Leverages Laravel Telescope's data collection for queries, models, and other operations
-4. **Data Collection**: After the request is handled, all enabled collectors gather their data
-5. **Injection**: For HTML responses, the toolbar UI is injected before the closing `</body>` tag. For Inertia.js requests, data is sent via a custom header
-6. **Caching**: Request data is cached briefly for MCP server access
+1. **Middleware Integration**: The toolbar registers two middleware:
+   - `WebStart`: Prepended to capture the beginning of request handling
+   - `WebEnd`: Appended to capture the end of request handling
+
+2. **Event Listeners**: Hooks into Laravel's native events to record 11 timing checkpoints:
+   - Framework initialization
+   - Service providers booting
+   - Request pipeline preparation
+   - Routing
+   - Middleware pipeline (in and out)
+   - Controller execution
+   - View rendering
+   - Response preparation
+
+3. **Query Monitoring**: Uses Laravel's native `QueryExecuted` event (no Telescope required) to track:
+   - All executed queries with bindings
+   - Execution time and memory usage
+   - Duplicate detection via SQL hash comparison
+   - Slow query detection (≥100ms threshold)
+   - Stack traces to identify query origin
+
+4. **Optional Telescope Integration**: If Telescope is installed, provides enhanced data for:
+   - Eloquent model operations (ModelsCollector)
+   - Alternative request data source (RequestCollector)
+
+5. **Data Collection**: After the request is handled, all enabled collectors gather their data
+
+6. **Response Injection**:
+   - **HTML responses**: Toolbar UI is injected before the closing `</body>` tag
+   - **Inertia.js requests**: Data is sent via `x-toolbar` header (base64-encoded JSON)
+   - **AJAX requests**: Automatically skipped to avoid interference
+   - **Non-HTML responses**: Automatically skipped
+
+7. **Caching**: Request data is cached for 30 seconds for MCP server access
 
 ## Usage in Different Contexts
 
@@ -183,17 +243,23 @@ The toolbar automatically excludes AJAX requests and non-HTML responses to avoid
 The toolbar includes built-in safety features:
 
 - Automatically disabled when running in console
-- Respects Telescope's `ignore_paths` configuration
+- Automatically skips AJAX requests and non-HTML responses
 - Supports both Vite HMR (development) and compiled assets (production)
 - Can be completely disabled via configuration
+- CSP nonce support for strict Content Security Policy headers
 
-For production deployments, it's recommended to not install this package or disable it in your configuration:
+**For production deployments**, it's strongly recommended to:
+
+1. **Don't install in production** (preferred): Only require the package in your `composer.json` dev dependencies
+2. **Or disable via configuration**:
 
 ```php
 if (app()->environment('production')) {
     $toolbarConfig->disable();
 }
 ```
+
+**Security note**: The toolbar shows sensitive application data including queries, environment variables, and request details. Never enable this in production environments.
 
 ## Testing
 

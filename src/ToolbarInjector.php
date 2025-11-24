@@ -215,17 +215,24 @@ class ToolbarInjector
     {
         $comment = $isDev ? '<!-- Laravel Toolbar (Development Mode with HMR) -->' : '<!-- Laravel Toolbar -->';
 
+        $nonce = Vite::cspNonce() ?? '';
+
         return <<<HTML
         {$comment}
         <div id="laravel-toolbar-shadow-host"></div>
         <script{$nonceAttribute}>
             window.__LARAVEL_TOOLBAR_DATA__ = {$data};
             window.__LARAVEL_TOOLBAR_CSS_URL__ = "{$cssUrl}";
+            window.__LARAVEL_TOOLBAR_NONCE__ = "{$nonce}";
 
             (function() {
                 var cached = sessionStorage.getItem('laravel-toolbar-html-cache');
                 var cachedCss = sessionStorage.getItem('laravel-toolbar-css-cache');
+
                 if (cached && cachedCss) {
+                    // Strip inline styles - Vue will re-add them when it hydrates
+                    cached = cached.replace(/\s*style="[^"]*"/g, '');
+
                     var host = document.getElementById('laravel-toolbar-shadow-host');
                     if (host) {
                         var shadow = host.attachShadow({ mode: 'open' });

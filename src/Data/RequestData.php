@@ -3,10 +3,10 @@
 namespace NckRtl\Toolbar\Data;
 
 use Illuminate\Http\Request;
-use Spatie\LaravelData\Data;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Route as RoutingRoute;
+use Illuminate\Support\Facades\Route;
 use NckRtl\Toolbar\Traits\ControllerActionEditorUrl;
+use Spatie\LaravelData\Data;
 
 class RequestData extends Data
 {
@@ -60,7 +60,7 @@ class RequestData extends Data
 
     private function setRouteEditorUrl(): void
     {
-        if(! $this->route) {
+        if (! $this->route) {
             return;
         }
 
