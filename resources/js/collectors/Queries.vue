@@ -7,7 +7,7 @@ import EmptyListIcon from '@/icons/EmptyListIcon.vue'
 import { FunnelIcon } from '@heroicons/vue/16/solid'
 
 const { data } = useToolbar()
-const isOpen = ref(true)
+const isOpen = ref(false)
 const searchPhrase = ref('')
 const filter = ref('none')
 
@@ -78,7 +78,7 @@ watch(queriesTable, (newVal) => {
             </div>
             <div class="flex gap-2 items-center">
               <span class="uppercase text-white/50 text-xxs font-medium">
-                Duration
+                  Duration
               </span>
               <span>
                 <span v-if="data.queries?.totalTimeFilteredQueries">{{ Math.round(data.queries?.totalTimeFilteredQueries * 100)/100 }}ms of </span>
