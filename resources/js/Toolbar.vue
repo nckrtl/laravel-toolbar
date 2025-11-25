@@ -11,6 +11,7 @@ import PHP from './collectors/PHP.vue'
 import Vue from './collectors/Vue.vue'
 import Models from './collectors/Models.vue'
 import { useToolbar } from './composables/useToolbar'
+import CommandPallete from './CommandPallete.vue'
 
 const { data } = useToolbar()
 
@@ -18,6 +19,10 @@ const { data } = useToolbar()
 
 <template>
   <div id="toolbar" class="bottom-0 fixed flex left-0 z-[999999] font-mono justify-between p-1 w-full font-medium">
+    <CommandPallete />
+    <div class="absolute -top-24 opacity-0" >
+      test
+    </div>
     <div class="flex gap-1">
       <Group>
           <Request />
