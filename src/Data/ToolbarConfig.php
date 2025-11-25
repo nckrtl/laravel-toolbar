@@ -12,6 +12,7 @@ use NckRtl\Toolbar\Collectors\RequestCollector;
 use NckRtl\Toolbar\Collectors\ResponseCollector;
 use NckRtl\Toolbar\Collectors\VueCollector;
 use NckRtl\Toolbar\Data\Configurations\CollectorConfig;
+use NckRtl\Toolbar\Data\Configurations\MiddlewareConfig;
 use NckRtl\Toolbar\Http\Middleware\MiddlewareEnd;
 use NckRtl\Toolbar\Http\Middleware\MiddlewareStart;
 use NckRtl\Toolbar\Observers\QueryObserver;
@@ -32,12 +33,14 @@ class ToolbarConfig extends Data
     {
         $this->debug(false)
             ->middleware(
-                prepend: [
-                    MiddlewareStart::class,
-                ],
-                append: [
-                    MiddlewareEnd::class,
-                ],
+                new MiddlewareConfig(
+                    prepend: [
+                        MiddlewareStart::class,
+                    ],
+                    append: [
+                        MiddlewareEnd::class,
+                    ],
+                )
             )
             ->observers([
                 new RequestObserver,
@@ -52,7 +55,7 @@ class ToolbarConfig extends Data
                 new LaravelCollector,
                 new PhpCollector,
                 new VueCollector,
-                new ModelsCollector,
+                // new ModelsCollector,
             ]);
     }
 
@@ -69,28 +72,23 @@ class ToolbarConfig extends Data
         return $this;
     }
 
-    public function middleware(?array $prepend = [], ?array $append = [], ?bool $enable = true): self
+    public function middleware(MiddlewareConfig $middlewareConfig): self
     {
-        if (! $enable || empty($prepend) && empty($append)) {
+        if (! $middlewareConfig->isEnabled() || empty($middlewareConfig->prepend) && empty($middlewareConfig->append)) {
             return $this;
         }
 
-        app()->booted(function () use ($prepend, $append) {
+        app()->booted(function () use ($middlewareConfig) {
             $kernel = app()->make(\Illuminate\Contracts\Http\Kernel::class);
             $router = app()->make(\Illuminate\Routing\Router::class);
 
-            if (! empty($prepend)) {
-                foreach ($prepend as $middleware) {
-
-                    $kernel->prependMiddleware($middleware);
-                }
+            foreach ($middlewareConfig->prepend as $middleware) {
+                $kernel->prependMiddleware($middleware);
             }
 
-            if (! empty($append)) {
-                foreach (array_keys($router->getMiddlewareGroups()) as $group) {
-                    foreach ($append as $middleware) {
-                        $router->pushMiddlewareToGroup($group, $middleware);
-                    }
+            foreach (array_keys($router->getMiddlewareGroups()) as $group) {
+                foreach ($middlewareConfig->append as $middleware) {
+                    $router->pushMiddlewareToGroup($group, $middleware);
                 }
             }
         });
@@ -143,6 +141,19 @@ class ToolbarConfig extends Data
     public function enabledCollectors(): array
     {
         return array_filter($this->collectors, fn ($collector) => $collector->config->enabled);
+    }
+
+    public function updateCollectorConfig(string $collectorClass, CollectorConfig $collectorConfig): self
+    {
+        $collector = array_values(array_filter($this->collectors, fn ($collector) => $collector instanceof $collectorClass));
+
+        if (empty($collector)) {
+            throw new \Exception('Collector '.$collectorClass.' not found');
+        }
+
+        $collector[0]->config = $collectorConfig;
+
+        return $this;
     }
 
     public function enable(): void

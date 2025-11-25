@@ -9,7 +9,7 @@ const props = defineProps({
 </script>
 
 <template>
-   <div :class="['rounded-full overflow-hidden flex', props.class]">
+   <div :class="['rounded-full overflow-hidden flex bg-[#171717]/95', props.class]">
       <slot />
    </div>
 </template>

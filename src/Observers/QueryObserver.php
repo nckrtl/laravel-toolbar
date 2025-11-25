@@ -2,10 +2,11 @@
 
 namespace NckRtl\Toolbar\Observers;
 
-use Illuminate\Database\Events\QueryExecuted;
-use NckRtl\Toolbar\Data\QueryData;
-use NckRtl\Toolbar\Enums\DataSizeUnit;
 use NckRtl\Toolbar\Measurement;
+use NckRtl\Toolbar\Data\QueryData;
+use NckRtl\Toolbar\Data\DatabaseData;
+use NckRtl\Toolbar\Enums\DataSizeUnit;
+use Illuminate\Database\Events\QueryExecuted;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 
 class QueryObserver
@@ -13,6 +14,12 @@ class QueryObserver
     use FetchesStackTrace;
 
     public float $totalTime = 0;
+
+    public array $connections = [];
+
+    public array $drivers = [];
+
+    public array $databases = [];
 
     public array $queries = [];
 
@@ -45,6 +52,10 @@ class QueryObserver
 
         [$hash, $queryIsduplicate] = $this->hash($event->sql);
 
+        $this->addConnection($event->connectionName);
+        $this->addDriver($event->connection->getDriverName());
+        $this->addDatabase($event->connection->getDatabaseName(), $event);
+
         $this->queries[] = new QueryData(
             hash: $hash,
             sql: $this->replaceBindings($event),
@@ -71,6 +82,34 @@ class QueryObserver
         }
 
         return [$hash, $queryIsduplicate];
+    }
+
+    public function addConnection($connection)
+    {
+        if (! in_array($connection, $this->connections)) {
+            $this->connections[] = $connection;
+        }
+    }
+
+    public function addDriver($driver)
+    {
+        if (! in_array($driver, $this->drivers)) {
+            $this->drivers[] = $driver;
+        }
+    }
+
+    public function addDatabase($database, $event)
+    {
+        if(array_key_exists($database, $this->databases)) {
+            return;
+        }
+
+        $this->databases[$database] = new DatabaseData(
+                name: $database,
+                connection: $event->connectionName,
+                driver: $event->connection->getDriverName(),
+        );
+
     }
 
     protected function formatBindings($event)

@@ -4,9 +4,10 @@ import ToolbarItem from '@/components/ToolbarItem.vue'
 import Panel from '@/components/Panel.vue'
 import { useToolbar } from '@/composables/useToolbar'
 import EmptyListIcon from '@/icons/EmptyListIcon.vue'
+import { FunnelIcon } from '@heroicons/vue/16/solid'
 
 const { data } = useToolbar()
-const isOpen = ref(false)
+const isOpen = ref(true)
 const searchPhrase = ref('')
 const filter = ref('none')
 
@@ -80,7 +81,8 @@ watch(queriesTable, (newVal) => {
                 Duration
               </span>
               <span>
-                {{ Math.round(data.queries?.totalTime) }}ms
+                <span v-if="data.queries?.totalTimeFilteredQueries">{{ Math.round(data.queries?.totalTimeFilteredQueries * 100)/100 }}ms of </span>
+                <span>{{ Math.round(data.queries?.totalTime) }}ms</span>
               </span>
             </div>
             <div class="flex gap-2 items-center">
@@ -103,13 +105,21 @@ watch(queriesTable, (newVal) => {
               <span class="uppercase text-white/50 text-xxs font-medium">
                 Database
               </span>
-              <span>
-                {{ data.queries?.databases.join(', ') }}
+              <span v-for="(database, index) in data.queries?.databases" :key="database.name">
+                <a :href="database.tablePlusConnectionUrl ?? '#'" target="_blank" class="text-white text-xxs font-medium" :class="{ 'hover:underline': database.tablePlusConnectionUrl }">
+                    {{ database.name }}
+                </a>
+                <span v-if="index < data.queries?.databases.length - 1">, </span>
               </span>
             </div>
           </div>
-          <div>
-            <input placeholder="Search" class="px-3 min-w-64 placeholder-white/40 py-2 rounded-md border border-white/10 bg-white/3  text-white/50 " type="text" v-model="searchPhrase" />
+          <div class="relative">
+            <input placeholder="Search" class="px-3 focus:outline-none focus:ring-2 focus:ring-white/20 text-white focus:border-white/70 min-w-64 placeholder-white/40 py-2 rounded-md border border-white/10 bg-white/3" type="text" v-model="searchPhrase" />
+
+            <div class="absolute right-2 top-2.5">
+              <div class="size-2 bg-red-500 rounded-full absolute -top-[5px] -right-[3px] border-1 border-black/80"></div>
+              <FunnelIcon class="size-4  text-white/50" />
+            </div>
           </div>
       </div>
       <div class="w-full h-2"></div>
@@ -163,8 +173,8 @@ watch(queriesTable, (newVal) => {
               </template>
               <tr v-else v-for="(query, index) in filteredQueries" :key="index" class="group relative">
                 <td class="w-[60%]">
-                  <div class="w-[calc(100%-20px)] h-[1px] absolute left-2.5 bottom-[2px]">
-                    <div :nonce="data.csp_nonce" class="h-full absolute bg-[#9684FF]/50" :style="{ width: `${query.percentage * 100}%`, left: `${query.offset * 100}%` }"></div>
+                  <div class="w-[calc(100%-20px)] h-px absolute left-2.5 bottom-0.5">
+                    <div class="h-full absolute  bg-[#9684FF]/50" :style="{ width: `${query.percentage * 100}%`, left: `${query.offset * 100}%` }"></div>
                   </div>
                   <div class=" py-0.5">
                     <div class="overflow-hidden text-ellipsis border-y border-l rounded-l-md px-3 py-2" :class="{
@@ -204,6 +214,7 @@ watch(queriesTable, (newVal) => {
                       <span v-if="query.isSlow" class=" whitespace-nowrap uppercase tracking-wider font-bold text-xxxs bg-cyan-400/10 py-2 px-2 text-cyan-400 rounded">
                         Slow
                       </span>
+                      <span v-else class="opacity-20">-</span>
                     </div>
                   </div>
                 </td>
@@ -227,7 +238,7 @@ watch(queriesTable, (newVal) => {
       </div>
     </Panel>
 
-    <ToolbarItem @mouseenter="isOpen = true" @mouseleave="isOpen = false" :isActive="isOpen" class="!border-x-0 pr-[3px]">
+    <ToolbarItem @mouseenter="isOpen = true" @mouseleave="isOpen = false" :isActive="isOpen" class="!border-l-0 !border-r-1 rounded-r-full pr-[3px]">
       <div class="flex gap-1 items-center py-0.5">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4">
           <path d="M8 7c3.314 0 6-1.343 6-3s-2.686-3-6-3-6 1.343-6 3 2.686 3 6 3Z" />

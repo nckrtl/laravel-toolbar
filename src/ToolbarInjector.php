@@ -99,7 +99,7 @@ class ToolbarInjector
     /**
      * Inject the debugbar into the response
      */
-    protected function injectToolbarHtml(Request $request, Response $response): void
+    protected function injectToolbarHtml(Request $request, Response|JsonResponse $response): void
     {
         if (! $this->shouldInjectHtml($request, $response)) {
             return;
@@ -215,7 +215,7 @@ class ToolbarInjector
     {
         $comment = $isDev ? '<!-- Laravel Toolbar (Development Mode with HMR) -->' : '<!-- Laravel Toolbar -->';
 
-        $nonce = Vite::cspNonce() ?? '';
+        $nonce = Vite::cspNonce() ?: null;
 
         return <<<HTML
         {$comment}
@@ -223,15 +223,18 @@ class ToolbarInjector
         <script{$nonceAttribute}>
             window.__LARAVEL_TOOLBAR_DATA__ = {$data};
             window.__LARAVEL_TOOLBAR_CSS_URL__ = "{$cssUrl}";
-            window.__LARAVEL_TOOLBAR_NONCE__ = "{$nonce}";
 
             (function() {
                 var cached = sessionStorage.getItem('laravel-toolbar-html-cache');
                 var cachedCss = sessionStorage.getItem('laravel-toolbar-css-cache');
 
                 if (cached && cachedCss) {
+
                     // Strip inline styles - Vue will re-add them when it hydrates
-                    cached = cached.replace(/\s*style="[^"]*"/g, '');
+                    if("{$nonce}" !== null)
+                    {
+                        cached = cached.replace(/\s*style="[^"]*"/g, '');
+                    }
 
                     var host = document.getElementById('laravel-toolbar-shadow-host');
                     if (host) {

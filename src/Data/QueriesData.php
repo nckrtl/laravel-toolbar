@@ -8,6 +8,7 @@ class QueriesData extends Data
 {
     public function __construct(
         public float $totalTime,
+        public float $totalTimeFilteredQueries,
         public array $databases,
         public array $connections,
         public array $drivers,

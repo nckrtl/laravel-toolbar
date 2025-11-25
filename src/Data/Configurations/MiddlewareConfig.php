@@ -4,11 +4,12 @@ namespace NckRtl\Toolbar\Data\Configurations;
 
 use Spatie\LaravelData\Data;
 
-class QueriesConfig extends Data implements CollectorConfig
+class MiddlewareConfig extends Data
 {
     public function __construct(
+        public array $prepend = [],
+        public array $append = [],
         public bool $enabled = true,
-        public bool $showSessionQueries = true,
     ) {}
 
     public function isEnabled(): bool

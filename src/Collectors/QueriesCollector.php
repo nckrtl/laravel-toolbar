@@ -13,6 +13,8 @@ class QueriesCollector extends Collector implements CollectorInterface
 {
     public float $totalTime = 0;
 
+    public float $totalTimeFilteredQueries = 0;
+
     public array $queries = [];
 
     public array $databases = [];
@@ -37,6 +39,7 @@ class QueriesCollector extends Collector implements CollectorInterface
 
         return new QueriesData(
             totalTime: $this->totalTime,
+            totalTimeFilteredQueries: $this->totalTimeFilteredQueries,
             databases: $this->databases,
             connections: $this->connections,
             drivers: $this->drivers,
@@ -55,19 +58,49 @@ class QueriesCollector extends Collector implements CollectorInterface
 
         $queryObserver = $toolbar->config->getObserver(QueryObserver::class);
 
-        ray($queryObserver);
-
         $this->totalTime = $queryObserver->totalTime;
 
         $this->queries = $queryObserver->queries;
 
+        $this->connections = $queryObserver->connections;
+        $this->drivers = $queryObserver->drivers;
+        $this->databases = $queryObserver->databases;
+
         $offset = 0;
 
+        $this->filterSessionQueries();
+
+        $this->totalTimeFilteredQueries = array_sum(array_column($this->queries, 'duration'));
+
         foreach ($this->queries as $query) {
-            $query->percentage = $query->duration / $this->totalTime;
+            $query->percentage = $query->duration / $this->totalTimeFilteredQueries;
             $query->offset = $offset;
             $offset += $query->percentage;
         }
+    }
+
+    public function filterSessionQueries(): void
+    {
+        if($this->config->showSessionQueries) {
+            return;
+        }
+
+        $this->queries = array_values(
+            array_filter($this->queries, function (QueryData $query, $key) {
+                $queryContainsSessionString = (
+                    str_contains($query->sql, 'select * from "sessions" where "id" =') ||
+                    str_contains($query->sql, 'update "sessions" set "payload" =')
+                );
+
+                if($queryContainsSessionString) {
+                    if($key !== 0 || $key !== count($this->queries) - 1) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }, ARRAY_FILTER_USE_BOTH)
+        );
     }
 
     public function handleTelescopeEntries(CollectorManager $collectorManager): void
