@@ -7,11 +7,11 @@ import {
   mountVueApp,
   cleanupFailedMount,
   mountSuccess,
-  setShadowRoot
+  setShadowRoot,
 } from '@/core/mount.base'
 import { setupCacheSaving } from '@/core/utils/cache'
 
-export const mountToolbar = async () => {
+export const mountToolbar = async (): Promise<void> => {
   if (!guardMount()) return
 
   setupHMR()
@@ -19,13 +19,18 @@ export const mountToolbar = async () => {
   log('🚀 mountToolbar() called (DEV)')
 
   try {
-    let shadowRoot, appContainer
+    let shadowRoot: ShadowRoot
+    let appContainer: HTMLElement
 
     // Check if shadow was pre-created from cache
     if (window.__TOOLBAR_SHADOW_PRECREATED__) {
       log('⚡ Using pre-created shadow DOM from cache')
       shadowRoot = window.__TOOLBAR_SHADOW_PRECREATED__
-      appContainer = shadowRoot.getElementById('laravel-toolbar-root')
+      const container = shadowRoot.getElementById('laravel-toolbar-root')
+      if (!container) {
+        throw new Error('Toolbar root not found in pre-created shadow DOM')
+      }
+      appContainer = container
       setShadowRoot(shadowRoot)
 
       // Reuse the cached stylesheet for HMR
@@ -51,7 +56,7 @@ export const mountToolbar = async () => {
   }
 }
 
-async function setupStyles(shadowRoot) {
+async function setupStyles(shadowRoot: ShadowRoot): Promise<void> {
   log('🎨 Setting up HMR styles (Development mode)')
 
   const sheet = new CSSStyleSheet()

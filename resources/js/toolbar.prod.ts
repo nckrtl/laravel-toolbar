@@ -7,22 +7,27 @@ import {
   mountVueApp,
   cleanupFailedMount,
   mountSuccess,
-  setShadowRoot
+  setShadowRoot,
 } from '@/core/mount.base'
 import { setupCacheSaving } from '@/core/utils/cache'
 
-const mountToolbar = async () => {
+const mountToolbar = async (): Promise<void> => {
   if (!guardMount()) return
 
   log('🚀 mountToolbar() called (PROD)')
 
   try {
-    let shadowRoot, appContainer
+    let shadowRoot: ShadowRoot
+    let appContainer: HTMLElement
 
     if (window.__TOOLBAR_SHADOW_PRECREATED__) {
       log('⚡ Using pre-created shadow DOM from cache')
       shadowRoot = window.__TOOLBAR_SHADOW_PRECREATED__
-      appContainer = shadowRoot.getElementById('laravel-toolbar-root')
+      const container = shadowRoot.getElementById('laravel-toolbar-root')
+      if (!container) {
+        throw new Error('Toolbar root not found in pre-created shadow DOM')
+      }
+      appContainer = container
       setShadowRoot(shadowRoot)
     } else {
       const result = setupShadowDOM()
@@ -43,7 +48,7 @@ const mountToolbar = async () => {
   }
 }
 
-async function loadProductionCSS(shadowRoot) {
+async function loadProductionCSS(shadowRoot: ShadowRoot): Promise<void> {
   const cssUrl = window.__LARAVEL_TOOLBAR_CSS_URL__
   if (!cssUrl) return
 

@@ -10,8 +10,8 @@ export default defineConfig({
     vue(),
     laravel({
         input: process.env.NODE_ENV === 'production'
-          ? 'resources/js/toolbar.prod.js'
-          : 'resources/js/toolbar.dev.js',
+          ? 'resources/js/toolbar.prod.ts'
+          : 'resources/js/toolbar.dev.ts',
         publicDirectory: './',
         detectTls: true,
     }),

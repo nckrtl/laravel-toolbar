@@ -1,7 +1,7 @@
-export const getNonce = () => {
+export const getNonce = (): string | null => {
   // Check script tags
   const scripts = document.getElementsByTagName('script')
-  for (let script of scripts) {
+  for (const script of scripts) {
     if (script.nonce) return script.nonce
     const nonceAttr = script.getAttribute('nonce')
     if (nonceAttr) return nonceAttr
@@ -9,5 +9,5 @@ export const getNonce = () => {
 
   // Check meta tag
   const metaNonce = document.querySelector('meta[name="csp-nonce"]')
-  return metaNonce?.getAttribute('content') || null
+  return metaNonce?.getAttribute('content') ?? null
 }

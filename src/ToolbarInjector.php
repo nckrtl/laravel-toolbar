@@ -183,6 +183,7 @@ class ToolbarInjector
     protected function toolbarHtmlWithProductionAssets(string $data, string $nonceAttribute): string
     {
         $assets = $this->getProductionManifestAssets();
+
         $jsUrl = route('toolbar.assets', ['asset' => $assets['js']]);
         $cssUrl = route('toolbar.assets', ['asset' => $assets['css']]);
 
@@ -273,7 +274,7 @@ class ToolbarInjector
         }
 
         $manifest = json_decode(file_get_contents($manifestPath), true);
-        $entry = $manifest['resources/js/toolbar.prod.js'] ?? null;
+        $entry = $manifest['resources/js/toolbar.prod.ts'] ?? null;
 
         if (! $entry) {
             return ['js' => '', 'css' => ''];

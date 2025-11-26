@@ -1,20 +1,25 @@
-import { createApp } from 'vue'
+import { createApp, type App } from 'vue'
 import Toolbar from '@/Toolbar.vue'
 import { log, logData } from '@/core/utils/logger'
 
 let isToolbarMounted = false
-let shadowRootRef = null
+let shadowRootRef: ShadowRoot | null = null
 
-export function setShadowRoot(shadowRoot) {
+export interface ShadowDOMSetupResult {
+  shadowRoot: ShadowRoot
+  appContainer: HTMLElement
+}
+
+export function setShadowRoot(shadowRoot: ShadowRoot): void {
   log('Storing shadowRoot reference')
   shadowRootRef = shadowRoot
 }
 
-export function getShadowRoot() {
+export function getShadowRoot(): ShadowRoot | null {
   return shadowRootRef
 }
 
-export function setupShadowDOM() {
+export function setupShadowDOM(): ShadowDOMSetupResult {
   log('📦 Setting up Shadow DOM')
 
   const shadowHost = document.getElementById('laravel-toolbar-shadow-host')
@@ -49,7 +54,7 @@ export function setupShadowDOM() {
   return { shadowRoot, appContainer }
 }
 
-export function mountVueApp(appContainer) {
+export function mountVueApp(appContainer: HTMLElement): App<Element> {
   log('🎯 Mounting Vue app')
 
   const app = createApp(Toolbar)
@@ -62,9 +67,11 @@ export function mountVueApp(appContainer) {
 
   app.mount(appContainer)
   log('✅ Vue app mounted in Shadow DOM')
+
+  return app
 }
 
-export function cleanupFailedMount() {
+export function cleanupFailedMount(): void {
   log('🧹 Cleaning up after failed mount')
 
   const shadowHost = document.getElementById('laravel-toolbar-shadow-host')
@@ -76,7 +83,7 @@ export function cleanupFailedMount() {
   isToolbarMounted = false
 }
 
-export function guardMount() {
+export function guardMount(): boolean {
   if (isToolbarMounted) {
     log('⚠️ Toolbar already mounted, skipping')
     return false
@@ -85,7 +92,7 @@ export function guardMount() {
   return true
 }
 
-export function mountSuccess() {
+export function mountSuccess(): void {
   log('✅ Toolbar mounted successfully')
   logData()
 }
