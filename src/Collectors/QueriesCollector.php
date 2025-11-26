@@ -81,7 +81,7 @@ class QueriesCollector extends Collector implements CollectorInterface
 
     public function filterSessionQueries(): void
     {
-        if($this->config->showSessionQueries) {
+        if ($this->config->showSessionQueries) {
             return;
         }
 
@@ -92,8 +92,8 @@ class QueriesCollector extends Collector implements CollectorInterface
                     str_contains($query->sql, 'update "sessions" set "payload" =')
                 );
 
-                if($queryContainsSessionString) {
-                    if($key !== 0 || $key !== count($this->queries) - 1) {
+                if ($queryContainsSessionString) {
+                    if ($key !== 0 || $key !== count($this->queries) - 1) {
                         return false;
                     }
                 }

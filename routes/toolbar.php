@@ -15,4 +15,3 @@ Route::prefix('_toolbar')->middleware(['web'])->group(function () {
         Route::post('/stop', [HorizonController::class, 'stop']);
     });
 });
-

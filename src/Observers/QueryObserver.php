@@ -2,11 +2,11 @@
 
 namespace NckRtl\Toolbar\Observers;
 
-use NckRtl\Toolbar\Measurement;
-use NckRtl\Toolbar\Data\QueryData;
-use NckRtl\Toolbar\Data\DatabaseData;
-use NckRtl\Toolbar\Enums\DataSizeUnit;
 use Illuminate\Database\Events\QueryExecuted;
+use NckRtl\Toolbar\Data\DatabaseData;
+use NckRtl\Toolbar\Data\QueryData;
+use NckRtl\Toolbar\Enums\DataSizeUnit;
+use NckRtl\Toolbar\Measurement;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 
 class QueryObserver
@@ -100,14 +100,14 @@ class QueryObserver
 
     public function addDatabase($database, $event)
     {
-        if(array_key_exists($database, $this->databases)) {
+        if (array_key_exists($database, $this->databases)) {
             return;
         }
 
         $this->databases[$database] = new DatabaseData(
-                name: $database,
-                connection: $event->connectionName,
-                driver: $event->connection->getDriverName(),
+            name: $database,
+            connection: $event->connectionName,
+            driver: $event->connection->getDriverName(),
         );
 
     }

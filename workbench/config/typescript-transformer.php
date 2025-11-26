@@ -2,7 +2,7 @@
 
 return [
     'auto_discover_types' => [
-        __DIR__ . '/../../src/Data',
+        __DIR__.'/../../src/Data',
     ],
 
     'transformers' => [
@@ -18,7 +18,7 @@ return [
         Spatie\TypeScriptTransformer\Collectors\EnumCollector::class,
     ],
 
-    'output_file' => __DIR__ . '/../../resources/js/types/generated.d.ts',
+    'output_file' => __DIR__.'/../../resources/js/types/generated.d.ts',
 
     'default_type_replacements' => [
         DateTime::class => 'string',
