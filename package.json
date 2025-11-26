@@ -10,7 +10,9 @@
     "build-watch": "vite build --watch",
     "format": "prettier --write resources/",
     "format:check": "prettier --check resources/",
-    "oxlint": "bunx oxlint@latest --fix --fix-suggestions"
+    "oxlint": "bunx oxlint@latest --fix --fix-suggestions",
+    "typecheck": "vue-tsc --noEmit",
+    "generate-types": "php vendor/bin/testbench typescript:transform"
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
@@ -30,6 +32,7 @@
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
     "vite": "^7.1.7",
-    "vite-plugin-shadow-style": "^1.2.0"
+    "vite-plugin-run": "^0.6.1",
+    "vue-tsc": "^3.1.5"
   }
 }
