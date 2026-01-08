@@ -2,6 +2,21 @@
 
 All notable changes to `laravel-toolbar` will be documented in this file.
 
+## v0.1.1 - 2026-01-08
+
+### New Features
+
+- Added Laravel Boost integration with AI guidelines for toolbar usage
+- Added release skill for standardized GitHub releases
+
+### Documentation
+
+- Document available collectors and configuration options
+- Include ToolbarConfigProvider example
+- Add Telescope integration guide
+
+**Full Changelog**: https://github.com/nckrtl/laravel-toolbar/compare/v0.1.0...v0.1.1
+
 ## v0.0.8 - 2026-01-07
 
 ### Fixes
