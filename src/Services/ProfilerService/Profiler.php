@@ -90,7 +90,7 @@ class Profiler
 
     private static function setupViewProfiling(): void
     {
-        if (! config('toolbar.enabled', env('LARAVEL_TOOLBAR_ENABLED', true))) {
+        if (! config('toolbar.enabled', true)) {
             return;
         }
 

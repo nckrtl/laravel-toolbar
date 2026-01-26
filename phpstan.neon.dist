@@ -9,3 +9,20 @@ parameters:
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true
+
+    ignoreErrors:
+        # env() is intentionally used in service provider for early boot check
+        # before config is loaded
+        -
+            identifier: larastan.noEnvCallsOutsideOfConfig
+            path: src/ToolbarServiceProvider.php
+
+        # Telescope is an optional dependency - class may not exist
+        -
+            identifier: class.notFound
+            path: src/CollectorManager.php
+
+        # Horizon is an optional dependency - class may not exist
+        -
+            identifier: class.notFound
+            path: src/Controllers/HorizonController.php

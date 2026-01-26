@@ -18,12 +18,16 @@ class DatabaseData extends Data
 
     public function setTablePlusConnectionUrl(): void
     {
+        /** @var string|null $username */
         $username = config('database.connections.'.$this->connection.'.username');
+        /** @var string|null $password */
         $password = config('database.connections.'.$this->connection.'.password');
+        /** @var string|null $host */
         $host = config('database.connections.'.$this->connection.'.host');
+        /** @var int|string|null $port */
         $port = config('database.connections.'.$this->connection.'.port');
 
-        if (empty($username) || empty($host) || empty($port)) {
+        if ($username === null || $username === '' || $host === null || $host === '' || $port === null || $port === '') {
             return;
         }
 
@@ -31,31 +35,24 @@ class DatabaseData extends Data
             'mysql' => 'mysql',
             'pgsql' => 'postgresql',
             'sqlite' => 'sqlite',
-            default => 'null',
+            default => null,
         };
 
-        if (empty($protocol !== 'null')) {
+        if ($protocol === null) {
             return;
         }
 
         $this->tablePlusConnectionUrl = $protocol.'://';
 
-        if (! empty($username)) {
-            $this->tablePlusConnectionUrl .= $username;
-        }
+        // Username, host, and port are guaranteed non-empty after check above
+        $this->tablePlusConnectionUrl .= $username;
 
-        if (! empty($password)) {
+        if ($password !== null && $password !== '') {
             $this->tablePlusConnectionUrl .= ':'.$password;
         }
 
-        if (! empty($host)) {
-            $this->tablePlusConnectionUrl .= '@'.$host;
-        }
-
-        if (! empty($port)) {
-            $this->tablePlusConnectionUrl .= ':'.$port;
-        }
-
+        $this->tablePlusConnectionUrl .= '@'.$host;
+        $this->tablePlusConnectionUrl .= ':'.$port;
         $this->tablePlusConnectionUrl .= '/'.$this->name;
     }
 }

@@ -131,7 +131,6 @@ class QueryObserver
             connection: $event->connectionName,
             driver: $event->connection->getDriverName(),
         );
-
     }
 
     protected function formatBindings($event)
@@ -175,11 +174,7 @@ class QueryObserver
     protected function quoteStringBinding($event, $binding)
     {
         try {
-            $pdo = $event->connection->getPdo();
-
-            if ($pdo instanceof \PDO) {
-                return $pdo->quote($binding);
-            }
+            return $event->connection->getPdo()->quote($binding);
         } catch (\PDOException $e) {
             throw_if($e->getCode() !== 'IM001', $e);
         }
