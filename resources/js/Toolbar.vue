@@ -18,7 +18,7 @@ const { data } = useToolbar();
                 class="flex gap-1"
                 :class="{
                     'absolute bottom-0 left-0 min-h-9.5 justify-start p-[5px]': section === 'left',
-                    'justify-center': section === 'center',
+                    'justify-center p-[5px]': section === 'center',
                     'absolute right-0 bottom-0 min-h-9.5 justify-end p-[5px]': section === 'right',
                     'w-full': section === 'center',
                 }"
