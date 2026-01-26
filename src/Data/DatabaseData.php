@@ -34,7 +34,7 @@ class DatabaseData extends Data
             default => 'null',
         };
 
-        if (empty($protocol !== 'null')) {
+        if ($protocol === 'null') {
             return;
         }
 
