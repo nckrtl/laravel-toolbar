@@ -14,9 +14,9 @@ class RequestData extends Data
 
     public string $route_name;
 
-    public ?string $controller_action_editor_url;
+    public ?string $controller_action_editor_url = null;
 
-    public ?string $route_editor_url;
+    public ?string $route_editor_url = null;
 
     private ?RoutingRoute $route = null;
 
