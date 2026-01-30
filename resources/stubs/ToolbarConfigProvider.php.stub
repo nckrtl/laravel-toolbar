@@ -1,15 +1,36 @@
 <?php
 
-namespace NckRtl\Toolbar\Providers;
+namespace App\Providers;
 
-use NckRtl\Toolbar\Toolbar;
-use NckRtl\Toolbar\Data\ToolbarConfig;
-use NckRtl\Toolbar\Providers\ToolbarProvider;
+use Illuminate\Support\ServiceProvider;
 
-class ToolbarConfigProvider extends ToolbarProvider
+class ToolbarConfigProvider extends ServiceProvider
 {
-    public function update(ToolbarConfig $toolbarConfig): void
+    public function register(): void
     {
+        // Toolbar is a dev-only dependency - skip if package not available
+        if (! class_exists(\NckRtl\Toolbar\Toolbar::class)) {
+            return;
+        }
+    }
+
+    public function boot(): void
+    {
+        // Skip configuration if toolbar package is not available (dev-only dependency)
+        if (! class_exists(\NckRtl\Toolbar\Toolbar::class)) {
+            return;
+        }
+
+        $toolbar = $this->app->make(\NckRtl\Toolbar\Toolbar::class);
+        $this->update($toolbar->config);
+    }
+
+    public function update(\NckRtl\Toolbar\Data\ToolbarConfig $toolbarConfig): void
+    {
+        // Customize your toolbar configuration here
+        // Examples:
+        // $toolbarConfig->debug();
+        // $toolbarConfig->collectors([...]);
         $toolbarConfig;
     }
 }
