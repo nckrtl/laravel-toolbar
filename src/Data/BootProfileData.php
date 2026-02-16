@@ -12,6 +12,5 @@ class BootProfileData extends Data
         public array $after_bootstrap,
         public array $providers_registered,
         public array $providers_booted,
-    ) {
-    }
+    ) {}
 }

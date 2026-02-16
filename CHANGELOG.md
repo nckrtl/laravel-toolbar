@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-toolbar` will be documented in this file.
 
+## v0.1.6 - 2026-01-30
+
+**Full Changelog**: https://github.com/nckrtl/laravel-toolbar/compare/v0.1.4...v0.1.6
+
 ## v0.1.4 - 2026-01-29
 
 ### What's Changed
