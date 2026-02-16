@@ -12,6 +12,5 @@ class ProfilerData extends Data
         public Measurement $total_real_memory,
         public Measurement $total_allocated_memory,
         public array $stages
-    ) {
-    }
+    ) {}
 }

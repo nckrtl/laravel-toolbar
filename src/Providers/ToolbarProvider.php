@@ -13,7 +13,5 @@ class ToolbarProvider extends ServiceProvider
         $this->update($toolbar->config);
     }
 
-    public function update(ToolbarConfig $toolbarConfig): void
-    {
-    }
+    public function update(ToolbarConfig $toolbarConfig): void {}
 }

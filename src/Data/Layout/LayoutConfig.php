@@ -15,8 +15,7 @@ class LayoutConfig extends Data
 
     public function __construct(
 
-    ) {
-    }
+    ) {}
 
     public function addGroup(GroupConfig $groupConfig, bool $prepend = false): self
     {

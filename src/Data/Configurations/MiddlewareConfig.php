@@ -10,8 +10,7 @@ class MiddlewareConfig extends Data
         public array $prepend = [],
         public array $append = [],
         public bool $enabled = true,
-    ) {
-    }
+    ) {}
 
     public function isEnabled(): bool
     {

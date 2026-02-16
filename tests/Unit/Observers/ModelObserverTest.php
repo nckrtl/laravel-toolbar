@@ -37,9 +37,7 @@ it('resets memory tracking on reset', function () {
     $observer = new ModelObserver;
 
     // Record a hydration to set currentMemory
-    $mockModel = new class
-    {
-    };
+    $mockModel = new class {};
     $observer->recordHydrations(['model' => $mockModel], 1000, 2000);
 
     // Reset should clear memory tracking
@@ -51,9 +49,7 @@ it('resets memory tracking on reset', function () {
 it('records hydration entries for models', function () {
     $observer = new ModelObserver;
 
-    $mockModel = new class
-    {
-    };
+    $mockModel = new class {};
     $modelClass = get_class($mockModel);
 
     $observer->recordHydrations(['model' => $mockModel], 1000, 2000);
@@ -65,9 +61,7 @@ it('records hydration entries for models', function () {
 it('increments count for duplicate model hydrations', function () {
     $observer = new ModelObserver;
 
-    $mockModel = new class
-    {
-    };
+    $mockModel = new class {};
     $modelClass = get_class($mockModel);
 
     $observer->recordHydrations(['model' => $mockModel], 1000, 2000);
@@ -80,9 +74,7 @@ it('increments count for duplicate model hydrations', function () {
 it('tracks memory usage for model hydrations', function () {
     $observer = new ModelObserver;
 
-    $mockModel = new class
-    {
-    };
+    $mockModel = new class {};
     $modelClass = get_class($mockModel);
 
     $observer->recordHydrations(['model' => $mockModel], 1000, 2000);
@@ -94,9 +86,7 @@ it('tracks memory usage for model hydrations', function () {
 it('sets action to retrieved for hydrations', function () {
     $observer = new ModelObserver;
 
-    $mockModel = new class
-    {
-    };
+    $mockModel = new class {};
     $modelClass = get_class($mockModel);
 
     $observer->recordHydrations(['model' => $mockModel], 1000, 2000);
@@ -107,9 +97,7 @@ it('sets action to retrieved for hydrations', function () {
 it('handles array data format for model', function () {
     $observer = new ModelObserver;
 
-    $mockModel = new class
-    {
-    };
+    $mockModel = new class {};
     $modelClass = get_class($mockModel);
 
     // Test array format with model at index 0
@@ -123,9 +111,7 @@ it('ignores non-retrieved events', function () {
 
     // The recordAction method should only process events matching *retrieved*
     // Test that other events are ignored
-    $mockModel = new class
-    {
-    };
+    $mockModel = new class {};
 
     // Directly call recordAction with a non-retrieved event
     $observer->recordAction('eloquent.created', ['model' => $mockModel]);
@@ -136,9 +122,7 @@ it('ignores non-retrieved events', function () {
 it('processes retrieved events', function () {
     $observer = new ModelObserver;
 
-    $mockModel = new class
-    {
-    };
+    $mockModel = new class {};
     $modelClass = get_class($mockModel);
 
     // Ensure profiler has a memory checkpoint
@@ -161,12 +145,8 @@ it('reset clears all accumulated data between requests', function () {
     $observer = new ModelObserver;
 
     // Simulate first request
-    $mockUser = new class
-    {
-    };
-    $mockPost = new class
-    {
-    };
+    $mockUser = new class {};
+    $mockPost = new class {};
 
     $observer->recordHydrations(['model' => $mockUser], 1000, 2000);
     $observer->recordHydrations(['model' => $mockPost], 2000, 3000);

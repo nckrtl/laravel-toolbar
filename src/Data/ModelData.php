@@ -12,6 +12,5 @@ class ModelData extends Data
         public string $model,
         public int $count,
         public ?Measurement $memory_used = null,
-    ) {
-    }
+    ) {}
 }

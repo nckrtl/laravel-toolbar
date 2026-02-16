@@ -8,8 +8,7 @@ class ResponseConfig extends Data implements CollectorConfig
 {
     public function __construct(
         public bool $enabled = true,
-    ) {
-    }
+    ) {}
 
     public function isEnabled(): bool
     {

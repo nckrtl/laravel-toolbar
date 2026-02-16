@@ -9,8 +9,7 @@ class QueriesConfig extends Data implements CollectorConfig
     public function __construct(
         public bool $enabled = true,
         public bool $showSessionQueries = true,
-    ) {
-    }
+    ) {}
 
     public function isEnabled(): bool
     {

@@ -10,8 +10,7 @@ class RequestConfig extends Data implements CollectorConfig
     public function __construct(
         public bool $enabled = true,
         public ?DataProvider $dataProvider = null,
-    ) {
-    }
+    ) {}
 
     public function isEnabled(): bool
     {

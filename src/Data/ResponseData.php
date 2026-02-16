@@ -11,6 +11,5 @@ class ResponseData extends Data
         public int $status_code,
         public array $headers,
         public Measurement $size,
-    ) {
-    }
+    ) {}
 }

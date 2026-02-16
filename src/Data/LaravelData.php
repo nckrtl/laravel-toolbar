@@ -18,6 +18,5 @@ class LaravelData extends Data
         public ?string $locale_editor_url = null,
         public ?string $debug = null,
         public ?string $debug_editor_url = null,
-    ) {
-    }
+    ) {}
 }

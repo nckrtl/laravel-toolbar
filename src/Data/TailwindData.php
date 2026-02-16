@@ -8,6 +8,5 @@ class TailwindData extends Data
 {
     public function __construct(
         public ?string $version = null,
-    ) {
-    }
+    ) {}
 }

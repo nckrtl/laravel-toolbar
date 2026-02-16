@@ -13,6 +13,5 @@ class QueriesData extends Data
         public array $connections,
         public array $drivers,
         public array $queries,
-    ) {
-    }
+    ) {}
 }
