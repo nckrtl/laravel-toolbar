@@ -10,5 +10,6 @@ class PhpData extends Data
         public string $version,
         public string $memory_limit,
         public string $max_execution_time,
-    ) {}
+    ) {
+    }
 }

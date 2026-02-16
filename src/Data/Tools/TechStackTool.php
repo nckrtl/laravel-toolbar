@@ -12,7 +12,8 @@ class TechStackTool extends Data implements ToolInterface
         public bool $php = true,
         public bool $inertia = false,
         public bool $tailwind = false,
-    ) {}
+    ) {
+    }
 
     public function component(): string
     {

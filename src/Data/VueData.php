@@ -10,5 +10,6 @@ class VueData extends Data
         public ?string $version = null,
         public ?string $version_editor_url = null,
         public ?string $devtools_version = null,
-    ) {}
+    ) {
+    }
 }

@@ -11,5 +11,6 @@ class ProfilerEvent
 
     public function __construct(
         public RequestCheckpointId $event,
-    ) {}
+    ) {
+    }
 }

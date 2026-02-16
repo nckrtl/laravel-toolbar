@@ -14,7 +14,8 @@ class LaravelConfig extends Data implements CollectorConfig
         public bool $debug = true,
         public bool $timezone = true,
         public bool $locale = true,
-    ) {}
+    ) {
+    }
 
     public function isEnabled(): bool
     {

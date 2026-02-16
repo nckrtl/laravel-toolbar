@@ -8,5 +8,6 @@ class ToolConfig extends Data
 {
     public function __construct(
 
-    ) {}
+    ) {
+    }
 }

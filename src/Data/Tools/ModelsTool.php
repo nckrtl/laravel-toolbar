@@ -8,7 +8,8 @@ class ModelsTool extends Data implements ToolInterface
 {
     public function __construct(
 
-    ) {}
+    ) {
+    }
 
     public function component(): string
     {
