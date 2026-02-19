@@ -38,6 +38,12 @@ class ToolbarInjector
             return;
         }
 
+        if (! Toolbar::$visible) {
+            new CollectorManager(response: $response)->collectData();
+
+            return;
+        }
+
         if ($this->isInertiaRequest($request)) {
             $this->injectToolbarData($response);
 

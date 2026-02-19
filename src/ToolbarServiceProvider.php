@@ -24,7 +24,13 @@ class ToolbarServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         if (! env('LARAVEL_TOOLBAR_ENABLED', true)) {
+            Toolbar::$enabled = false;
+
             return;
+        }
+
+        if (! env('LARAVEL_TOOLBAR_VISIBLE', true)) {
+            Toolbar::$visible = false;
         }
 
         app()->instance(Toolbar::class, new Toolbar);

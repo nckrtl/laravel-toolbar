@@ -9,6 +9,8 @@ class Toolbar
 {
     public static bool $enabled = true;
 
+    public static bool $visible = true;
+
     public static function enable(): void
     {
         self::$enabled = true;
@@ -17,6 +19,16 @@ class Toolbar
     public static function disable(): void
     {
         self::$enabled = false;
+    }
+
+    public static function show(): void
+    {
+        self::$visible = true;
+    }
+
+    public static function hide(): void
+    {
+        self::$visible = false;
     }
 
     public array $collectors = [];

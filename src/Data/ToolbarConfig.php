@@ -211,6 +211,20 @@ class ToolbarConfig extends Data
         return $this;
     }
 
+    public function show(): self
+    {
+        Toolbar::$visible = true;
+
+        return $this;
+    }
+
+    public function hide(): self
+    {
+        Toolbar::$visible = false;
+
+        return $this;
+    }
+
     public function enableInConsole(bool $enabled = true): self
     {
         $this->enabledInConsole = $enabled;

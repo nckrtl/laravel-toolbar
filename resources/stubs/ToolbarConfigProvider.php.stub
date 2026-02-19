@@ -21,6 +21,10 @@ class ToolbarConfigProvider extends ServiceProvider
             return;
         }
 
+        if (! $this->app->bound(\NckRtl\Toolbar\Toolbar::class)) {
+            return;
+        }
+
         $toolbar = $this->app->make(\NckRtl\Toolbar\Toolbar::class);
         $this->update($toolbar->config);
     }
