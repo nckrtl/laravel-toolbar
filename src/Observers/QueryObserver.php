@@ -56,7 +56,10 @@ class QueryObserver
     public function recordQuery(QueryExecuted $event)
     {
         if ($this->currentMemory == 0) {
-            $this->currentMemory = Profiler::getCurrentMemoryUsage()->value;
+            $memoryMeasurement = Profiler::getCurrentMemoryUsage();
+            $this->currentMemory = $memoryMeasurement !== null
+                ? $memoryMeasurement->value
+                : memory_get_usage();
         }
 
         $memoryBefore = $this->currentMemory;

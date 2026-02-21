@@ -327,3 +327,25 @@ it('reset simulates Octane request boundary', function () {
     expect($observer->queries)->toHaveCount(1);
     expect($observer->totalTime)->toBeLessThan($firstRequestTotalTime + $observer->queries[0]->duration);
 });
+
+// Regression test for null Profiler::getCurrentMemoryUsage
+it('handles queries when Profiler has no memory checkpoints', function () {
+    // Simulate scenario where no checkpoints with memory measurement have been recorded
+    // This happens in contexts like recall.beast health checks with Caddy/systemd
+    // Use getRequestStages() to clear ALL state including private $latestMemoryCheckpoint
+    Profiler::getRequestStages();
+    Profiler::$requestCheckpoints = [];
+
+    // Verify that getCurrentMemoryUsage returns null in this state
+    expect(Profiler::getCurrentMemoryUsage())->toBeNull();
+
+    // QueryObserver should not throw when recording queries without Profiler memory data
+    $observer = new QueryObserver;
+
+    DB::table('test_users')->insert(['name' => 'John', 'email' => 'john@example.com']);
+
+    // Query should be recorded successfully despite null memory checkpoint
+    expect($observer->queries)->not->toBeEmpty();
+    expect($observer->queries)->toHaveCount(1);
+    expect($observer->queries[0]->sql)->toContain('insert');
+});

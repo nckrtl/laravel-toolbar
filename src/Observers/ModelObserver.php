@@ -38,7 +38,10 @@ class ModelObserver
     public function recordAction($event, $data)
     {
         if ($this->currentMemory == 0) {
-            $this->currentMemory = Profiler::getCurrentMemoryUsage()->value;
+            $memoryMeasurement = Profiler::getCurrentMemoryUsage();
+            $this->currentMemory = $memoryMeasurement !== null
+                ? $memoryMeasurement->value
+                : memory_get_usage();
         }
 
         if (! Str::is('*retrieved*', $event)) {
