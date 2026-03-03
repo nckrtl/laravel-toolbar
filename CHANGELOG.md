@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-toolbar` will be documented in this file.
 
+## v0.1.11 - 2026-03-03
+
+Widen laravel/mcp constraint to `^0.5.1 || ^0.6.0` for compatibility with projects using laravel/boost (which requires mcp ^0.5.1).
+
 ## v0.1.10 - 2026-03-03
 
 ### Bug fixes
