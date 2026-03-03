@@ -332,9 +332,7 @@ it('reset simulates Octane request boundary', function () {
 it('handles queries when Profiler has no memory checkpoints', function () {
     // Simulate scenario where no checkpoints with memory measurement have been recorded
     // This happens in contexts like recall.beast health checks with Caddy/systemd
-    // Use getRequestStages() to clear ALL state including private $latestMemoryCheckpoint
-    Profiler::getRequestStages();
-    Profiler::$requestCheckpoints = [];
+    Profiler::resetState();
 
     // Verify that getCurrentMemoryUsage returns null in this state
     expect(Profiler::getCurrentMemoryUsage())->toBeNull();

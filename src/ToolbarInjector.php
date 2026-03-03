@@ -77,7 +77,7 @@ class ToolbarInjector
         // Add debug data as a custom header
         $response->headers->set(
             'x-toolbar',
-            base64_encode(json_encode($data))
+            base64_encode(json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE) ?: '{}')
         );
 
         return $response;
@@ -137,12 +137,12 @@ class ToolbarInjector
         $position = strripos($content, '</body>');
 
         // Generate the debugbar HTML
-        $toolbarHtml = $this->getToolbarHtml(
-            json_encode(
-                $data,
-                JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
-            )
+        $json = json_encode(
+            $data,
+            JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE
         );
+
+        $toolbarHtml = $this->getToolbarHtml($json ?: '{}');
 
         if ($position !== false) {
             $content = substr($content, 0, $position).$toolbarHtml.substr($content, $position);
@@ -277,7 +277,7 @@ class ToolbarInjector
                 if (cached && cachedCss) {
 
                     // Strip inline styles - Vue will re-add them when it hydrates
-                    if("{$nonce}" !== null)
+                    if("{$nonce}" !== "")
                     {
                         cached = cached.replace(/\s*style="[^"]*"/g, '');
                     }

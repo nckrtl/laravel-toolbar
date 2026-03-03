@@ -34,6 +34,10 @@ class ModelsCollector extends Collector implements CollectorInterface
 
         $modelObserver = $toolbar->config->getObserver(ModelObserver::class);
 
+        if (! $modelObserver) {
+            return;
+        }
+
         $this->models = $modelObserver->hydrationEntries;
     }
 }

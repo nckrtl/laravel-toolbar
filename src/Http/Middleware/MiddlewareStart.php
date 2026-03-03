@@ -6,11 +6,16 @@ use Closure;
 use Illuminate\Http\Request;
 use NckRtl\Toolbar\Enums\RequestCheckpointId;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+use NckRtl\Toolbar\Toolbar;
 
 class MiddlewareStart
 {
     public function handle(Request $request, Closure $next)
     {
+        // Reset static state for Octane/long-running processes
+        Toolbar::$enabled = config('toolbar.enabled', true);
+        Toolbar::$visible = config('toolbar.visible', true);
+
         if (! Profiler::getCheckpoint(RequestCheckpointId::BEFORE_MIDDLEWARE)) {
             Profiler::record(RequestCheckpointId::BEFORE_MIDDLEWARE);
         }

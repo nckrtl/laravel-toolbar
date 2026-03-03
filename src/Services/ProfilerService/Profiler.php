@@ -105,12 +105,11 @@ class Profiler
             {
                 public function get($path, array $data = [])
                 {
-                    $result = parent::get($path, $data);
-
-                    // First view? Record the start
                     if (empty(Profiler::$viewRenders)) {
                         Profiler::record(RequestCheckpointId::BEFORE_VIEW_RENDERING);
                     }
+
+                    $result = parent::get($path, $data);
 
                     Profiler::$viewRenders[$path] = new RequestCheckpointData;
 
@@ -195,13 +194,15 @@ class Profiler
 
         $profileMarkers = self::$profileMarkers;
 
-        // Clear all state for next request (important for Octane)
-        self::$requestCheckpoints = [];
-        self::$profileMarkers = [];
-        self::$viewRenders = [];
-        self::$latestMemoryCheckpoint = null;
-
         return [$requestStages, $profileMarkers];
+    }
+
+    public static function resetState(): void
+    {
+        self::$requestCheckpoints = [];
+        self::$viewRenders = [];
+        self::$profileMarkers = [];
+        self::$latestMemoryCheckpoint = null;
     }
 
     public static function getCheckpoint(RequestCheckpointId $id): ?RequestCheckpointData

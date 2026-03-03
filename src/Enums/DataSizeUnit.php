@@ -56,8 +56,8 @@ enum DataSizeUnit: string implements Unit
      */
     public function convertValueTo(int|float $value, Unit $convertToUnit): int|float
     {
-        if ($this->factor() > $convertToUnit->factor()) {
-            return $value / $this->factor() * $convertToUnit->factor();
+        if ($this === $convertToUnit) {
+            return $value;
         }
 
         return $value * $this->factor() / $convertToUnit->factor();

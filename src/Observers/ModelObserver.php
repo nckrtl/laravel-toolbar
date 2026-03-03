@@ -73,6 +73,7 @@ class ModelObserver
             );
         } else {
             $model = $this->hydrationEntries[$modelClass];
+            $model->memory_used->value += ($memoryAfter - $memoryBefore);
             $model->memory_used->formatValue();
             $model->count++;
         }

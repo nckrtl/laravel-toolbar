@@ -13,6 +13,7 @@ class ToolbarServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('laravel-toolbar')
+            ->hasConfigFile()
             ->hasRoutes(['toolbar', 'ai'])
             ->publishesServiceProvider('ToolbarConfigProvider')
             ->hasCommands([
@@ -23,13 +24,13 @@ class ToolbarServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
-        if (! env('LARAVEL_TOOLBAR_ENABLED', true)) {
+        if (! config('toolbar.enabled', true)) {
             Toolbar::$enabled = false;
 
             return;
         }
 
-        if (! env('LARAVEL_TOOLBAR_VISIBLE', true)) {
+        if (! config('toolbar.visible', true)) {
             Toolbar::$visible = false;
         }
 

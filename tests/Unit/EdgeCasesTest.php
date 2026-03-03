@@ -309,9 +309,7 @@ it('QueriesCollector handles zero queries without division by zero', function ()
 // Profiler::getCurrentMemoryUsage Edge Cases
 
 it('Profiler getCurrentMemoryUsage returns null with no memory checkpoints', function () {
-    // Use getRequestStages() to clear ALL state including private $latestMemoryCheckpoint
-    Profiler::getRequestStages();
-    Profiler::$requestCheckpoints = [];
+    Profiler::resetState();
 
     $result = Profiler::getCurrentMemoryUsage();
 
@@ -319,9 +317,7 @@ it('Profiler getCurrentMemoryUsage returns null with no memory checkpoints', fun
 });
 
 it('Profiler getCurrentMemoryUsage returns null when no checkpoints have measureMemory true', function () {
-    // Use getRequestStages() to clear ALL state including private $latestMemoryCheckpoint
-    Profiler::getRequestStages();
-    Profiler::$requestCheckpoints = [];
+    Profiler::resetState();
 
     // Record a checkpoint that doesn't measure memory
     Profiler::record(

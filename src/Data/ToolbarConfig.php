@@ -139,7 +139,7 @@ class ToolbarConfig extends Data
 
     public function observers(?array $observers = null): self
     {
-        $this->observers = $observers;
+        $this->observers = $observers ?? [];
 
         return $this;
     }
@@ -157,6 +157,8 @@ class ToolbarConfig extends Data
     {
         if (is_null($collectors) || empty($collectors)) {
             $this->collectors = [];
+
+            return $this;
         }
 
         foreach ($collectors as $collector) {
