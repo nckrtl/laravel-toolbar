@@ -143,34 +143,33 @@ describe('Profiler state accumulation', function () {
         Profiler::$profileMarkers = [];
     });
 
-    it('clears checkpoints after getRequestStages', function () {
+    it('clears checkpoints via resetState', function () {
         Profiler::record(\NckRtl\Toolbar\Enums\RequestCheckpointId::BEFORE_MIDDLEWARE);
 
         expect(Profiler::$requestCheckpoints)->not->toBeEmpty();
 
-        Profiler::getRequestStages();
+        Profiler::resetState();
 
         expect(Profiler::$requestCheckpoints)->toBeEmpty();
     });
 
-    it('clears profile markers after getRequestStages', function () {
+    it('clears profile markers via resetState', function () {
         Profiler::profile('Test marker');
 
         expect(Profiler::$profileMarkers)->toHaveCount(1);
 
-        Profiler::getRequestStages();
+        Profiler::resetState();
 
         expect(Profiler::$profileMarkers)->toBeEmpty();
     });
 
-    it('clears viewRenders after getRequestStages', function () {
+    it('clears viewRenders via resetState', function () {
         Profiler::$viewRenders['/path/to/view.blade.php'] = new \NckRtl\Toolbar\Data\RequestCheckpointData;
 
         expect(Profiler::$viewRenders)->toHaveCount(1);
 
-        Profiler::getRequestStages();
+        Profiler::resetState();
 
-        // Fixed: viewRenders is now cleared
         expect(Profiler::$viewRenders)->toBeEmpty();
     });
 

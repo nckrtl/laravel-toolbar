@@ -69,11 +69,7 @@ enum TimeUnit: string implements Unit
             return $value;
         }
 
-        if ($this->factor() > $convertToUnit->factor()) {
-            return $value * $this->factor() / $convertToUnit->factor();
-        }
-
-        return $value / $this->factor() * $convertToUnit->factor();
+        return $value * $this->factor() / $convertToUnit->factor();
     }
 
     public function formatMaxFractionDigits(int $maxFractionDigits, int|float $value, ?Unit $formatToUnit = null): string

@@ -57,9 +57,15 @@ class CollectorManager
         foreach ($collectors as $collector) {
             $startCollector = microtime(true);
 
-            $this->data[$collector->key()] = $collector->collectData(
-                collectorManager: $this,
-            );
+            try {
+                $this->data[$collector->key()] = $collector->collectData(
+                    collectorManager: $this,
+                );
+            } catch (\Throwable $e) {
+                report($e);
+
+                continue;
+            }
 
             $endCollector = microtime(true);
 

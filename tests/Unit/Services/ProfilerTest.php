@@ -8,15 +8,7 @@ use NckRtl\Toolbar\Measurement;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 
 beforeEach(function () {
-    // Use getRequestStages() to clear ALL state including private $latestMemoryCheckpoint
-    // This is necessary because initialize() registers callbacks that fire immediately
-    // in the test environment (since Laravel is already booted)
-    Profiler::getRequestStages();
-
-    // Ensure public arrays are clean for test isolation
-    Profiler::$requestCheckpoints = [];
-    Profiler::$viewRenders = [];
-    Profiler::$profileMarkers = [];
+    Profiler::resetState();
 });
 
 it('records checkpoints', function () {
@@ -180,12 +172,12 @@ it('returns request stages array', function () {
     expect($stages)->toBeArray();
 });
 
-it('clears checkpoints after getting request stages', function () {
+it('clears checkpoints via resetState', function () {
     Profiler::record(RequestCheckpointId::BEFORE_MIDDLEWARE);
 
     expect(Profiler::$requestCheckpoints)->not->toBeEmpty();
 
-    Profiler::getRequestStages();
+    Profiler::resetState();
 
     expect(Profiler::$requestCheckpoints)->toBeEmpty();
 });
@@ -265,12 +257,12 @@ it('clears profile markers', function () {
     expect(Profiler::$profileMarkers)->toBeEmpty();
 });
 
-it('clears profile markers after getting request stages', function () {
+it('clears profile markers via resetState', function () {
     Profiler::profile('Test marker');
 
     expect(Profiler::$profileMarkers)->toHaveCount(1);
 
-    Profiler::getRequestStages();
+    Profiler::resetState();
 
     expect(Profiler::$profileMarkers)->toBeEmpty();
 });

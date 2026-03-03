@@ -38,16 +38,8 @@ class HorizonController
             ]);
         }
 
-        $logFile = escapeshellarg(storage_path('logs/horizon.log'));
-        $basePath = escapeshellarg(base_path());
-
         // Find php CLI binary
-        $php = trim(shell_exec('which php') ?? '');
-
-        if (empty($php)) {
-            // Herd typical location
-            $php = $_SERVER['HOME'].'/Library/Application Support/Herd/bin/php';
-        }
+        $php = trim(shell_exec('which php') ?? '') ?: PHP_BINARY;
 
         $logFile = escapeshellarg(storage_path('logs/horizon.log'));
         $basePath = escapeshellarg(base_path());
@@ -78,10 +70,7 @@ class HorizonController
             ]);
         }
 
-        $php = trim(shell_exec('which php') ?? '');
-        if (empty($php)) {
-            $php = $_SERVER['HOME'].'/Library/Application Support/Herd/bin/php';
-        }
+        $php = trim(shell_exec('which php') ?? '') ?: PHP_BINARY;
 
         $basePath = escapeshellarg(base_path());
         $php = escapeshellarg($php);

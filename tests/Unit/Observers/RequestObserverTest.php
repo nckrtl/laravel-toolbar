@@ -5,7 +5,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
-use NckRtl\Toolbar\Enums\RequestCheckpointId;
 use NckRtl\Toolbar\Observers\RequestObserver;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 use NckRtl\Toolbar\Toolbar;
@@ -26,7 +25,7 @@ beforeEach(function () {
     Route::get('/_toolbar/assets/{asset}', fn () => '')->name('toolbar.assets');
 });
 
-it('listens to RequestHandled event', function () {
+it('listens to RequestHandled event and injects toolbar', function () {
     $observer = new RequestObserver;
 
     $request = Request::create('/', 'GET');
@@ -35,13 +34,11 @@ it('listens to RequestHandled event', function () {
     // Dispatch the event
     event(new RequestHandled($request, $response));
 
-    // Check that the REQUEST_HANDLED checkpoint was recorded
-    $checkpoint = Profiler::getCheckpoint(RequestCheckpointId::REQUEST_HANDLED);
-
-    expect($checkpoint)->not->toBeNull();
+    // Verify the observer handled the event by checking injection result
+    expect($response->getContent())->toContain('laravel-toolbar-shadow-host');
 });
 
-it('records REQUEST_HANDLED checkpoint', function () {
+it('resets profiler state after handling request', function () {
     $observer = new RequestObserver;
 
     $request = Request::create('/', 'GET');
@@ -49,7 +46,8 @@ it('records REQUEST_HANDLED checkpoint', function () {
 
     event(new RequestHandled($request, $response));
 
-    expect(Profiler::$requestCheckpoints)->toHaveKey(RequestCheckpointId::REQUEST_HANDLED->value);
+    // State should be cleared after request handling (critical for Octane)
+    expect(Profiler::$requestCheckpoints)->toBeEmpty();
 });
 
 it('injects toolbar into response', function () {

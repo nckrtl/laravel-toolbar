@@ -36,10 +36,7 @@ class QueryData extends Data
 
     private function setType(): void
     {
-        if (str_contains($this->sql, 'select * from "sessions" where "id" =') ||
-            str_contains($this->sql, 'update "sessions" set "payload" =') ||
-            str_contains($this->sql, 'delete from "sessions" where')
-        ) {
+        if (preg_match('/(?:select \* from|update|delete from)\s+[`"\[]?sessions[`"\]]?\s/i', $this->sql)) {
             $this->type = QueryType::SESSION;
         }
     }

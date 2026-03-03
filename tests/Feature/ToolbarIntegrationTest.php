@@ -85,6 +85,7 @@ it('tracks queries during request', function () {
 });
 
 it('respects disabled toolbar state', function () {
+    config(['toolbar.enabled' => false]);
     Toolbar::disable();
 
     Route::get('/disabled-test', function () {

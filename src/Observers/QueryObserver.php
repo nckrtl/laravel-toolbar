@@ -89,6 +89,8 @@ class QueryObserver
             is_slow: $time >= 100,
             memory_used: new Measurement($memoryAfter - $memoryBefore, DataSizeUnit::BYTES)->convertTo(DataSizeUnit::KILOBYTES),
         );
+
+        $this->currentMemory = $memoryAfter;
     }
 
     public function hash($sql): array
@@ -156,12 +158,16 @@ class QueryObserver
                 $binding = $this->quoteStringBinding($event, $binding);
             }
 
-            $sql = preg_replace(
+            $replacement = (string) $binding;
+
+            $result = preg_replace_callback(
                 $regex,
-                $binding,
+                fn () => $replacement,
                 $sql,
                 is_numeric($key) ? 1 : -1
             );
+
+            $sql = $result ?? $sql;
         }
 
         return $sql;

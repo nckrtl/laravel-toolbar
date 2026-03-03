@@ -52,6 +52,10 @@ class QueriesCollector extends Collector implements CollectorInterface
 
         $queryObserver = $toolbar->config->getObserver(QueryObserver::class);
 
+        if (! $queryObserver) {
+            return;
+        }
+
         $this->totalTime = $queryObserver->totalTime;
 
         $this->queries = $queryObserver->queries;
