@@ -2,6 +2,21 @@
 
 All notable changes to `laravel-toolbar` will be documented in this file.
 
+## v0.1.10 - 2026-03-03
+
+### Bug fixes
+
+Addresses 16 bugs from a bughunt audit (12 confirmed, 4 partially confirmed):
+
+- **Error resilience**: CollectorManager wraps each collector in try-catch
+- **Null safety**: Null guards in QueriesCollector, ModelsCollector, and ToolbarConfig
+- **Unit conversion**: Fixed inverted formula branches in DataSizeUnit and TimeUnit
+- **Memory tracking**: QueryObserver and ModelObserver now track per-query/model deltas correctly
+- **View profiling**: Records BEFORE_VIEW_RENDERING checkpoint before rendering, not after
+- **Data integrity**: JSON_INVALID_UTF8_SUBSTITUTE flag, preg_replace_callback for bindings, regex session query detection
+- **Config**: Added `config/toolbar.php`, replaced `env()` with `config()`, fixed CSP nonce check, portable PHP binary fallback
+- **Octane state**: Profiler::resetState() + observer reset after each request, Toolbar static state reset at request start
+
 ## v0.1.6 - 2026-01-30
 
 **Full Changelog**: https://github.com/nckrtl/laravel-toolbar/compare/v0.1.4...v0.1.6
