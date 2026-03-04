@@ -1,0 +1,196 @@
+{
+  "timestamp": "2026-03-02T23:44:48.088Z",
+  "slug": "1772493424-bughunt",
+  "prompt": "audit the entire laravel-toolbar package for correctness bugs, edge cases, null dereferences, race conditions, and missing error handling",
+  "promptSource": "inline",
+  "readOnlyPolicy": "enforced",
+  "tools": [
+    {
+      "toolId": "claude-opus",
+      "status": "success",
+      "exitCode": 0,
+      "durationMs": 184480,
+      "wordCount": 3104,
+      "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/claude-opus.md",
+      "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/claude-opus.stderr"
+    },
+    {
+      "toolId": "codex-5.3-high",
+      "status": "success",
+      "exitCode": 0,
+      "durationMs": 459921,
+      "wordCount": 666,
+      "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/codex-5.3-high.md",
+      "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/codex-5.3-high.stderr"
+    },
+    {
+      "toolId": "gemini-3-pro",
+      "status": "success",
+      "exitCode": 0,
+      "durationMs": 111019,
+      "wordCount": 1442,
+      "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/gemini-3-pro.md",
+      "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/gemini-3-pro.stderr"
+    },
+    {
+      "toolId": "claude-opus",
+      "status": "timeout",
+      "exitCode": 1,
+      "durationMs": 540032,
+      "wordCount": 0,
+      "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/claude-opus.md",
+      "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/claude-opus.stderr",
+      "error": ""
+    },
+    {
+      "toolId": "codex-5.3-high",
+      "status": "success",
+      "exitCode": 0,
+      "durationMs": 467330,
+      "wordCount": 868,
+      "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/codex-5.3-high.md",
+      "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/codex-5.3-high.stderr"
+    },
+    {
+      "toolId": "gemini-3-pro",
+      "status": "success",
+      "exitCode": 0,
+      "durationMs": 140128,
+      "wordCount": 1504,
+      "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/gemini-3-pro.md",
+      "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/gemini-3-pro.stderr"
+    },
+    {
+      "toolId": "claude-opus",
+      "status": "success",
+      "exitCode": 0,
+      "durationMs": 437411,
+      "wordCount": 2915,
+      "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/claude-opus.md",
+      "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/claude-opus.stderr"
+    },
+    {
+      "toolId": "codex-5.3-high",
+      "status": "success",
+      "exitCode": 0,
+      "durationMs": 320849,
+      "wordCount": 761,
+      "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/codex-5.3-high.md",
+      "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/codex-5.3-high.stderr"
+    },
+    {
+      "toolId": "gemini-3-pro",
+      "status": "success",
+      "exitCode": 0,
+      "durationMs": 69191,
+      "wordCount": 1726,
+      "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/gemini-3-pro.md",
+      "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/gemini-3-pro.stderr"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "timestamp": "2026-03-02T23:28:30.640Z",
+      "tools": [
+        {
+          "toolId": "claude-opus",
+          "status": "success",
+          "exitCode": 0,
+          "durationMs": 184480,
+          "wordCount": 3104,
+          "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/claude-opus.md",
+          "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/claude-opus.stderr"
+        },
+        {
+          "toolId": "codex-5.3-high",
+          "status": "success",
+          "exitCode": 0,
+          "durationMs": 459921,
+          "wordCount": 666,
+          "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/codex-5.3-high.md",
+          "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/codex-5.3-high.stderr"
+        },
+        {
+          "toolId": "gemini-3-pro",
+          "status": "success",
+          "exitCode": 0,
+          "durationMs": 111019,
+          "wordCount": 1442,
+          "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/gemini-3-pro.md",
+          "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/gemini-3-pro.stderr"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "timestamp": "2026-03-02T23:37:30.674Z",
+      "tools": [
+        {
+          "toolId": "claude-opus",
+          "status": "timeout",
+          "exitCode": 1,
+          "durationMs": 540032,
+          "wordCount": 0,
+          "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/claude-opus.md",
+          "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/claude-opus.stderr",
+          "error": ""
+        },
+        {
+          "toolId": "codex-5.3-high",
+          "status": "success",
+          "exitCode": 0,
+          "durationMs": 467330,
+          "wordCount": 868,
+          "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/codex-5.3-high.md",
+          "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/codex-5.3-high.stderr"
+        },
+        {
+          "toolId": "gemini-3-pro",
+          "status": "success",
+          "exitCode": 0,
+          "durationMs": 140128,
+          "wordCount": 1504,
+          "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/gemini-3-pro.md",
+          "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/gemini-3-pro.stderr"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "timestamp": "2026-03-02T23:44:48.087Z",
+      "tools": [
+        {
+          "toolId": "claude-opus",
+          "status": "success",
+          "exitCode": 0,
+          "durationMs": 437411,
+          "wordCount": 2915,
+          "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/claude-opus.md",
+          "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/claude-opus.stderr"
+        },
+        {
+          "toolId": "codex-5.3-high",
+          "status": "success",
+          "exitCode": 0,
+          "durationMs": 320849,
+          "wordCount": 761,
+          "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/codex-5.3-high.md",
+          "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/codex-5.3-high.stderr"
+        },
+        {
+          "toolId": "gemini-3-pro",
+          "status": "success",
+          "exitCode": 0,
+          "durationMs": 69191,
+          "wordCount": 1726,
+          "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/gemini-3-pro.md",
+          "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/gemini-3-pro.stderr"
+        }
+      ]
+    }
+  ],
+  "totalRounds": 3,
+  "durationMs": 1437371,
+  "preset": "bughunt"
+}

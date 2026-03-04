@@ -1,0 +1,1823 @@
+OpenAI Codex v0.104.0 (research preview)
+--------
+workdir: /home/nckrtl/projects/laravel-toolbar
+model: gpt-5.3-codex
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: high
+reasoning summaries: auto
+session id: 019cb0e1-c064-7ac0-a51d-b9e5f67cfeca
+--------
+user
+Read the file at /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/prompt.md and follow the instructions within it.
+mcp: laravel-boost starting
+mcp: laravel-boost failed: MCP client for `laravel-boost` failed to start: MCP startup failed: handshaking with MCP server failed: connection closed: initialize response
+mcp startup: failed: laravel-boost
+
+thinking
+**Preparing file inspection approach**
+codex
+I’m going to open the referenced prompt file first, then execute exactly what it asks within the current repository context.
+exec
+/usr/bin/zsh -lc 'cat /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/prompt.md' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+Now I have a thorough understanding of the codebase. Here is the prompt:
+
+You are a senior software engineer performing a correctness audit of the `laravel-toolbar` package — a Laravel dev toolbar that collects request profiling data, database queries, model hydrations, and timing information, injecting a Vue 3 toolbar into HTML responses via Shadow DOM.
+
+## Objective
+
+Systematically audit the entire `laravel-toolbar` package for correctness bugs, edge cases, null dereferences, race conditions, and missing error handling. Focus on real, user-visible failures — not style issues. The package runs in both standard PHP-FPM and long-running Octane (Swoole/RoadRunner) environments, making state management bugs especially critical.
+
+## Priority
+
+1. User-visible correctness failures (crashes, wrong data shown, data leaks between requests)
+2. High-blast-radius bugs (affect every request, corrupt shared state, break injection)
+3. Findings that would produce meaningful failing tests
+
+## Tech Stack
+
+- PHP 8.4+ with Laravel 11/12
+- Spatie Laravel Data for DTOs
+- PHPStan level 5 with Larastan
+- Pest 4 for testing
+
+thinking
+**Planning comprehensive audit**
+codex
+I’ve loaded the audit brief and will now inspect the referenced source files plus prior round reports, then return a severity-ordered finding list with confirmed/refined/invalidated status per overlap.
+Plan update
+  → Read prior round outputs to identify existing claims and avoid blind duplication
+  • Inspect high-priority observer/profiler/injector code paths for concrete failures
+  • Inspect medium/lower-priority collectors, DTOs, enums, and controllers for correctness/security issues
+  • Assemble severity-ordered findings with evidence, impact, minimal fix, and test ideas including overlap status
+
+thinking
+**Planning parallel execution approach**
+exec
+/usr/bin/zsh -lc "sed -n '1,220p' /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/claude-opus.md" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "sed -n '1,220p' /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/gemini-3-pro.md" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "sed -n '1,220p' /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/codex-5.3-high.md" in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+Now I have a thorough understanding of the codebase. Here is my correctness audit:
+
+---
+
+# Correctness Audit: laravel-toolbar
+
+## Finding 1 — `ToolbarConfig::collectors(null)` causes TypeError
+
+- **severity**: critical
+- **confidence**: high
+- **location**: `src/Data/ToolbarConfig.php:156-168` — `collectors()`
+- **evidence**: When called with `null` (the default), line 158 evaluates `is_null(null) || empty(null)` → `true`, setting `$this->collectors = []`. But execution continues to line 162: `foreach ($collectors as $collector)` — iterating over `null` throws `TypeError: foreach() argument must be of type array|object, null given` in PHP 8.
+- **impact**: Calling `->collectors(null)` or `->collectors()` (no args) crashes the entire toolbar initialization. While the default constructor always passes an array, any user customization calling `->collectors()` with no args will crash.
+- **minimal fix**: Add `return $this;` after line 159, or restructure with early return:
+  ```php
+  if (is_null($collectors) || empty($collectors)) {
+      $this->collectors = [];
+      return $this;
+  }
+  ```
+ succeeded in 50ms:
+Here is the systematic correctness audit of the `laravel-toolbar` package, prioritized by severity.
+
+### CRITICAL
+
+**1. Uncaught exceptions in ProfilerCollector crashing requests**
+- **severity**: critical
+- **confidence**: high
+- **location**: `src/Collectors/ProfilerCollector.php` - `getTotals()` and `fillInMissingStartAndEnd()`
+- **evidence**: Throws `Exception` when encountering edge cases like "Wall time overlap detected" and "No next stage with a end time found". 
+- **impact**: Since this runs in the request lifecycle during `collectData()`, slight process scheduling anomalies or missing checkpoints will trigger an uncaught exception, resulting in a 500 server error for the user's application.
+- **minimal fix**: Remove the `throw new \Exception(...)` calls. Instead, cap overlapping values to the total wall time and provide safe defaults (like setting the end time to the current time) when a checkpoint is missing.
+- **test idea**: Mock `Profiler::getRequestStages()` to return stages with overlapping timestamps (e.g., stage 2 ends after stage 3 starts). Assert `collectData()` completes successfully without throwing an exception.
+
+### HIGH
+
+**2. DataSizeUnit inverted conversion formula**
+- **severity**: high
+- **confidence**: high
+- **location**: `src/Enums/DataSizeUnit.php` - `convertValueTo()`
+- **evidence**: `if ($this->factor() > $convertToUnit->factor()) { return $value / $this->factor() * $convertToUnit->factor(); }` When converting MEGABYTES to BYTES, it divides by 1024^2 instead of multiplying, which is mathematically inverted.
+ succeeded in 51ms:
+1. **severity:** critical  
+**confidence:** high  
+**location:** [RequestObserver.php:13](/home/nckrtl/projects/laravel-toolbar/src/Observers/RequestObserver.php:13), [QueryObserver.php:45](/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php:45), [ModelObserver.php:32](/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php:32)  
+**evidence:** `QueryObserver`/`ModelObserver` are long-lived listeners with mutable arrays, both expose `reset()`, but `reset()` is never called anywhere in `src` after a request completes.  
+**impact:** In Octane workers, query/model data leaks across requests (wrong duplicates, inflated counts, cross-request data exposure).  
+**minimal fix:** At request end, iterate configured observers and call `reset()` when present (eg in `RequestObserver` after injection, or in a dedicated terminating middleware).  
+**test idea:** Simulate two requests with the same observer instance; assert second request starts with empty `queries`/`hydrationEntries`.
+
+2. **severity:** high  
+**confidence:** high  
+**location:** [ProfilerCollector.php:142](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:142), [ProfilerCollector.php:198](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:198), [ProfilerCollector.php:221](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:221)  
+**evidence:** `getTotals()` / `fillInMissingStartAndEnd()` / `findNextStageWithEnd()` throw uncaught `\Exception`. `CollectorManager::collectData()` does not catch collector exceptions.  
+**impact:** Toolbar collection can 500 the request when checkpoints are missing/inconsistent.  
+**minimal fix:** Convert these throws to graceful fallbacks (skip bad stages, zero totals, attach debug metadata instead of throwing).  
+**test idea:** Configure profiler collector with missing terminal checkpoint and assert collection returns valid `ProfilerData` instead of exception.
+
+3. **severity:** high  
+**confidence:** high  
+**location:** [QueriesCollector.php:53](/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php:53), [ModelsCollector.php:35](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php:35)  
+**evidence:** `getObserver(...)` is nullable, but result is dereferenced immediately (`$queryObserver->totalTime`, `$modelObserver->hydrationEntries`).  
+
+thinking
+**Scanning repository structure**
+codex
+I’ve reviewed prior findings; next I’m validating each claim against the actual implementation to confirm, refine, or invalidate with concrete code paths.
+exec
+/usr/bin/zsh -lc "rg --files src tests resources/js | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'ls -la /home/nckrtl/projects/laravel-toolbar/src/Observers /home/nckrtl/projects/laravel-toolbar/src/Collectors /home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService /home/nckrtl/projects/laravel-toolbar/src/Data /home/nckrtl/projects/laravel-toolbar/src/Enums /home/nckrtl/projects/laravel-toolbar/src/Controllers' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+resources/js/composables/useToolbar.ts
+resources/js/CommandPallete.vue
+src/ToolbarServiceProvider.php
+src/CollectorManager.php
+resources/js/toolbar.prod.ts
+resources/js/Toolbar.vue
+resources/js/toolbar.dev.ts
+tests/Feature/ToolbarIntegrationTest.php
+tests/Feature/MiddlewareTest.php
+tests/Pest.php
+tests/ArchTest.php
+tests/ExampleTest.php
+tests/TestCase.php
+src/Controllers/HorizonController.php
+src/Controllers/AssetController.php
+resources/js/icons/EmptyListIcon.vue
+resources/js/icons/InertiaIcon.vue
+resources/js/icons/LaravelIcon.vue
+resources/js/icons/TailwindIcon.vue
+resources/js/icons/TargetIcon.vue
+ succeeded in 51ms:
+/home/nckrtl/projects/laravel-toolbar/src/Collectors:
+total 64
+drwxrwxr-x  2 nckrtl nckrtl 4096 Feb 19 19:32 .
+drwxrwxr-x 15 nckrtl nckrtl 4096 Feb 19 19:32 ..
+-rw-rw-r--  1 nckrtl nckrtl 1000 Feb 19 19:32 Collector.php
+-rw-rw-r--  1 nckrtl nckrtl  272 Feb 19 19:32 CollectorInterface.php
+-rw-rw-r--  1 nckrtl nckrtl 1535 Feb 19 19:32 InertiaCollector.php
+-rw-rw-r--  1 nckrtl nckrtl 2209 Feb 19 19:32 LaravelCollector.php
+-rw-rw-r--  1 nckrtl nckrtl  905 Feb 19 19:32 ModelsCollector.php
+-rw-rw-r--  1 nckrtl nckrtl  672 Feb 19 19:32 PhpCollector.php
+-rw-rw-r--  1 nckrtl nckrtl 8357 Feb 19 19:32 ProfilerCollector.php
+-rw-rw-r--  1 nckrtl nckrtl 2119 Feb 19 19:32 QueriesCollector.php
+-rw-rw-r--  1 nckrtl nckrtl 1034 Feb 19 19:32 RequestCollector.php
+-rw-rw-r--  1 nckrtl nckrtl 1034 Feb 19 19:32 ResponseCollector.php
+-rw-rw-r--  1 nckrtl nckrtl 2106 Feb 19 19:32 TailwindCollector.php
+-rw-rw-r--  1 nckrtl nckrtl 2612 Feb 19 19:32 VueCollector.php
+
+/home/nckrtl/projects/laravel-toolbar/src/Controllers:
+total 16
+drwxrwxr-x  2 nckrtl nckrtl 4096 Feb 19 19:32 .
+
+thinking
+**Inspecting key config file**
+exec
+/usr/bin/zsh -lc "nl -ba src/Observers/QueryObserver.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Observers/ModelObserver.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Observers;
+     4	
+     5	use Illuminate\Database\Events\QueryExecuted;
+     6	use NckRtl\Toolbar\Data\DatabaseData;
+     7	use NckRtl\Toolbar\Data\QueryData;
+     8	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     9	use NckRtl\Toolbar\Measurement;
+    10	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    11	
+    12	class QueryObserver
+    13	{
+    14	    use FetchesStackTrace;
+    15	
+    16	    public float $totalTime = 0;
+    17	
+    18	    public array $connections = [];
+    19	
+    20	    public array $drivers = [];
+exec
+/usr/bin/zsh -lc "nl -ba src/Observers/FetchesStackTrace.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Observers;
+     4	
+     5	use BackedEnum;
+     6	use Illuminate\Database\Eloquent\Relations\Pivot;
+     7	use Illuminate\Support\Arr;
+     8	use Illuminate\Support\Str;
+     9	use NckRtl\Toolbar\Data\ModelData;
+    10	use NckRtl\Toolbar\Enums\DataSizeUnit;
+    11	use NckRtl\Toolbar\Measurement;
+    12	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    13	
+    14	class ModelObserver
+    15	{
+    16	    private int $currentMemory = 0;
+    17	
+    18	    public array $hydrationEntries = [];
+    19	
+    20	    public function __construct(array $options = [])
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Observers;
+     4	
+     5	use Illuminate\Support\Str;
+     6	
+     7	trait FetchesStackTrace
+     8	{
+     9	    /**
+    10	     * Find the first frame in the stack trace outside of Telescope/Laravel.
+    11	     *
+    12	     * @param  int|string|array  $forgetLines
+    13	     */
+    14	    protected function getCallerFromStackTrace($forgetLines = 0): ?array
+    15	    {
+    16	        $trace = collect(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))->forget($forgetLines);
+    17	
+    18	        return $trace->first(function ($frame) {
+    19	            if (! isset($frame['file'])) {
+    20	                return false;
+exec
+/usr/bin/zsh -lc "nl -ba src/Observers/RoutingObserver.php | sed -n '1,220p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Observers/RequestObserver.php | sed -n '1,220p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Observers;
+     4	
+     5	use Illuminate\Routing\Events\RouteMatched;
+     6	use Illuminate\Routing\Events\Routing;
+     7	use Illuminate\Support\Facades\Event;
+     8	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     9	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    10	
+    11	class RoutingObserver
+    12	{
+    13	    public function __construct()
+    14	    {
+    15	        Event::listen(Routing::class, function () {
+    16	            Profiler::record(RequestCheckpointId::BEFORE_ROUTING);
+    17	        });
+    18	
+    19	        Event::listen(RouteMatched::class, function ($event) {
+    20	            Profiler::record(RequestCheckpointId::AFTER_ROUTING);
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Observers;
+     4	
+     5	use Illuminate\Foundation\Http\Events\RequestHandled;
+     6	use Illuminate\Support\Facades\Event;
+     7	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     8	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     9	use NckRtl\Toolbar\ToolbarInjector;
+    10	
+    11	class RequestObserver
+    12	{
+    13	    public function __construct()
+    14	    {
+    15	        Event::listen(RequestHandled::class, function ($event) {
+    16	            Profiler::record(RequestCheckpointId::REQUEST_HANDLED);
+    17	
+    18	            new ToolbarInjector()->inject($event->request, $event->response);
+    19	        });
+    20	    }
+
+thinking
+**Planning multi-file inspection**
+codex
+I’ve confirmed the observer implementations; now I’m tracing how profiler state, injection, and collectors interact to identify which failures are truly user-visible versus theoretical.
+exec
+/usr/bin/zsh -lc "nl -ba src/Services/ProfilerService/Profiler.php | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/ToolbarInjector.php | sed -n '1,360p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/CollectorManager.php | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Toolbar.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Services\ProfilerService;
+     4	
+     5	use Illuminate\View\Engines\CompilerEngine;
+     6	use NckRtl\Toolbar\Data\ProfileMarkerData;
+     7	use NckRtl\Toolbar\Data\RequestCheckpointData;
+     8	use NckRtl\Toolbar\Data\RequestStageData;
+     9	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+    10	use NckRtl\Toolbar\Enums\TimeUnit;
+    11	use NckRtl\Toolbar\Measurement;
+    12	
+    13	class Profiler
+    14	{
+    15	    public static array $requestCheckpoints = [];
+    16	
+    17	    public static array $viewRenders = [];
+    18	
+    19	    public static array $profileMarkers = [];
+    20	
+exec
+/usr/bin/zsh -lc "nl -ba src/ToolbarServiceProvider.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar;
+     4	
+     5	use Illuminate\Http\JsonResponse;
+     6	use Illuminate\Http\RedirectResponse;
+     7	use Illuminate\Http\Request;
+     8	use Illuminate\Http\Response;
+     9	use Illuminate\Support\Facades\Http;
+    10	use Illuminate\Support\Facades\Vite;
+    11	use Symfony\Component\HttpFoundation\BinaryFileResponse;
+    12	use Symfony\Component\HttpFoundation\StreamedResponse;
+    13	
+    14	class ToolbarInjector
+    15	{
+    16	    /**
+    17	     * Cached Vite dev server URL check result
+    18	     */
+    19	    protected static ?string $cachedViteUrl = null;
+    20	
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar;
+     4	
+     5	use Illuminate\Http\JsonResponse;
+     6	use Illuminate\Http\RedirectResponse;
+     7	use Illuminate\Http\Response;
+     8	use Illuminate\Support\Collection;
+     9	use Illuminate\Support\Facades\Cache;
+    10	use Illuminate\Support\Str;
+    11	use Laravel\Telescope\Telescope;
+    12	use NckRtl\Toolbar\Enums\TimeUnit;
+    13	
+    14	class CollectorManager
+    15	{
+    16	    public string $id;
+    17	
+    18	    public bool $telescopeIsInstalled = false;
+    19	
+    20	    public ?Collection $telescopeEntries = null;
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar;
+     4	
+     5	use NckRtl\Toolbar\Data\ToolbarConfig;
+     6	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     7	
+     8	class Toolbar
+     9	{
+    10	    public static bool $enabled = true;
+    11	
+    12	    public static bool $visible = true;
+    13	
+    14	    public static function enable(): void
+    15	    {
+    16	        self::$enabled = true;
+    17	    }
+    18	
+    19	    public static function disable(): void
+    20	    {
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar;
+     4	
+     5	use NckRtl\Toolbar\Console\CustomizeToolbarCommand;
+     6	use NckRtl\Toolbar\Console\StartMcpServerCommand;
+     7	use Spatie\LaravelPackageTools\Package;
+     8	use Spatie\LaravelPackageTools\PackageServiceProvider;
+     9	
+    10	class ToolbarServiceProvider extends PackageServiceProvider
+    11	{
+    12	    public function configurePackage(Package $package): void
+    13	    {
+    14	        $package
+    15	            ->name('laravel-toolbar')
+    16	            ->hasRoutes(['toolbar', 'ai'])
+    17	            ->publishesServiceProvider('ToolbarConfigProvider')
+    18	            ->hasCommands([
+    19	                StartMcpServerCommand::class,
+    20	                CustomizeToolbarCommand::class,
+exec
+/usr/bin/zsh -lc "nl -ba src/Collectors/ProfilerCollector.php | sed -n '1,360p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Collectors/QueriesCollector.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Collectors/ModelsCollector.php | sed -n '1,220p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Collectors/VueCollector.php | sed -n '1,300p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Collectors/InertiaCollector.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Collectors/ResponseCollector.php | sed -n '1,220p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Collectors/TailwindCollector.php | sed -n '1,280p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Data\Configurations\ProfilerConfig;
+     7	use NckRtl\Toolbar\Data\ProfileMarkerData;
+     8	use NckRtl\Toolbar\Data\ProfilerData;
+     9	use NckRtl\Toolbar\Data\RequestStageData;
+    10	use NckRtl\Toolbar\Data\SubstageData;
+    11	use NckRtl\Toolbar\Enums\DataSizeUnit;
+    12	use NckRtl\Toolbar\Enums\TimeUnit;
+    13	use NckRtl\Toolbar\Measurement;
+    14	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    15	
+    16	class ProfilerCollector extends Collector implements CollectorInterface
+    17	{
+    18	    public function key(): string
+    19	    {
+    20	        return 'profiler';
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Data\Configurations\QueriesConfig;
+     7	use NckRtl\Toolbar\Data\QueriesData;
+     8	use NckRtl\Toolbar\Observers\QueryObserver;
+     9	use NckRtl\Toolbar\Toolbar;
+    10	
+    11	class QueriesCollector extends Collector implements CollectorInterface
+    12	{
+    13	    public float $totalTime = 0;
+    14	
+    15	    public float $totalTimeFilteredQueries = 0;
+    16	
+    17	    public array $queries = [];
+    18	
+    19	    public array $databases = [];
+    20	
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Data\Configurations\ModelsConfig;
+     7	use NckRtl\Toolbar\Observers\ModelObserver;
+     8	use NckRtl\Toolbar\Toolbar;
+     9	
+    10	class ModelsCollector extends Collector implements CollectorInterface
+    11	{
+    12	    public array $models = [];
+    13	
+    14	    public function key(): string
+    15	    {
+    16	        return 'models';
+    17	    }
+    18	
+    19	    public function configClass(): string
+    20	    {
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use Illuminate\Foundation\Concerns\ResolvesDumpSource;
+     6	use Illuminate\Support\Facades\File;
+     7	use NckRtl\Toolbar\CollectorManager;
+     8	use NckRtl\Toolbar\Data\Configurations\VueConfig;
+     9	use NckRtl\Toolbar\Data\VueData;
+    10	
+    11	class VueCollector extends Collector implements CollectorInterface
+    12	{
+    13	    use ResolvesDumpSource;
+    14	
+    15	    /**
+    16	     * Cached version string (persists for process lifetime since package versions don't change)
+    17	     */
+    18	    private static ?string $cachedVersion = null;
+    19	
+    20	    /**
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use Illuminate\Support\Facades\File;
+     6	use NckRtl\Toolbar\CollectorManager;
+     7	use NckRtl\Toolbar\Data\Configurations\InertiaConfig;
+     8	use NckRtl\Toolbar\Data\InertiaData;
+     9	
+    10	class InertiaCollector extends Collector implements CollectorInterface
+    11	{
+    12	    /**
+    13	     * Cached version string (persists for process lifetime since package versions don't change)
+    14	     */
+    15	    private static ?string $cachedVersion = null;
+    16	
+    17	    /**
+    18	     * Whether we've already checked for the version
+    19	     */
+    20	    private static bool $versionChecked = false;
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Data\Configurations\ResponseConfig;
+     7	use NckRtl\Toolbar\Data\ResponseData;
+     8	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     9	use NckRtl\Toolbar\Measurement;
+    10	
+    11	class ResponseCollector extends Collector implements CollectorInterface
+    12	{
+    13	    public function key(): string
+    14	    {
+    15	        return 'response';
+    16	    }
+    17	
+    18	    public function configClass(): string
+    19	    {
+    20	        return ResponseConfig::class;
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use Illuminate\Support\Facades\File;
+     6	use NckRtl\Toolbar\CollectorManager;
+     7	use NckRtl\Toolbar\Data\Configurations\TailwindConfig;
+     8	use NckRtl\Toolbar\Data\TailwindData;
+     9	
+    10	class TailwindCollector extends Collector implements CollectorInterface
+    11	{
+    12	    /**
+    13	     * Cached version string (persists for process lifetime since package versions don't change)
+    14	     */
+    15	    private static ?string $cachedVersion = null;
+    16	
+    17	    /**
+    18	     * Whether we've already checked for the version
+    19	     */
+    20	    private static bool $versionChecked = false;
+
+thinking
+**Listing required data objects**
+exec
+/usr/bin/zsh -lc "nl -ba src/Data/RequestStageData.php | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Data/QueryData.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Enums/DataSizeUnit.php | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Data/ToolbarConfig.php | sed -n '1,340p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Enums/TimeUnit.php | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Measurement.php | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Enums\QueryType;
+     6	use NckRtl\Toolbar\Measurement;
+     7	use NckRtl\Toolbar\Traits\ControllerActionEditorUrl;
+     8	use Spatie\LaravelData\Data;
+     9	
+    10	class QueryData extends Data
+    11	{
+    12	    use ControllerActionEditorUrl;
+    13	
+    14	    public ?string $controller_action_editor_url = null;
+    15	
+    16	    public ?QueryType $type = null;
+    17	
+    18	    public function __construct(
+    19	        public string $hash,
+    20	        public string $sql,
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     6	use NckRtl\Toolbar\Enums\TimeUnit;
+     7	use NckRtl\Toolbar\Measurement;
+     8	use Spatie\LaravelData\Data;
+     9	
+    10	class RequestStageData extends Data
+    11	{
+    12	    public bool $recordedStart = true;
+    13	
+    14	    public bool $recordedEnd = true;
+    15	
+    16	    public RequestStagePropertyData $wall_time;
+    17	
+    18	    public ?RequestStagePropertyData $memory_real_delta = null;
+    19	
+    20	    /** @var SubstageData[] */
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Enums;
+     4	
+     5	enum DataSizeUnit: string implements Unit
+     6	{
+     7	    case BYTES = 'bytes';
+     8	    case KILOBYTES = 'kilobytes';
+     9	    case MEGABYTES = 'megabytes';
+    10	    case GIGABYTES = 'gigabytes';
+    11	    case TERABYTES = 'terabytes';
+    12	    case PETABYTES = 'petabytes';
+    13	
+    14	    private function abbreviations(): array
+    15	    {
+    16	        return [
+    17	            self::BYTES->value => 'B',
+    18	            self::KILOBYTES->value => 'KB',
+    19	            self::MEGABYTES->value => 'MB',
+    20	            self::GIGABYTES->value => 'GB',
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Enums;
+     4	
+     5	enum TimeUnit: string implements Unit
+     6	{
+     7	    case MICROSECONDS = 'microseconds';
+     8	    case MILLISECONDS = 'milliseconds';
+     9	    case SECONDS = 'seconds';
+    10	    case MINUTES = 'minutes';
+    11	    case HOURS = 'hours';
+    12	    case DAYS = 'days';
+    13	    case WEEKS = 'weeks';
+    14	    case MONTHS = 'months';
+    15	    case YEARS = 'years';
+    16	
+    17	    private function abbreviations(): array
+    18	    {
+    19	        return [
+    20	            self::MICROSECONDS->value => 'µs',
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Collectors\CollectorInterface;
+     6	use NckRtl\Toolbar\Collectors\InertiaCollector;
+     7	use NckRtl\Toolbar\Collectors\LaravelCollector;
+     8	use NckRtl\Toolbar\Collectors\ModelsCollector;
+     9	use NckRtl\Toolbar\Collectors\PhpCollector;
+    10	use NckRtl\Toolbar\Collectors\ProfilerCollector;
+    11	use NckRtl\Toolbar\Collectors\QueriesCollector;
+    12	use NckRtl\Toolbar\Collectors\RequestCollector;
+    13	use NckRtl\Toolbar\Collectors\ResponseCollector;
+    14	use NckRtl\Toolbar\Collectors\TailwindCollector;
+    15	use NckRtl\Toolbar\Collectors\VueCollector;
+    16	use NckRtl\Toolbar\Data\Configurations\CollectorConfig;
+    17	use NckRtl\Toolbar\Data\Configurations\MiddlewareConfig;
+    18	use NckRtl\Toolbar\Data\Layout\GroupConfig;
+    19	use NckRtl\Toolbar\Data\Layout\LayoutConfig;
+    20	use NckRtl\Toolbar\Data\Tools\BreakpointIndicatorTool;
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar;
+     4	
+     5	use NckRtl\Toolbar\Enums\Unit;
+     6	
+     7	class Measurement
+     8	{
+     9	    public string $formattedValue;
+    10	
+    11	    public function __construct(
+    12	        public int|float $value,
+    13	        public Unit $unit
+    14	    ) {
+    15	        $this->formatValue();
+    16	    }
+    17	
+    18	    public function convertTo(Unit $unit): self
+    19	    {
+    20	        $this->value = $this->unit->convertValueTo($this->value, $unit);
+
+thinking
+**Planning security inspection**
+exec
+/usr/bin/zsh -lc "nl -ba src/Controllers/HorizonController.php | sed -n '1,360p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Controllers/AssetController.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Http/Middleware/MiddlewareStart.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Http/Middleware/MiddlewareEnd.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba routes/toolbar.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Controllers;
+     4	
+     5	use Illuminate\Http\Response;
+     6	use Illuminate\Routing\Controller;
+     7	
+     8	class AssetController extends Controller
+     9	{
+    10	    /**
+    11	     * Serve toolbar assets from Vite's build output
+    12	     */
+    13	    public function __invoke(string $asset): Response
+    14	    {
+    15	        $assetPath = __DIR__.'/../../build/assets/'.$asset;
+    16	
+    17	        if (! file_exists($assetPath)) {
+    18	            abort(404);
+    19	        }
+    20	
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	// src/Controllers/HorizonController.php
+     4	
+     5	namespace NckRtl\Toolbar\Controllers;
+     6	
+     7	use Illuminate\Http\JsonResponse;
+     8	use Laravel\Horizon\Contracts\MasterSupervisorRepository;
+     9	
+    10	class HorizonController
+    11	{
+    12	    public function status(): JsonResponse
+    13	    {
+    14	        if (! $this->isAvailable()) {
+    15	            return response()->json([
+    16	                'available' => false,
+    17	                'reason' => 'Horizon not installed',
+    18	            ]);
+    19	        }
+    20	
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	use Illuminate\Support\Facades\Route;
+     4	use NckRtl\Toolbar\Controllers\AssetController;
+     5	use NckRtl\Toolbar\Controllers\HorizonController;
+     6	
+     7	Route::prefix('_toolbar')->middleware(['web'])->group(function () {
+     8	    // Existing asset route
+     9	    Route::get('/{asset}', AssetController::class)->name('toolbar.assets');
+    10	
+    11	    // New: Horizon control
+    12	    Route::prefix('horizon')->group(function () {
+    13	        Route::get('/status', [HorizonController::class, 'status']);
+    14	        Route::post('/start', [HorizonController::class, 'start']);
+    15	        Route::post('/stop', [HorizonController::class, 'stop']);
+    16	    });
+    17	});
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Http\Middleware;
+     4	
+     5	use Closure;
+     6	use Illuminate\Http\Request;
+     7	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     8	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     9	
+    10	class MiddlewareStart
+    11	{
+    12	    public function handle(Request $request, Closure $next)
+    13	    {
+    14	        if (! Profiler::getCheckpoint(RequestCheckpointId::BEFORE_MIDDLEWARE)) {
+    15	            Profiler::record(RequestCheckpointId::BEFORE_MIDDLEWARE);
+    16	        }
+    17	
+    18	        $response = $next($request);
+    19	
+    20	        if (! Profiler::getCheckpoint(RequestCheckpointId::AFTER_MIDDLEWARE)) {
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Http\Middleware;
+     4	
+     5	use Closure;
+     6	use Illuminate\Http\Request;
+     7	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     8	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     9	
+    10	class MiddlewareEnd
+    11	{
+    12	    public function handle(Request $request, Closure $next)
+    13	    {
+    14	        if (! Profiler::getCheckpoint(RequestCheckpointId::BEFORE_CONTROLLER)) {
+    15	            Profiler::record(RequestCheckpointId::BEFORE_CONTROLLER);
+    16	        }
+    17	
+    18	        $response = $next($request);
+    19	
+    20	        if (! Profiler::getCheckpoint(RequestCheckpointId::AFTER_VIEW_RENDERING)) {
+
+thinking
+**Inspecting frontend interceptors**
+codex
+I’m now validating the frontend integrity claims and current tests, so the final report only includes failures that can be reproduced or reasoned concretely.
+exec
+/usr/bin/zsh -lc "nl -ba resources/js/core/interceptors.ts | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba resources/js/core/mount.base.ts | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba resources/js/composables/useToolbar.ts | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba resources/js/core/utils/cache.ts | sed -n '1,360p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba resources/js/core/utils/csp.ts | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba resources/js/core/base.ts | sed -n '1,360p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	import { log, logData } from '@/core/utils/logger'
+     2	import type { ToolbarData } from '@/types'
+     3	
+     4	type ResponseLike = Response | XMLHttpRequest
+     5	
+     6	export const setupInterceptors = (): void => {
+     7	  log('Setting up interceptors BEFORE Inertia loads')
+     8	
+     9	  setupFetchInterceptor()
+    10	  setupXHRInterceptor()
+    11	
+    12	  log('Interceptors installed successfully')
+    13	}
+    14	
+    15	const setupFetchInterceptor = (): void => {
+    16	  const originalFetch = window.fetch
+    17	
+    18	  window.fetch = async function (...args: Parameters<typeof fetch>): Promise<Response> {
+    19	    const response = await originalFetch.apply(this, args)
+    20	
+ succeeded in 50ms:
+     1	import { createApp, type App } from 'vue';
+     2	import Toolbar from '@/Toolbar.vue';
+     3	import { log, logData } from '@/core/utils/logger';
+     4	
+     5	let isToolbarMounted = false;
+     6	let shadowRootRef: ShadowRoot | null = null;
+     7	
+     8	export interface ShadowDOMSetupResult {
+     9	    shadowRoot: ShadowRoot;
+    10	    appContainer: HTMLElement;
+    11	}
+    12	
+    13	export function setShadowRoot(shadowRoot: ShadowRoot): void {
+    14	    log('Storing shadowRoot reference');
+    15	    shadowRootRef = shadowRoot;
+    16	}
+    17	
+    18	export function getShadowRoot(): ShadowRoot | null {
+    19	    return shadowRootRef;
+    20	}
+ succeeded in 50ms:
+     1	import { ref, type Ref } from 'vue'
+     2	import type { ToolbarData, ToolbarUpdateEvent } from '@/types'
+     3	
+     4	// ✅ Initialize with data BEFORE any component mounts
+     5	const data: Ref<ToolbarData> = ref(window.__LARAVEL_TOOLBAR_DATA__)
+     6	
+     7	window.addEventListener('laravel-toolbar:update', (event: ToolbarUpdateEvent) => {
+     8	  if (event.detail?.data) {
+     9	    data.value = event.detail.data
+    10	  }
+    11	})
+    12	
+    13	export const useToolbar = (): { data: Ref<ToolbarData> } => {
+    14	  return {
+    15	    data,
+    16	  }
+    17	}
+ succeeded in 50ms:
+     1	// cache.ts - HTML and CSS shell caching utilities
+     2	
+     3	const HTML_KEY = 'laravel-toolbar-html-cache'
+     4	const CSS_KEY = 'laravel-toolbar-css-cache'
+     5	
+     6	/**
+     7	 * Save toolbar HTML and CSS to sessionStorage before page unload
+     8	 */
+     9	export function setupCacheSaving(shadowRoot: ShadowRoot): void {
+    10	  const saveCache = (): void => {
+    11	    const toolbarRoot = shadowRoot.getElementById('laravel-toolbar-root')
+    12	    if (toolbarRoot) {
+    13	      try {
+    14	        sessionStorage.setItem(HTML_KEY, toolbarRoot.innerHTML)
+    15	
+    16	        const sheet = shadowRoot.adoptedStyleSheets[0]
+    17	        if (sheet) {
+    18	          const rules = Array.from(sheet.cssRules || [])
+    19	          const cssText = rules.map((rule) => rule.cssText).join('\n')
+    20	          if (cssText) {
+ succeeded in 50ms:
+     1	export const getNonce = (): string | null => {
+     2	  // Check script tags
+     3	  const scripts = document.getElementsByTagName('script')
+     4	  for (const script of scripts) {
+     5	    if (script.nonce) return script.nonce
+     6	    const nonceAttr = script.getAttribute('nonce')
+     7	    if (nonceAttr) return nonceAttr
+     8	  }
+     9	
+    10	  // Check meta tag
+    11	  const metaNonce = document.querySelector('meta[name="csp-nonce"]')
+    12	  return metaNonce?.getAttribute('content') ?? null
+    13	}
+ succeeded in 50ms:
+     1	import { setupInterceptors } from '@/core/interceptors'
+     2	
+     3	export type MountFunction = () => Promise<void>
+     4	
+     5	// Setup interceptors first (shared between dev and prod)
+     6	setupInterceptors()
+     7	
+     8	/**
+     9	 * Shared mount orchestration
+    10	 * Import the appropriate mount function (dev or prod) and call this
+    11	 */
+    12	export async function initToolbar(mountFn: MountFunction): Promise<void> {
+    13	  try {
+    14	    await mountFn()
+    15	  } catch (error) {
+    16	    console.error('[Laravel Toolbar] Failed to mount:', error)
+    17	    throw error
+    18	  }
+    19	}
+
+thinking
+**Assessing claim-related tests**
+exec
+/usr/bin/zsh -lc "nl -ba tests/Unit/Observers/QueryObserverTest.php | sed -n '1,340p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+     1	<?php
+     2	
+     3	use Illuminate\Database\Events\QueryExecuted;
+     4	use Illuminate\Support\Facades\DB;
+     5	use Illuminate\Support\Facades\Schema;
+     6	use NckRtl\Toolbar\Observers\QueryObserver;
+     7	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     8	
+     9	beforeEach(function () {
+    10	    // Initialize the Profiler to avoid errors
+    11	    Profiler::initialize();
+    12	
+    13	    // Create a simple table for testing
+    14	    Schema::create('test_users', function ($table) {
+    15	        $table->id();
+    16	        $table->string('name');
+    17	        $table->string('email')->nullable();
+    18	        $table->timestamps();
+    19	    });
+    20	});
+exec
+/usr/bin/zsh -lc "nl -ba tests/Unit/Observers/ModelObserverTest.php | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	use NckRtl\Toolbar\Data\ModelData;
+     4	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     5	use NckRtl\Toolbar\Measurement;
+     6	use NckRtl\Toolbar\Observers\ModelObserver;
+     7	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     8	
+     9	beforeEach(function () {
+    10	    Profiler::$requestCheckpoints = [];
+    11	    Profiler::initialize();
+    12	});
+    13	
+    14	it('has empty hydration entries on construction', function () {
+    15	    $observer = new ModelObserver;
+    16	
+    17	    expect($observer->hydrationEntries)->toBeEmpty();
+    18	});
+    19	
+    20	it('resets state correctly', function () {
+exec
+/usr/bin/zsh -lc "nl -ba tests/Unit/Services/ProfilerTest.php | sed -n '1,360p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba tests/Unit/Collectors/ProfilerCollectorTest.php | sed -n '1,360p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	use NckRtl\Toolbar\Data\RequestCheckpointData;
+     4	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     5	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     6	use NckRtl\Toolbar\Enums\TimeUnit;
+     7	use NckRtl\Toolbar\Measurement;
+     8	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     9	
+    10	beforeEach(function () {
+    11	    // Use getRequestStages() to clear ALL state including private $latestMemoryCheckpoint
+    12	    // This is necessary because initialize() registers callbacks that fire immediately
+    13	    // in the test environment (since Laravel is already booted)
+    14	    Profiler::getRequestStages();
+    15	
+    16	    // Ensure public arrays are clean for test isolation
+    17	    Profiler::$requestCheckpoints = [];
+    18	    Profiler::$viewRenders = [];
+    19	    Profiler::$profileMarkers = [];
+    20	});
+exec
+/usr/bin/zsh -lc "nl -ba tests/Unit/StateAccumulationTest.php | sed -n '1,420p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba tests/Unit/Data/ToolbarConfigTest.php | sed -n '1,340p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	use NckRtl\Toolbar\Collectors\ProfilerCollector;
+     4	use NckRtl\Toolbar\Data\Configurations\ProfilerConfig;
+     5	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     6	use NckRtl\Toolbar\Toolbar;
+     7	
+     8	beforeEach(function () {
+     9	    // Reset profiler state
+    10	    Profiler::$requestCheckpoints = [];
+    11	    Profiler::$viewRenders = [];
+    12	    Profiler::$profileMarkers = [];
+    13	
+    14	    Toolbar::enable();
+    15	    $toolbar = new Toolbar;
+    16	    $toolbar->config->collectors([]);
+    17	    $toolbar->config->enableInConsole();
+    18	    app()->instance(Toolbar::class, $toolbar);
+    19	});
+    20	
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	/**
+     4	 * Tests for state accumulation issues that occur in long-running processes
+     5	 * like Laravel Octane (Swoole/RoadRunner) where the same PHP process handles
+     6	 * multiple requests without restarting.
+     7	 *
+     8	 * These tests verify that observers and the profiler properly reset their state
+     9	 * between requests to prevent data from one request leaking into another.
+    10	 */
+    11	
+    12	use Illuminate\Support\Facades\DB;
+    13	use Illuminate\Support\Facades\Schema;
+    14	use NckRtl\Toolbar\Observers\ModelObserver;
+    15	use NckRtl\Toolbar\Observers\QueryObserver;
+    16	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    17	
+    18	beforeEach(function () {
+    19	    // Create a test table
+    20	    Schema::create('test_items', function ($table) {
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	use NckRtl\Toolbar\Collectors\CollectorInterface;
+     4	use NckRtl\Toolbar\Collectors\LaravelCollector;
+     5	use NckRtl\Toolbar\Collectors\PhpCollector;
+     6	use NckRtl\Toolbar\Data\ToolbarConfig;
+     7	use NckRtl\Toolbar\Observers\QueryObserver;
+     8	use NckRtl\Toolbar\Observers\RequestObserver;
+     9	use NckRtl\Toolbar\Toolbar;
+    10	
+    11	beforeEach(function () {
+    12	    Toolbar::enable();
+    13	});
+    14	
+    15	afterEach(function () {
+    16	    Toolbar::enable();
+    17	});
+    18	
+    19	it('can be instantiated', function () {
+    20	    $config = new ToolbarConfig;
+
+thinking
+**Reviewing remaining test coverage**
+exec
+/usr/bin/zsh -lc "nl -ba tests/Unit/Observers/QueryObserverTest.php | sed -n '340,520p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+   340	    expect(Profiler::getCurrentMemoryUsage())->toBeNull();
+   341	
+   342	    // QueryObserver should not throw when recording queries without Profiler memory data
+   343	    $observer = new QueryObserver;
+   344	
+   345	    DB::table('test_users')->insert(['name' => 'John', 'email' => 'john@example.com']);
+   346	
+   347	    // Query should be recorded successfully despite null memory checkpoint
+   348	    expect($observer->queries)->not->toBeEmpty();
+   349	    expect($observer->queries)->toHaveCount(1);
+   350	    expect($observer->queries[0]->sql)->toContain('insert');
+   351	});
+
+thinking
+**Inspecting tests for ToolbarInjector**
+exec
+/usr/bin/zsh -lc "nl -ba tests/Unit/ToolbarInjectorTest.php | sed -n '1,420p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba tests/Unit/CollectorManagerTest.php | sed -n '1,420p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba tests/Unit/Observers/RoutingObserverTest.php | sed -n '1,280p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba tests/Unit/Observers/RequestObserverTest.php | sed -n '1,280p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba tests/Unit/Collectors/QueriesCollectorTest.php | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba tests/Unit/Collectors/ModelsCollectorTest.php | sed -n '1,280p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+     1	<?php
+     2	
+     3	use Illuminate\Http\Request;
+     4	use Illuminate\Support\Facades\Config;
+     5	use Illuminate\Support\Facades\Route;
+     6	use Illuminate\Support\Facades\Vite;
+     7	use NckRtl\Toolbar\Tests\Helpers\MockResponse;
+     8	use NckRtl\Toolbar\Toolbar;
+     9	use NckRtl\Toolbar\ToolbarInjector;
+    10	use Symfony\Component\HttpFoundation\BinaryFileResponse;
+    11	use Symfony\Component\HttpFoundation\StreamedResponse;
+    12	
+    13	beforeEach(function () {
+    14	    // Ensure toolbar is enabled by default
+    15	    Config::set('toolbar.enabled', true);
+    16	    Toolbar::enable();
+    17	
+    18	    // Register a singleton Toolbar with no collectors to avoid Profiler exceptions
+    19	    $toolbar = new Toolbar;
+    20	    $toolbar->config->collectors([]);
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	use Illuminate\Support\Facades\Cache;
+     4	use NckRtl\Toolbar\CollectorManager;
+     5	use NckRtl\Toolbar\Collectors\LaravelCollector;
+     6	use NckRtl\Toolbar\Collectors\PhpCollector;
+     7	use NckRtl\Toolbar\Tests\Helpers\MockResponse;
+     8	use NckRtl\Toolbar\Toolbar;
+     9	
+    10	beforeEach(function () {
+    11	    Toolbar::enable();
+    12	
+    13	    $toolbar = new Toolbar;
+    14	    $toolbar->config->collectors([]);
+    15	    $toolbar->config->enableInConsole();
+    16	    app()->instance(Toolbar::class, $toolbar);
+    17	});
+    18	
+    19	it('generates unique request id', function () {
+    20	    $manager1 = new CollectorManager;
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	use Illuminate\Foundation\Http\Events\RequestHandled;
+     4	use Illuminate\Http\Request;
+     5	use Illuminate\Http\Response;
+     6	use Illuminate\Support\Facades\Event;
+     7	use Illuminate\Support\Facades\Route;
+     8	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     9	use NckRtl\Toolbar\Observers\RequestObserver;
+    10	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    11	use NckRtl\Toolbar\Toolbar;
+    12	
+    13	beforeEach(function () {
+    14	    // Reset profiler checkpoints
+    15	    Profiler::$requestCheckpoints = [];
+    16	    Profiler::initialize();
+    17	
+    18	    // Setup toolbar
+    19	    Toolbar::enable();
+    20	    $toolbar = new Toolbar;
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	use Illuminate\Http\Request;
+     4	use Illuminate\Routing\Events\RouteMatched;
+     5	use Illuminate\Routing\Events\Routing;
+     6	use Illuminate\Support\Facades\Route;
+     7	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     8	use NckRtl\Toolbar\Observers\RoutingObserver;
+     9	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    10	
+    11	beforeEach(function () {
+    12	    // Reset profiler checkpoints
+    13	    Profiler::$requestCheckpoints = [];
+    14	    Profiler::initialize();
+    15	});
+    16	
+    17	it('records BEFORE_ROUTING checkpoint on Routing event', function () {
+    18	    $observer = new RoutingObserver;
+    19	
+    20	    event(new Routing(Request::create('/', 'GET')));
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	use Illuminate\Support\Facades\DB;
+     4	use Illuminate\Support\Facades\Schema;
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Collectors\QueriesCollector;
+     7	use NckRtl\Toolbar\Data\Configurations\QueriesConfig;
+     8	use NckRtl\Toolbar\Data\QueriesData;
+     9	use NckRtl\Toolbar\Observers\QueryObserver;
+    10	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    11	use NckRtl\Toolbar\Toolbar;
+    12	
+    13	beforeEach(function () {
+    14	    Profiler::$requestCheckpoints = [];
+    15	    Profiler::initialize();
+    16	
+    17	    Toolbar::enable();
+    18	    $toolbar = new Toolbar;
+    19	    $toolbar->config->collectors([]);
+    20	    $toolbar->config->enableInConsole();
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	use NckRtl\Toolbar\CollectorManager;
+     4	use NckRtl\Toolbar\Collectors\ModelsCollector;
+     5	use NckRtl\Toolbar\Data\Configurations\ModelsConfig;
+     6	use NckRtl\Toolbar\Data\ModelData;
+     7	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     8	use NckRtl\Toolbar\Measurement;
+     9	use NckRtl\Toolbar\Observers\ModelObserver;
+    10	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    11	use NckRtl\Toolbar\Toolbar;
+    12	
+    13	beforeEach(function () {
+    14	    Profiler::$requestCheckpoints = [];
+    15	    Profiler::initialize();
+    16	
+    17	    Toolbar::enable();
+    18	    $toolbar = new Toolbar;
+    19	    $toolbar->config->collectors([]);
+    20	    $toolbar->config->enableInConsole();
+
+thinking
+**Inspecting provider customization**
+codex
+I’m checking provider/bootstrap code next to see whether observer reset and listener lifetimes are handled elsewhere, which affects Octane-leak severity.
+exec
+/usr/bin/zsh -lc "nl -ba src/Providers/ToolbarProvider.php | sed -n '1,360p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Data/RequestCheckpointData.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "rg -n \"reset\\(|observers\\(|new QueryObserver|new ModelObserver|RequestHandled|RouteMatched|Routing::class|Profiler::initialize\\(\" src tests | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "rg -n \"ToolbarConfigProvider|toolbar.php|LARAVEL_TOOLBAR_ENABLED|LARAVEL_TOOLBAR_VISIBLE\" -S . | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Providers;
+     4	
+     5	use Illuminate\Support\ServiceProvider;
+     6	use NckRtl\Toolbar\Data\ToolbarConfig;
+     7	use NckRtl\Toolbar\Toolbar;
+     8	
+     9	class ToolbarProvider extends ServiceProvider
+    10	{
+    11	    public function boot(Toolbar $toolbar): void
+    12	    {
+    13	        $this->update($toolbar->config);
+    14	    }
+    15	
+    16	    public function update(ToolbarConfig $toolbarConfig): void {}
+    17	}
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     6	use NckRtl\Toolbar\Enums\TimeUnit;
+     7	use NckRtl\Toolbar\Measurement;
+     8	use Spatie\LaravelData\Data;
+     9	
+    10	class RequestCheckpointData extends Data
+    11	{
+    12	    public function __construct(
+    13	        public ?Measurement $memory_real = null,
+    14	        public ?Measurement $time = null,
+    15	        public bool $measureMemory = true,
+    16	    ) {
+    17	        if ($this->measureMemory) {
+    18	            $this->memory_real = $this->memory_real ?? new Measurement(memory_get_usage(), DataSizeUnit::BYTES);
+    19	        }
+    20	        $this->time = $this->time ?? new Measurement(microtime(true), TimeUnit::SECONDS);
+ succeeded in 50ms:
+src/Toolbar.php:42:        Profiler::initialize();
+tests/Unit/Data/ToolbarConfigTest.php:68:    $observers = [new QueryObserver];
+tests/Unit/Data/ToolbarConfigTest.php:70:    $config->observers($observers);
+tests/Unit/Data/ToolbarConfigTest.php:78:    $result = $config->observers([]);
+tests/Unit/Data/ToolbarConfigTest.php:85:    $queryObserver = new QueryObserver;
+tests/Unit/Data/ToolbarConfigTest.php:86:    $config->observers([$queryObserver]);
+tests/Unit/Data/ToolbarConfigTest.php:95:    $config->observers([new QueryObserver]);
+src/Observers/RoutingObserver.php:5:use Illuminate\Routing\Events\RouteMatched;
+src/Observers/RoutingObserver.php:15:        Event::listen(Routing::class, function () {
+src/Observers/RoutingObserver.php:19:        Event::listen(RouteMatched::class, function ($event) {
+tests/Unit/StateAccumulationTest.php:34:        $observer = new QueryObserver;
+tests/Unit/StateAccumulationTest.php:49:        $observer = new QueryObserver;
+tests/Unit/StateAccumulationTest.php:64:        $observer = new QueryObserver;
+tests/Unit/StateAccumulationTest.php:76:        $observer = new QueryObserver;
+tests/Unit/StateAccumulationTest.php:86:        $observer->reset();
+tests/Unit/StateAccumulationTest.php:97:        $observer = new QueryObserver;
+tests/Unit/StateAccumulationTest.php:105:        $observer->reset();
+tests/Unit/StateAccumulationTest.php:120:        $observer = new ModelObserver;
+tests/Unit/StateAccumulationTest.php:127:        $observer = new ModelObserver;
+tests/Unit/StateAccumulationTest.php:132:        $observer->reset();
+ succeeded in 51ms:
+Total output lines: 67
+
+./CHANGELOG.md:45:- Include ToolbarConfigProvider example
+./src/ToolbarServiceProvider.php:17:            ->publishesServiceProvider('ToolbarConfigProvider')
+./src/ToolbarServiceProvider.php:26:        if (! env('LARAVEL_TOOLBAR_ENABLED', true)) {
+./src/ToolbarServiceProvider.php:32:        if (! env('LARAVEL_TOOLBAR_VISIBLE', true)) {
+./src/CollectorManager.php:45:                    'collectors' => 'No collectors enabled in the toolbar configuration (toolbar.php)',
+./README.md:70:1. Publish a `ToolbarConfigProvider` to `app/Providers/ToolbarConfigProvider.php`
+./README.md:92:class ToolbarConfigProvider extends ToolbarProvider
+./src/Console/CustomizeToolbarCommand.php:25:            'Registering config provider' => fn () => $this->registerToolbarConfigProvider(),
+./src/Console/CustomizeToolbarCommand.php:31:        $providerPath = app_path('Providers/ToolbarConfigProvider.php');
+./src/Console/CustomizeToolbarCommand.php:52:    protected function registerToolbarConfigProvider(): bool
+./src/Console/CustomizeToolbarCommand.php:57:            ServiceProvider::addProviderToBootstrapFile("{$namespace}\\Providers\\ToolbarConfigProvider");
+./src/Console/CustomizeToolbarCommand.php:64:        if (Str::contains($appConfig, $namespace.'\\Providers\\ToolbarConfigProvider::class')) {
+./src/Console/CustomizeToolbarCommand.php:70:            "{$namespace}\\Providers\\EventServiceProvider::class,".PHP_EOL."        {$namespace}\\Providers\\ToolbarConfigProvider::class,".PHP_EOL,
+./src/Console/CustomizeToolbarCommand.php:74:        file_put_contents(app_path('Providers/ToolbarConfigProvider.php'), str_replace(
+./src/Console/CustomizeToolbarCommand.php:77:            file_get_contents(app_path('Providers/ToolbarConfigProvider.php'))
+./agents/counselors/1772493424-bughunt/round-1/codex-5.3-high.md:27:**location:** [routes/toolbar.php:7](/home/nckrtl/projects/laravel-toolbar/routes/toolbar.php:7), [HorizonController.php:28](/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php:28), [HorizonController.php:68](/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php:68)  
+./agents/counselors/1772493424-bughunt/round-1/codex-5.3-high.md:76:**evidence:** Service provider reads `env()` directly (`LARAVEL_TOOLBAR_ENABLED/VISIBLE`) instead of config.  
+./agents/counselors/1772493424-bughunt/round-1/gemini-3-pro.md:123:- **evidence**: Evaluates `if (! env('LARAVEL_TOOLBAR_ENABLED', true))` directly.
+
+thinking
+**Reviewing README for config details**
+exec
+/usr/bin/zsh -lc "nl -ba README.md | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	# Laravel Toolbar
+     2	
+     3	[![Latest Version on Packagist](https://img.shields.io/packagist/v/nckrtl/laravel-toolbar.svg?style=flat-square)](https://packagist.org/packages/nckrtl/laravel-toolbar)
+     4	[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/nckrtl/laravel-toolbar/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/nckrtl/laravel-toolbar/actions?query=workflow%3Arun-tests+branch%3Amain)
+     5	[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/nckrtl/laravel-toolbar/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/nckrtl/laravel-toolbar/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+     6	[![Total Downloads](https://img.shields.io/packagist/dt/nckrtl/laravel-toolbar.svg?style=flat-square)](https://packagist.org/packages/nckrtl/laravel-toolbar)
+     7	
+     8	A powerful development toolbar for Laravel that sits at the bottom of your screen, providing real-time insights into your application's performance, database queries, request lifecycle, and more. Built with Vue.js and works standalone with optional Laravel Telescope integration for enhanced data collection.
+     9	
+    10	## Features
+    11	
+    12	- **Request Profiling**: Detailed breakdown of your request lifecycle with timing for each stage (bootstrapping, service providers, routing, middleware, controller, view rendering)
+    13	- **Database Query Monitoring**: Track all queries with timing, detect duplicates and slow queries, see SQL with bindings
+    14	- **Request Information**: View HTTP method, URI, IP address, controller action, and middleware stack
+    15	- **Laravel Environment**: Display Laravel version, environment, timezone, locale, and debug mode
+    16	- **PHP Information**: PHP version and configuration details
+    17	- **Eloquent Models**: Track model operations via Telescope integration
+    18	- **Vue.js Integration**: Monitor Vue.js related data in your application
+    19	- **Response Details**: Inspect response data and headers
+    20	- **Inertia.js Support**: Works seamlessly with Inertia.js requests via custom headers
+
+thinking
+**Investigating null collector cause**
+exec
+/usr/bin/zsh -lc "nl -ba resources/stubs/ToolbarConfigProvider.php.stub | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace App\Providers;
+     4	
+     5	use Illuminate\Support\ServiceProvider;
+     6	
+     7	class ToolbarConfigProvider extends ServiceProvider
+     8	{
+     9	    public function register(): void
+    10	    {
+    11	        // Toolbar is a dev-only dependency - skip if package not available
+    12	        if (! class_exists(\NckRtl\Toolbar\Toolbar::class)) {
+    13	            return;
+    14	        }
+    15	    }
+    16	
+    17	    public function boot(): void
+    18	    {
+    19	        // Skip configuration if toolbar package is not available (dev-only dependency)
+    20	        if (! class_exists(\NckRtl\Toolbar\Toolbar::class)) {
+
+thinking
+**Reviewing edge case tests**
+exec
+/usr/bin/zsh -lc "nl -ba tests/Unit/EdgeCasesTest.php | sed -n '1,420p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	use Illuminate\Http\Request;
+     4	use Illuminate\Support\Facades\Route;
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     7	use NckRtl\Toolbar\Tests\Helpers\MockResponse;
+     8	use NckRtl\Toolbar\Toolbar;
+     9	use NckRtl\Toolbar\ToolbarInjector;
+    10	
+    11	beforeEach(function () {
+    12	    Toolbar::enable();
+    13	    Profiler::$requestCheckpoints = [];
+    14	    Profiler::$viewRenders = [];
+    15	
+    16	    $toolbar = new Toolbar;
+    17	    $toolbar->config->collectors([]);
+    18	    $toolbar->config->enableInConsole();
+    19	    app()->instance(Toolbar::class, $toolbar);
+    20	
+
+thinking
+**Checking unit tests for enums**
+exec
+/usr/bin/zsh -lc "rg -n \"DataSizeUnit|TimeUnit|convertValueTo|formatMaxFractionDigits\" tests/src tests | sed -n '1,300p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+rg: tests/src: No such file or directory (os error 2)
+tests/Unit/EdgeCasesTest.php:330:            time: new \NckRtl\Toolbar\Measurement(microtime(true), \NckRtl\Toolbar\Enums\TimeUnit::SECONDS),
+tests/Unit/Data/ProfileMarkerDataTest.php:4:use NckRtl\Toolbar\Enums\DataSizeUnit;
+tests/Unit/Data/ProfileMarkerDataTest.php:5:use NckRtl\Toolbar\Enums\TimeUnit;
+tests/Unit/Data/ProfileMarkerDataTest.php:18:    expect($marker->time->unit)->toBe(TimeUnit::SECONDS);
+tests/Unit/Data/ProfileMarkerDataTest.php:26:    expect($marker->memory_real->unit)->toBe(DataSizeUnit::BYTES);
+tests/Unit/Data/ProfileMarkerDataTest.php:31:    $customTime = new Measurement(1234.5678, TimeUnit::SECONDS);
+tests/Unit/Data/ProfileMarkerDataTest.php:42:    $customMemory = new Measurement(123456789, DataSizeUnit::BYTES);
+tests/Unit/Observers/ModelObserverTest.php:4:use NckRtl\Toolbar\Enums\DataSizeUnit;
+tests/Unit/Observers/ModelObserverTest.php:28:        memory_used: new Measurement(1024, DataSizeUnit::BYTES),
+tests/Unit/Services/ProfilerTest.php:4:use NckRtl\Toolbar\Enums\DataSizeUnit;
+tests/Unit/Services/ProfilerTest.php:6:use NckRtl\Toolbar\Enums\TimeUnit;
+tests/Unit/Services/ProfilerTest.php:59:        memory_real: new Measurement($customMemory, DataSizeUnit::BYTES),
+tests/Unit/Services/ProfilerTest.php:60:        time: new Measurement($customTime, TimeUnit::SECONDS)
+tests/Unit/Services/ProfilerTest.php:73:        time: new Measurement($firstTime, TimeUnit::SECONDS)
+tests/Unit/Services/ProfilerTest.php:79:        time: new Measurement($secondTime, TimeUnit::SECONDS)
+tests/Unit/Services/ProfilerTest.php:146:        memory_real: new Measurement(1000000, DataSizeUnit::BYTES),
+tests/Unit/Services/ProfilerTest.php:159:        time: new Measurement(microtime(true), TimeUnit::SECONDS),
+tests/Unit/Services/ProfilerTest.php:171:        time: new Measurement($baseTime, TimeUnit::SECONDS),
+tests/Unit/Services/ProfilerTest.php:175:        time: new Measurement($baseTime + 0.001, TimeUnit::SECONDS)
+
+thinking
+**Investigating request data dependency**
+exec
+/usr/bin/zsh -lc "nl -ba src/Collectors/RequestCollector.php | sed -n '1,300p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Data/RequestData.php | sed -n '1,340p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Data/SubstageData.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Data/RequestStagePropertyData.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Data\Configurations\RequestConfig;
+     7	use NckRtl\Toolbar\Data\RequestData;
+     8	
+     9	/**
+    10	 * @property RequestConfig $config
+    11	 */
+    12	class RequestCollector extends Collector implements CollectorInterface
+    13	{
+    14	    public function key(): string
+    15	    {
+    16	        return 'request';
+    17	    }
+    18	
+    19	    public function configClass(): string
+    20	    {
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use Illuminate\Http\Request;
+     6	use Illuminate\Routing\Route as RoutingRoute;
+     7	use Illuminate\Support\Facades\Route;
+     8	use NckRtl\Toolbar\Traits\ControllerActionEditorUrl;
+     9	use Spatie\LaravelData\Data;
+    10	
+    11	class RequestData extends Data
+    12	{
+    13	    use ControllerActionEditorUrl;
+    14	
+    15	    public string $route_name;
+    16	
+    17	    public ?string $controller_action_editor_url = null;
+    18	
+    19	    public ?string $route_editor_url = null;
+    20	
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     6	use NckRtl\Toolbar\Enums\TimeUnit;
+     7	use NckRtl\Toolbar\Measurement;
+     8	use Spatie\LaravelData\Data;
+     9	
+    10	class SubstageData extends Data
+    11	{
+    12	    public ?RequestStagePropertyData $wall_time = null;
+    13	
+    14	    public ?RequestStagePropertyData $memory_real_delta = null;
+    15	
+    16	    public function __construct(
+    17	        public string $label,
+    18	        public ProfileMarkerData $start,
+    19	        public ProfileMarkerData $end,
+    20	    ) {
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Enums\Unit;
+     6	use NckRtl\Toolbar\Measurement;
+     7	use Spatie\LaravelData\Data;
+     8	
+     9	class RequestStagePropertyData extends Data
+    10	{
+    11	    public float $percentage = 0;
+    12	
+    13	    public Measurement $measurement;
+    14	
+    15	    public function __construct(
+    16	        float $value,
+    17	        Unit $unit
+    18	    ) {
+    19	        $this->measurement = new Measurement($value, $unit);
+    20	    }
+
+thinking
+**Inspecting environment handling in collectors**
+exec
+/usr/bin/zsh -lc "nl -ba src/Collectors/LaravelCollector.php | sed -n '1,320p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Collectors/Collector.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "nl -ba src/Data/Configurations/CollectorConfig.php | sed -n '1,260p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use Illuminate\Foundation\Concerns\ResolvesDumpSource;
+     6	use NckRtl\Toolbar\CollectorManager;
+     7	use NckRtl\Toolbar\Data\Configurations\LaravelConfig;
+     8	use NckRtl\Toolbar\Data\LaravelData;
+     9	use NckRtl\Toolbar\Traits\ResolvesConfigSource;
+    10	
+    11	/**
+    12	 * @property LaravelConfig $config
+    13	 */
+    14	class LaravelCollector extends Collector implements CollectorInterface
+    15	{
+    16	    use ResolvesConfigSource;
+    17	    use ResolvesDumpSource;
+    18	
+    19	    public function key(): string
+    20	    {
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use NckRtl\Toolbar\Data\Configurations\CollectorConfig;
+     6	use Spatie\LaravelData\Data;
+     7	
+     8	abstract class Collector extends Data
+     9	{
+    10	    abstract public function configClass(): string;
+    11	
+    12	    abstract public function key(): string;
+    13	
+    14	    public function __construct(public ?CollectorConfig $config = null)
+    15	    {
+    16	        $configClass = $this->configClass();
+    17	
+    18	        if (! $configClass) {
+    19	            throw new \Exception('Collector '.$this->key().' config class must be set.');
+    20	        }
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data\Configurations;
+     4	
+     5	interface CollectorConfig
+     6	{
+     7	    public function isEnabled(): bool;
+     8	}
+
+thinking
+**Inspecting default configuration states**
+exec
+/usr/bin/zsh -lc "nl -ba src/Data/Configurations/ModelsConfig.php | sed -n '1,220p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data\Configurations;
+     4	
+     5	use Spatie\LaravelData\Data;
+     6	
+     7	class ModelsConfig extends Data implements CollectorConfig
+     8	{
+     9	    public function __construct(
+    10	        public bool $enabled = true,
+    11	    ) {}
+    12	
+    13	    public function isEnabled(): bool
+    14	    {
+    15	        return $this->enabled;
+    16	    }
+    17	}
+
+thinking
+**Confirming singleton lifecycle and state reset issues**
+exec
+/usr/bin/zsh -lc "php -r '"'$o=new class{}; var_dump($o->x["y"] ?? []);'"'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+array(0) {
+}
+
+thinking
+**Testing error reporting settings**
+exec
+/usr/bin/zsh -lc "php -d display_errors=1 -d error_reporting=32767 -r '"'$o=new class{}; var_dump($o->x["y"] ?? []);'"'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+array(0) {
+}
+
+thinking
+**Validating profiler memory state leak**
+exec
+/usr/bin/zsh -lc "php -r 'require \"vendor/autoload.php\"; use NckRtl\\Toolbar\\Enums\\DataSizeUnit; echo DataSizeUnit::KILOBYTES->convertValueTo(1, DataSizeUnit::BYTES),\"\\n\"; echo DataSizeUnit::BYTES->convertValueTo(1024, DataSizeUnit::KILOBYTES),\"\\n\";'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+0.0009765625
+1
+
+thinking
+**Checking time unit conversion bug**
+exec
+/usr/bin/zsh -lc "php -r 'require \"vendor/autoload.php\"; use NckRtl\\Toolbar\\Enums\\TimeUnit; echo TimeUnit::SECONDS->convertValueTo(1, TimeUnit::MILLISECONDS),\"\\n\"; echo TimeUnit::MILLISECONDS->convertValueTo(1000, TimeUnit::SECONDS),\"\\n\";'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+1000
+1000000
+
+thinking
+**Identifying multiple formatting and encoding bugs**
+exec
+/usr/bin/zsh -lc "php -r '"'$sql="select ?"; $binding="'"\\"'$1"; echo preg_replace("/'"\\?/\", "'$binding, $sql, 1),"'"\\n\";'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+select 
+
+thinking
+**Confirming memory tracking bug**
+exec
+/usr/bin/zsh -lc "rg -n \"formatValue\\(|decimals\\(|convertTo\\(\" src | sed -n '1,360p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+src/Collectors/ProfilerCollector.php:148:                new Measurement(0, TimeUnit::MILLISECONDS)->decimals(0),
+src/Collectors/ProfilerCollector.php:169:            $differenceFromStartToCurrentRequestStageEnd = new Measurement($requestStageEndTime - $startTime, TimeUnit::SECONDS)->convertTo(TimeUnit::MILLISECONDS)->value;
+src/Collectors/ProfilerCollector.php:181:            new Measurement($totalWallTime, TimeUnit::MILLISECONDS)->decimals(0),
+src/Collectors/ResponseCollector.php:35:            )->formatValue()
+src/Measurement.php:15:        $this->formatValue();
+src/Measurement.php:18:    public function convertTo(Unit $unit): self
+src/Measurement.php:23:        $this->formatValue($unit);
+src/Measurement.php:28:    public function decimals(int $decimals): self
+src/Measurement.php:35:    public function formatValue(?Unit $formatToUnit = null): self
+src/Observers/QueryObserver.php:90:            memory_used: new Measurement($memoryAfter - $memoryBefore, DataSizeUnit::BYTES)->convertTo(DataSizeUnit::KILOBYTES),
+src/Observers/ModelObserver.php:76:            $model->memory_used->formatValue();
+src/Data/RequestStageData.php:54:        )->convertTo(TimeUnit::MILLISECONDS);
+src/Data/RequestStageData.php:83:        $this->wall_time->convertTo(TimeUnit::MILLISECONDS);
+src/Data/RequestStageData.php:84:        $this->memory_real_delta->convertTo(DataSizeUnit::MEGABYTES);
+src/Data/SubstageData.php:30:        )->convertTo(TimeUnit::MILLISECONDS);
+src/Data/RequestStagePropertyData.php:29:    public function convertTo(Unit $unit): self
+src/Data/RequestStagePropertyData.php:31:        $this->measurement->convertTo($unit);
+
+thinking
+**Analyzing response and injection edge cases**
+exec
+/usr/bin/zsh -lc "php -d display_errors=1 -d error_reporting=32767 -r 'var_dump(stripos(false,\"</body>\")===false);'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+bool(true)
+
+thinking
+**Testing strlen behavior with false input**
+exec
+/usr/bin/zsh -lc "php -d display_errors=1 -d error_reporting=32767 -r 'var_dump(strlen(false));'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+int(0)
+
+thinking
+**Refining observer memory leak and error risks**
+exec
+/usr/bin/zsh -lc "php -r 'function f(string "'$s){var_dump($s);} try{f(null);}catch(Throwable $e){echo get_class($e),": ",$e->getMessage(),"'"\\n\";}'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+TypeError: f(): Argument #1 ($s) must be of type string, null given, called in Command line code on line 1
+
+thinking
+**Analyzing rare preg_replace failures and float timing drift**
+exec
+/usr/bin/zsh -lc "php -r '"'$hits=0;$n=100000;for($i=0;$i<$n;$i++){ $a=mt_rand()/mt_getrandmax()*1000; $b=$a+mt_rand()/mt_getrandmax(); $c=$b+mt_rand()/mt_getrandmax(); $sum=(($b-$a)*1000)+(($c-$b)*1000); $diff=($c-$a)*1000; if($diff>$sum || ($sum>0 && $diff<$sum)) $hits++; } echo $hits,"/",$n,"'"\\n\";'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+1109/100000
+
+
+thinking
+**Analyzing observer registration and memory leaks**
+thinking
+**Identifying toolbar disablement gaps exposing routes**
+exec
+/usr/bin/zsh -lc "php -r 'require \"vendor/autoload.php\"; "'$cfg=new NckRtl'"\\Toolbar\\Data\\ToolbarConfig; try{"'$cfg->collectors(null); echo "ok'"\\n\";}catch(Throwable "'$e){echo get_class($e),": ",$e->getMessage(),"'"\\n\";}'" in /home/nckrtl/projects/laravel-toolbar exited 255 in 51ms:
+PHP Fatal error:  Uncaught Error: Call to undefined method Illuminate\Container\Container::booted() in /home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:122
+Stack trace:
+#0 /home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php(54): NckRtl\Toolbar\Data\ToolbarConfig->middleware()
+#1 Command line code(1): NckRtl\Toolbar\Data\ToolbarConfig->__construct()
+#2 {main}
+  thrown in /home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php on line 122
+
+thinking
+**Testing constructor-free instantiation**
+exec
+/usr/bin/zsh -lc "php -r 'require \"vendor/autoload.php\"; "'$rc=new ReflectionClass(NckRtl'"\\Toolbar\\Data\\ToolbarConfig::class); "'$cfg=$rc->newInstanceWithoutConstructor(); try{$cfg->observers(null);}catch(Throwable $e){echo get_class($e),": ",$e->getMessage(),"'"\\n\";}'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+TypeError: Cannot assign null to property NckRtl\Toolbar\Data\ToolbarConfig::$observers of type array
+exec
+/usr/bin/zsh -lc "php -r 'require \"vendor/autoload.php\"; "'$rc=new ReflectionClass(NckRtl'"\\Toolbar\\Data\\ToolbarConfig::class); "'$cfg=$rc->newInstanceWithoutConstructor(); try{$cfg->collectors(null);}catch(Throwable $e){echo get_class($e),": ",$e->getMessage(),"'"\\n\";}'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+PHP Warning:  foreach() argument must be of type array|object, null given in /home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php on line 162
+TypeError: Cannot assign null to property NckRtl\Toolbar\Data\ToolbarConfig::$collectors of type array
+
+thinking
+**Prioritizing in-depth bug and security inspections**
+exec
+/usr/bin/zsh -lc "rg -n \"->reset\\(\" src | sed -n '1,120p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+rg: unrecognized flag ->
+
+thinking
+**Refining search pattern with escape**
+exec
+/usr/bin/zsh -lc "rg -n -- \"reset\\(\" src | sed -n '1,120p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+src/Observers/QueryObserver.php:45:    public function reset(): void
+src/Observers/ModelObserver.php:32:    public function reset(): void
+
+thinking
+**Planning Octane doc updates**
+exec
+/usr/bin/zsh -lc "rg -n \"Octane|reset\" README.md SECURITY.md CHANGELOG.md src | sed -n '1,220p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+src/Observers/QueryObserver.php:42:     * This is critical for long-running processes like Laravel Octane
+src/Observers/QueryObserver.php:45:    public function reset(): void
+src/Observers/ModelObserver.php:29:     * This is critical for long-running processes like Laravel Octane
+src/Observers/ModelObserver.php:32:    public function reset(): void
+src/Services/ProfilerService/Profiler.php:63:        // Reset all state for a new request (important for Octane)
+src/Services/ProfilerService/Profiler.php:198:        // Clear all state for next request (important for Octane)
+
+
+thinking
+**Identifying critical profiler state leak**
+thinking
+**Summarizing overlaps and confirmations**
+codex
+I’ve finished validating code paths and reproduced key behaviors (unit conversion outputs, null-path type errors, and reset-call absence). I’m compiling the final audit now with overlap statuses and concrete failing-test ideas.
+Plan update
+  ✓ Read prior round outputs to identify existing claims and avoid blind duplication
+  ✓ Inspect high-priority observer/profiler/injector code paths for concrete failures
+  ✓ Inspect medium/lower-priority collectors, DTOs, enums, and controllers for correctness/security issues
+  → Assemble severity-ordered findings with evidence, impact, minimal fix, and test ideas including overlap status
+
+thinking
+**Designing detailed final findings list**
+codex
+1. **Cross-request state leaks and stale profiler data in Octane**
+status: refined (overlaps prior observer/profiler leak findings; new evidence is the non-HTML/no-collection path)  
+severity: critical  
+confidence: high  
+location: [RequestObserver::__construct](/home/nckrtl/projects/laravel-toolbar/src/Observers/RequestObserver.php:13), [ToolbarInjector::injectToolbarHtml](/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:125), [Profiler::getRequestStages](/home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService/Profiler.php:123), [QueryObserver::reset](/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php:45), [ModelObserver::reset](/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php:32)  
+evidence: observer `reset()` methods exist but are never called in `src`; profiler state is cleared only inside `getRequestStages()`, but `collectData()` is skipped when HTML injection is skipped (`shouldInjectHtml() === false`, e.g. AJAX/JSON). In Octane, static state persists, so stale checkpoints/query/model data survive and contaminate later requests.  
+impact: wrong toolbar data, cross-request leakage, and unbounded memory growth in long-running workers.  
+minimal fix: add an unconditional request-boundary reset (terminating middleware/event) that always clears profiler state and calls `reset()` on configured observers, independent of whether toolbar HTML/header is injected.  
+test idea: simulate two sequential requests in one process: request A JSON (no injection), request B HTML (injection). Assert request B shows only B’s checkpoints/queries/models.
+
+2. **Uncaught profiler math exceptions can 500 requests**
+status: confirmed  
+severity: high  
+confidence: high  
+location: [ProfilerCollector::getTotals](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:142), [ProfilerCollector::fillInMissingStartAndEnd](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:198), [CollectorManager::collectData](/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php:32)  
+evidence: multiple `throw new \Exception(...)` paths in profiler collector, with no catch in `CollectorManager`.  
+impact: toolbar collection can crash request handling instead of failing open.  
+minimal fix: convert hard throws to tolerant fallbacks (or catch collector exceptions centrally and continue).  
+test idea: feed stages with tiny floating-point drift or missing terminal checkpoint; assert collection returns data instead of throwing.
+
+3. **Observer-removal config causes null dereference in collectors**
+status: confirmed  
+severity: high  
+confidence: high  
+location: [QueriesCollector::setEntries](/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php:49), [ModelsCollector::setEntries](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php:31), [ToolbarConfig::getObserver](/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:147)  
+evidence: `getObserver(...)` is nullable, then immediately dereferenced (`$queryObserver->totalTime`, `$modelObserver->hydrationEntries`).  
+impact: user customization that omits one observer crashes collection.  
+minimal fix: null-guard and return empty dataset defaults.  
+test idea: configure observers without `QueryObserver`/`ModelObserver`, keep respective collectors enabled, assert no exception.
+
+4. **Horizon control endpoints are unauthenticated**
+status: refined  
+severity: high  
+confidence: high  
+location: [routes/toolbar.php](/home/nckrtl/projects/laravel-toolbar/routes/toolbar.php:7), [HorizonController::start](/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php:28), [HorizonController::stop](/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php:68)  
+evidence: routes are only under `web` middleware; no auth/authorization gate. `start()` also reports success without verifying Horizon availability after spawn.  
+impact: any local-environment web user can start/stop Horizon; misleading success responses when start fails.  
+minimal fix: add auth/ability middleware and availability/start-result checks before success response.  
+test idea: unauthenticated POST to `/_toolbar/horizon/start` should be forbidden; when Horizon is unavailable, `start()` should return failure.
+
+5. **`replaceBindings()` corrupts SQL for `$`/`\` bindings**
+status: confirmed  
+severity: medium  
+confidence: high  
+location: [QueryObserver::replaceBindings](/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php:144)  
+evidence: binding is used as raw `preg_replace` replacement string. Example: replacement `"$1"` is interpreted as backreference and disappears.  
+impact: displayed SQL is wrong for valid inputs containing `$`/backslashes.  
+minimal fix: use `preg_replace_callback()` or escape replacement meta chars before replacement.  
+test idea: execute query with binding `'$100'`; expected SQL contains literal `'$100'`, actual output is mangled.
+
+6. **`collectors(null)` and `observers(null)` are broken**
+status: refined (collectors issue confirmed; observers null crash is additional)  
+severity: medium  
+confidence: high  
+location: [ToolbarConfig::collectors](/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:156), [ToolbarConfig::observers](/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:140)  
+evidence: `collectors(null)` does `foreach ($collectors as ...)` then assigns null to typed `array` property; `observers(null)` directly assigns null to typed `array`.  
+impact: runtime warnings/type errors during legitimate “clear config” style calls.  
+minimal fix: normalize null to `[]` immediately and return early.  
+test idea: call both methods with null and assert no warning/exception, arrays become empty.
+
+7. **Unit conversions are mathematically wrong in common directions**
+status: refined (prior DataSize bug confirmed; TimeUnit reverse-path bug additionally confirmed)  
+severity: medium  
+confidence: high  
+location: [DataSizeUnit::convertValueTo](/home/nckrtl/projects/laravel-toolbar/src/Enums/DataSizeUnit.php:57), [TimeUnit::convertValueTo](/home/nckrtl/projects/laravel-toolbar/src/Enums/TimeUnit.php:66)  
+evidence: runtime check: `1 KB -> BYTES` returns `0.0009765625`; `1000 ms -> seconds` returns `1000000`.  
+impact: wrong values whenever conversions go through affected direction/branch.  
+minimal fix: use one formula for both: `value * fromFactor / toFactor` (with same-unit fast return).  
+test idea: assert bidirectional conversions for bytes↔KB and ms↔s.
+
+8. **Memory metrics are incorrect in query/model observers**
+status: refined  
+severity: medium  
+confidence: high  
+location: [QueryObserver::recordQuery](/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php:56), [ModelObserver::recordHydrations](/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php:63)  
+evidence: `QueryObserver` never updates `$currentMemory` after each query; `ModelObserver` increments count but does not add new delta to existing `memory_used` value.  
+impact: per-query/per-model memory shown to users is misleading.  
+minimal fix: update query baseline each event; accumulate model `memory_used->value += delta` before reformatting.  
+test idea: two known-memory events should produce per-event query deltas and cumulative model memory.
+
+9. **Invalid UTF-8 in payload can break injected script**
+status: refined  
+severity: medium  
+confidence: medium  
+location: [ToolbarInjector::injectToolbarHtml](/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:140), [ToolbarInjector::getToolbarHtml](/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:212)  
+evidence: `json_encode($data, ...)` can return `false`; that value is passed into JS assignment (`window.__LARAVEL_TOOLBAR_DATA__ = ...`), yielding invalid script content.  
+impact: toolbar script can fail to parse on affected responses.  
+minimal fix: use `JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE` and fallback safely on encode failure.  
+test idea: include invalid UTF-8 in collected data and assert injected HTML remains syntactically valid JS.
+
+10. **CSP nonce check in injected JS is always true**
+status: confirmed  
+severity: low  
+confidence: high  
+location: [ToolbarInjector::toolbarHtml](/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:280)  
+evidence: condition is `if("{$nonce}" !== null)`; when nonce is absent this becomes `if("" !== null)` (true).  
+impact: inline-style stripping runs unconditionally, which can remove cached inline styles even without CSP nonce requirements.  
+minimal fix: emit a real JS nullable/boolean variable and branch on that.  
+test idea: no CSP nonce + cached HTML with inline style; assert styles are preserved before hydration.
+
+Invalidated prior leads:
+- `FetchesStackTrace` undefined `$this->options` causing fatal: invalidated; null-coalescing access does not raise runtime error here.
+- `Profiler::initialize()` callback stacking as an every-request Octane bug: not confirmed from current lifecycle wiring.
+- `Toolbar::isEnabled()` throwing when unbound: invalidated; short-circuit `app()->bound(...) && ...` prevents resolution when unbound.
+- `AssetController` traversal via `/../`: not confirmed with current single-segment route shape.
+tokens used
+145,520

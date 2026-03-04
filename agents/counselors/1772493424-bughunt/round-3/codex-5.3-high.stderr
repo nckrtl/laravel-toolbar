@@ -1,0 +1,1638 @@
+OpenAI Codex v0.104.0 (research preview)
+--------
+workdir: /home/nckrtl/projects/laravel-toolbar
+model: gpt-5.3-codex
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: high
+reasoning summaries: auto
+session id: 019cb0e9-fd76-7da3-bdd3-4c486e177e4c
+--------
+user
+Read the file at /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/prompt.md and follow the instructions within it.
+mcp: laravel-boost starting
+mcp: laravel-boost failed: MCP client for `laravel-boost` failed to start: MCP startup failed: handshaking with MCP server failed: connection closed: initialize response
+mcp startup: failed: laravel-boost
+
+thinking
+**Preparing file inspection**
+codex
+I’m going to open the referenced prompt file first, then I’ll execute its instructions exactly as written within the current repository constraints.
+exec
+/usr/bin/zsh -lc 'cat /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-3/prompt.md' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+Now I have a thorough understanding of the codebase. Here is the prompt:
+
+You are a senior software engineer performing a correctness audit of the `laravel-toolbar` package — a Laravel dev toolbar that collects request profiling data, database queries, model hydrations, and timing information, injecting a Vue 3 toolbar into HTML responses via Shadow DOM.
+
+## Objective
+
+Systematically audit the entire `laravel-toolbar` package for correctness bugs, edge cases, null dereferences, race conditions, and missing error handling. Focus on real, user-visible failures — not style issues. The package runs in both standard PHP-FPM and long-running Octane (Swoole/RoadRunner) environments, making state management bugs especially critical.
+
+## Priority
+
+1. User-visible correctness failures (crashes, wrong data shown, data leaks between requests)
+2. High-blast-radius bugs (affect every request, corrupt shared state, break injection)
+3. Findings that would produce meaningful failing tests
+
+## Tech Stack
+
+- PHP 8.4+ with Laravel 11/12
+- Spatie Laravel Data for DTOs
+- PHPStan level 5 with Larastan
+- Pest 4 for testing
+
+thinking
+**Planning parallel correctness audit**
+codex
+I’ve loaded the audit brief. Next I’m scanning the referenced prior-round reports and the current source files side-by-side to confirm, refine, or invalidate findings with fresh evidence.
+exec
+/usr/bin/zsh -lc 'wc -l /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/claude-opus.md /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/codex-5.3-high.md /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/gemini-3-pro.md /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/claude-opus.md /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/codex-5.3-high.md /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/gemini-3-pro.md' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'rg --files /home/nckrtl/projects/laravel-toolbar/src /home/nckrtl/projects/laravel-toolbar/resources/js /home/nckrtl/projects/laravel-toolbar/tests | wc -l' in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+  292 /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/claude-opus.md
+   80 /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/codex-5.3-high.md
+  126 /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/gemini-3-pro.md
+    0 /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/claude-opus.md
+  105 /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/codex-5.3-high.md
+  117 /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/gemini-3-pro.md
+  720 total
+ succeeded in 50ms:
+167
+
+thinking
+**Planning output and code review**
+exec
+/usr/bin/zsh -lc 'cat /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/codex-5.3-high.md' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'cat /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/gemini-3-pro.md' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'cat /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-2/codex-5.3-high.md' in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+1. **severity:** critical  
+**confidence:** high  
+**location:** [RequestObserver.php:13](/home/nckrtl/projects/laravel-toolbar/src/Observers/RequestObserver.php:13), [QueryObserver.php:45](/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php:45), [ModelObserver.php:32](/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php:32)  
+**evidence:** `QueryObserver`/`ModelObserver` are long-lived listeners with mutable arrays, both expose `reset()`, but `reset()` is never called anywhere in `src` after a request completes.  
+**impact:** In Octane workers, query/model data leaks across requests (wrong duplicates, inflated counts, cross-request data exposure).  
+**minimal fix:** At request end, iterate configured observers and call `reset()` when present (eg in `RequestObserver` after injection, or in a dedicated terminating middleware).  
+**test idea:** Simulate two requests with the same observer instance; assert second request starts with empty `queries`/`hydrationEntries`.
+
+2. **severity:** high  
+**confidence:** high  
+**location:** [ProfilerCollector.php:142](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:142), [ProfilerCollector.php:198](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:198), [ProfilerCollector.php:221](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:221)  
+**evidence:** `getTotals()` / `fillInMissingStartAndEnd()` / `findNextStageWithEnd()` throw uncaught `\Exception`. `CollectorManager::collectData()` does not catch collector exceptions.  
+**impact:** Toolbar collection can 500 the request when checkpoints are missing/inconsistent.  
+**minimal fix:** Convert these throws to graceful fallbacks (skip bad stages, zero totals, attach debug metadata instead of throwing).  
+**test idea:** Configure profiler collector with missing terminal checkpoint and assert collection returns valid `ProfilerData` instead of exception.
+
+3. **severity:** high  
+**confidence:** high  
+**location:** [QueriesCollector.php:53](/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php:53), [ModelsCollector.php:35](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php:35)  
+**evidence:** `getObserver(...)` is nullable, but result is dereferenced immediately (`$queryObserver->totalTime`, `$modelObserver->hydrationEntries`).  
+ succeeded in 51ms:
+1. **Cross-request state leaks and stale profiler data in Octane**
+status: refined (overlaps prior observer/profiler leak findings; new evidence is the non-HTML/no-collection path)  
+severity: critical  
+confidence: high  
+location: [RequestObserver::__construct](/home/nckrtl/projects/laravel-toolbar/src/Observers/RequestObserver.php:13), [ToolbarInjector::injectToolbarHtml](/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:125), [Profiler::getRequestStages](/home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService/Profiler.php:123), [QueryObserver::reset](/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php:45), [ModelObserver::reset](/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php:32)  
+evidence: observer `reset()` methods exist but are never called in `src`; profiler state is cleared only inside `getRequestStages()`, but `collectData()` is skipped when HTML injection is skipped (`shouldInjectHtml() === false`, e.g. AJAX/JSON). In Octane, static state persists, so stale checkpoints/query/model data survive and contaminate later requests.  
+impact: wrong toolbar data, cross-request leakage, and unbounded memory growth in long-running workers.  
+minimal fix: add an unconditional request-boundary reset (terminating middleware/event) that always clears profiler state and calls `reset()` on configured observers, independent of whether toolbar HTML/header is injected.  
+test idea: simulate two sequential requests in one process: request A JSON (no injection), request B HTML (injection). Assert request B shows only B’s checkpoints/queries/models.
+
+2. **Uncaught profiler math exceptions can 500 requests**
+status: confirmed  
+severity: high  
+confidence: high  
+location: [ProfilerCollector::getTotals](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:142), [ProfilerCollector::fillInMissingStartAndEnd](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:198), [CollectorManager::collectData](/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php:32)  
+evidence: multiple `throw new \Exception(...)` paths in profiler collector, with no catch in `CollectorManager`.  
+impact: toolbar collection can crash request handling instead of failing open.  
+minimal fix: convert hard throws to tolerant fallbacks (or catch collector exceptions centrally and continue).  
+test idea: feed stages with tiny floating-point drift or missing terminal checkpoint; assert collection returns data instead of throwing.
+
+ succeeded in 51ms:
+Here is a systematic correctness audit of the `laravel-toolbar` package, prioritized by severity.
+
+### CRITICAL
+
+**1. Severe State Leak in Octane Environments**
+- **severity**: critical
+- **confidence**: high
+- **location**: `src/Observers/QueryObserver.php` and `src/Observers/ModelObserver.php` — class instances
+- **evidence**: Both observers maintain state arrays (e.g., `$this->queries = []`, `$this->hydrationEntries = []`) and explicitly provide a `reset()` method documented as "critical for long-running processes like Laravel Octane". However, a codebase search reveals that `->reset()` is *never called anywhere* in the package's source code. `ToolbarServiceProvider` registers the `Toolbar` instance as a singleton per Octane worker.
+- **impact**: In long-running environments like Octane or RoadRunner, data completely bleeds between requests. Request 2 will display Request 1's queries and models. Eventually, the worker will crash due to Out-Of-Memory (OOM) errors as the arrays grow indefinitely over thousands of requests.
+- **minimal fix**: Bind an event listener to Laravel's `RequestHandled` or `RequestReceived` events to call `$toolbar->config->getObserver(QueryObserver::class)?->reset();` at the start or end of the request cycle.
+- **test idea**: In an Octane simulation, resolve `Toolbar` from the container, fire a `QueryExecuted` event, and simulate a second request cycle by firing a new `QueryExecuted` event. Assert that the second request's collected queries array has exactly 1 element, not 2.
+
+### HIGH
+
+**2. Null Dereferences in Collectors when Observers are Omitted**
+- **severity**: high
+- **confidence**: high
+- **location**: `src/Collectors/QueriesCollector.php:53` and `src/Collectors/ModelsCollector.php:35` — `setEntries()`
+- **evidence**: The collectors fetch their respective observers using `$toolbar->config->getObserver()`, which is nullable if a user customizes their `observers` array to omit them. The code immediately dereferences the result without a null check: `$this->totalTime = $queryObserver->totalTime;`.
+
+thinking
+**Planning parallel read of round1 files**
+codex
+I’ve pulled round-2 outputs; now I’m checking round-1 notes and then validating current code paths directly so any overlap is explicitly marked as confirmed/refined/invalidated.
+exec
+/usr/bin/zsh -lc 'cat /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/gemini-3-pro.md' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'cat /home/nckrtl/projects/laravel-toolbar/agents/counselors/1772493424-bughunt/round-1/claude-opus.md' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+Here is the systematic correctness audit of the `laravel-toolbar` package, prioritized by severity.
+
+### CRITICAL
+
+**1. Uncaught exceptions in ProfilerCollector crashing requests**
+- **severity**: critical
+- **confidence**: high
+- **location**: `src/Collectors/ProfilerCollector.php` - `getTotals()` and `fillInMissingStartAndEnd()`
+- **evidence**: Throws `Exception` when encountering edge cases like "Wall time overlap detected" and "No next stage with a end time found". 
+- **impact**: Since this runs in the request lifecycle during `collectData()`, slight process scheduling anomalies or missing checkpoints will trigger an uncaught exception, resulting in a 500 server error for the user's application.
+- **minimal fix**: Remove the `throw new \Exception(...)` calls. Instead, cap overlapping values to the total wall time and provide safe defaults (like setting the end time to the current time) when a checkpoint is missing.
+- **test idea**: Mock `Profiler::getRequestStages()` to return stages with overlapping timestamps (e.g., stage 2 ends after stage 3 starts). Assert `collectData()` completes successfully without throwing an exception.
+
+### HIGH
+
+**2. DataSizeUnit inverted conversion formula**
+- **severity**: high
+- **confidence**: high
+- **location**: `src/Enums/DataSizeUnit.php` - `convertValueTo()`
+- **evidence**: `if ($this->factor() > $convertToUnit->factor()) { return $value / $this->factor() * $convertToUnit->factor(); }` When converting MEGABYTES to BYTES, it divides by 1024^2 instead of multiplying, which is mathematically inverted.
+ succeeded in 51ms:
+Now I have a thorough understanding of the codebase. Here is my correctness audit:
+
+---
+
+# Correctness Audit: laravel-toolbar
+
+## Finding 1 — `ToolbarConfig::collectors(null)` causes TypeError
+
+- **severity**: critical
+- **confidence**: high
+- **location**: `src/Data/ToolbarConfig.php:156-168` — `collectors()`
+- **evidence**: When called with `null` (the default), line 158 evaluates `is_null(null) || empty(null)` → `true`, setting `$this->collectors = []`. But execution continues to line 162: `foreach ($collectors as $collector)` — iterating over `null` throws `TypeError: foreach() argument must be of type array|object, null given` in PHP 8.
+- **impact**: Calling `->collectors(null)` or `->collectors()` (no args) crashes the entire toolbar initialization. While the default constructor always passes an array, any user customization calling `->collectors()` with no args will crash.
+- **minimal fix**: Add `return $this;` after line 159, or restructure with early return:
+  ```php
+  if (is_null($collectors) || empty($collectors)) {
+      $this->collectors = [];
+      return $this;
+  }
+  ```
+
+thinking
+**Preparing repository inspection**
+exec
+/usr/bin/zsh -lc 'ls -la /home/nckrtl/projects/laravel-toolbar' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+total 700
+drwxrwxr-x 15 nckrtl nckrtl   4096 Mar  3 00:20 .
+drwxr-x--- 25 nckrtl nckrtl   4096 Mar  2 00:12 ..
+drwxrwxr-x  2 nckrtl nckrtl   4096 Feb 19 19:32 .claude
+-rw-rw-r--  1 nckrtl nckrtl    220 Feb 19 19:32 .editorconfig
+drwxrwxr-x  8 nckrtl nckrtl   4096 Feb 21 14:29 .git
+-rw-rw-r--  1 nckrtl nckrtl    705 Feb 19 19:32 .gitattributes
+drwxrwxr-x  4 nckrtl nckrtl   4096 Feb 19 19:32 .github
+-rw-rw-r--  1 nckrtl nckrtl    402 Feb 19 19:32 .gitignore
+-rw-rw-r--  1 nckrtl nckrtl     91 Feb 19 19:32 .oxlintrc.json
+-rw-rw-r--  1 nckrtl nckrtl      4 Feb 19 19:32 .php-version
+drwxr-xr-x  2 nckrtl nckrtl   4096 Feb 21 13:55 .phpunit.cache
+-rw-rw-r--  1 nckrtl nckrtl     99 Feb 19 19:32 .prettierrc
+-rw-rw-r--  1 nckrtl nckrtl   6080 Feb 19 19:32 AGENTS.md
+-rw-rw-r--  1 nckrtl nckrtl   4294 Feb 19 19:32 CHANGELOG.md
+lrwxrwxrwx  1 nckrtl nckrtl      9 Feb 19 19:32 CLAUDE.md -> AGENTS.md
+-rw-rw-r--  1 nckrtl nckrtl   2572 Feb 19 19:32 CONTRIBUTING.md
+-rw-rw-r--  1 nckrtl nckrtl   1091 Feb 19 19:32 LICENSE.md
+-rw-rw-r--  1 nckrtl nckrtl  12453 Feb 19 19:32 README.md
+-rw-rw-r--  1 nckrtl nckrtl   1491 Feb 19 19:32 SECURITY.md
+
+thinking
+**Planning parallel file inspection**
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Observers/FetchesStackTrace.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Observers;
+     4	
+     5	use Illuminate\Support\Str;
+     6	
+     7	trait FetchesStackTrace
+     8	{
+     9	    /**
+    10	     * Find the first frame in the stack trace outside of Telescope/Laravel.
+    11	     *
+    12	     * @param  int|string|array  $forgetLines
+    13	     */
+    14	    protected function getCallerFromStackTrace($forgetLines = 0): ?array
+    15	    {
+    16	        $trace = collect(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))->forget($forgetLines);
+    17	
+    18	        return $trace->first(function ($frame) {
+    19	            if (! isset($frame['file'])) {
+    20	                return false;
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Observers;
+     4	
+     5	use Illuminate\Database\Events\QueryExecuted;
+     6	use NckRtl\Toolbar\Data\DatabaseData;
+     7	use NckRtl\Toolbar\Data\QueryData;
+     8	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     9	use NckRtl\Toolbar\Measurement;
+    10	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    11	
+    12	class QueryObserver
+    13	{
+    14	    use FetchesStackTrace;
+    15	
+    16	    public float $totalTime = 0;
+    17	
+    18	    public array $connections = [];
+    19	
+    20	    public array $drivers = [];
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Observers;
+     4	
+     5	use BackedEnum;
+     6	use Illuminate\Database\Eloquent\Relations\Pivot;
+     7	use Illuminate\Support\Arr;
+     8	use Illuminate\Support\Str;
+     9	use NckRtl\Toolbar\Data\ModelData;
+    10	use NckRtl\Toolbar\Enums\DataSizeUnit;
+    11	use NckRtl\Toolbar\Measurement;
+    12	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    13	
+    14	class ModelObserver
+    15	{
+    16	    private int $currentMemory = 0;
+    17	
+    18	    public array $hydrationEntries = [];
+    19	
+    20	    public function __construct(array $options = [])
+
+thinking
+**Planning parallel file review**
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Observers/RequestObserver.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Observers/RoutingObserver.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService/Profiler.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Observers;
+     4	
+     5	use Illuminate\Foundation\Http\Events\RequestHandled;
+     6	use Illuminate\Support\Facades\Event;
+     7	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     8	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     9	use NckRtl\Toolbar\ToolbarInjector;
+    10	
+    11	class RequestObserver
+    12	{
+    13	    public function __construct()
+    14	    {
+    15	        Event::listen(RequestHandled::class, function ($event) {
+    16	            Profiler::record(RequestCheckpointId::REQUEST_HANDLED);
+    17	
+    18	            new ToolbarInjector()->inject($event->request, $event->response);
+    19	        });
+    20	    }
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Observers;
+     4	
+     5	use Illuminate\Routing\Events\RouteMatched;
+     6	use Illuminate\Routing\Events\Routing;
+     7	use Illuminate\Support\Facades\Event;
+     8	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     9	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    10	
+    11	class RoutingObserver
+    12	{
+    13	    public function __construct()
+    14	    {
+    15	        Event::listen(Routing::class, function () {
+    16	            Profiler::record(RequestCheckpointId::BEFORE_ROUTING);
+    17	        });
+    18	
+    19	        Event::listen(RouteMatched::class, function ($event) {
+    20	            Profiler::record(RequestCheckpointId::AFTER_ROUTING);
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Services\ProfilerService;
+     4	
+     5	use Illuminate\View\Engines\CompilerEngine;
+     6	use NckRtl\Toolbar\Data\ProfileMarkerData;
+     7	use NckRtl\Toolbar\Data\RequestCheckpointData;
+     8	use NckRtl\Toolbar\Data\RequestStageData;
+     9	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+    10	use NckRtl\Toolbar\Enums\TimeUnit;
+    11	use NckRtl\Toolbar\Measurement;
+    12	
+    13	class Profiler
+    14	{
+    15	    public static array $requestCheckpoints = [];
+    16	
+    17	    public static array $viewRenders = [];
+    18	
+    19	    public static array $profileMarkers = [];
+    20	
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar;
+     4	
+     5	use Illuminate\Http\JsonResponse;
+     6	use Illuminate\Http\RedirectResponse;
+     7	use Illuminate\Http\Request;
+     8	use Illuminate\Http\Response;
+     9	use Illuminate\Support\Facades\Http;
+    10	use Illuminate\Support\Facades\Vite;
+    11	use Symfony\Component\HttpFoundation\BinaryFileResponse;
+    12	use Symfony\Component\HttpFoundation\StreamedResponse;
+    13	
+    14	class ToolbarInjector
+    15	{
+    16	    /**
+    17	     * Cached Vite dev server URL check result
+    18	     */
+    19	    protected static ?string $cachedViteUrl = null;
+    20	
+
+thinking
+**Planning broad code inspection**
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar;
+     4	
+     5	use Illuminate\Http\JsonResponse;
+     6	use Illuminate\Http\RedirectResponse;
+     7	use Illuminate\Http\Response;
+     8	use Illuminate\Support\Collection;
+     9	use Illuminate\Support\Facades\Cache;
+    10	use Illuminate\Support\Str;
+    11	use Laravel\Telescope\Telescope;
+    12	use NckRtl\Toolbar\Enums\TimeUnit;
+    13	
+    14	class CollectorManager
+    15	{
+    16	    public string $id;
+    17	
+    18	    public bool $telescopeIsInstalled = false;
+    19	
+    20	    public ?Collection $telescopeEntries = null;
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Data\Configurations\ProfilerConfig;
+     7	use NckRtl\Toolbar\Data\ProfileMarkerData;
+     8	use NckRtl\Toolbar\Data\ProfilerData;
+     9	use NckRtl\Toolbar\Data\RequestStageData;
+    10	use NckRtl\Toolbar\Data\SubstageData;
+    11	use NckRtl\Toolbar\Enums\DataSizeUnit;
+    12	use NckRtl\Toolbar\Enums\TimeUnit;
+    13	use NckRtl\Toolbar\Measurement;
+    14	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    15	
+    16	class ProfilerCollector extends Collector implements CollectorInterface
+    17	{
+    18	    public function key(): string
+    19	    {
+    20	        return 'profiler';
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Data\Configurations\QueriesConfig;
+     7	use NckRtl\Toolbar\Data\QueriesData;
+     8	use NckRtl\Toolbar\Observers\QueryObserver;
+     9	use NckRtl\Toolbar\Toolbar;
+    10	
+    11	class QueriesCollector extends Collector implements CollectorInterface
+    12	{
+    13	    public float $totalTime = 0;
+    14	
+    15	    public float $totalTimeFilteredQueries = 0;
+    16	
+    17	    public array $queries = [];
+    18	
+    19	    public array $databases = [];
+    20	
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Data\Configurations\ModelsConfig;
+     7	use NckRtl\Toolbar\Observers\ModelObserver;
+     8	use NckRtl\Toolbar\Toolbar;
+     9	
+    10	class ModelsCollector extends Collector implements CollectorInterface
+    11	{
+    12	    public array $models = [];
+    13	
+    14	    public function key(): string
+    15	    {
+    16	        return 'models';
+    17	    }
+    18	
+    19	    public function configClass(): string
+    20	    {
+
+thinking
+**Reviewing remaining components**
+codex
+I’m now validating the remaining collectors/data/enums/controllers to isolate only issues that are still reproducible in the current code, including cases where earlier reports were likely false positives.
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Collectors/VueCollector.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Collectors/ResponseCollector.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Collectors/TailwindCollector.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Collectors/InertiaCollector.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Data\Configurations\ResponseConfig;
+     7	use NckRtl\Toolbar\Data\ResponseData;
+     8	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     9	use NckRtl\Toolbar\Measurement;
+    10	
+    11	class ResponseCollector extends Collector implements CollectorInterface
+    12	{
+    13	    public function key(): string
+    14	    {
+    15	        return 'response';
+    16	    }
+    17	
+    18	    public function configClass(): string
+    19	    {
+    20	        return ResponseConfig::class;
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use Illuminate\Foundation\Concerns\ResolvesDumpSource;
+     6	use Illuminate\Support\Facades\File;
+     7	use NckRtl\Toolbar\CollectorManager;
+     8	use NckRtl\Toolbar\Data\Configurations\VueConfig;
+     9	use NckRtl\Toolbar\Data\VueData;
+    10	
+    11	class VueCollector extends Collector implements CollectorInterface
+    12	{
+    13	    use ResolvesDumpSource;
+    14	
+    15	    /**
+    16	     * Cached version string (persists for process lifetime since package versions don't change)
+    17	     */
+    18	    private static ?string $cachedVersion = null;
+    19	
+    20	    /**
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use Illuminate\Support\Facades\File;
+     6	use NckRtl\Toolbar\CollectorManager;
+     7	use NckRtl\Toolbar\Data\Configurations\TailwindConfig;
+     8	use NckRtl\Toolbar\Data\TailwindData;
+     9	
+    10	class TailwindCollector extends Collector implements CollectorInterface
+    11	{
+    12	    /**
+    13	     * Cached version string (persists for process lifetime since package versions don't change)
+    14	     */
+    15	    private static ?string $cachedVersion = null;
+    16	
+    17	    /**
+    18	     * Whether we've already checked for the version
+    19	     */
+    20	    private static bool $versionChecked = false;
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use Illuminate\Support\Facades\File;
+     6	use NckRtl\Toolbar\CollectorManager;
+     7	use NckRtl\Toolbar\Data\Configurations\InertiaConfig;
+     8	use NckRtl\Toolbar\Data\InertiaData;
+     9	
+    10	class InertiaCollector extends Collector implements CollectorInterface
+    11	{
+    12	    /**
+    13	     * Cached version string (persists for process lifetime since package versions don't change)
+    14	     */
+    15	    private static ?string $cachedVersion = null;
+    16	
+    17	    /**
+    18	     * Whether we've already checked for the version
+    19	     */
+    20	    private static bool $versionChecked = false;
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Data/RequestStageData.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Data/QueryData.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Enums/TimeUnit.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Enums/DataSizeUnit.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     6	use NckRtl\Toolbar\Enums\TimeUnit;
+     7	use NckRtl\Toolbar\Measurement;
+     8	use Spatie\LaravelData\Data;
+     9	
+    10	class RequestStageData extends Data
+    11	{
+    12	    public bool $recordedStart = true;
+    13	
+    14	    public bool $recordedEnd = true;
+    15	
+    16	    public RequestStagePropertyData $wall_time;
+    17	
+    18	    public ?RequestStagePropertyData $memory_real_delta = null;
+    19	
+    20	    /** @var SubstageData[] */
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Enums\QueryType;
+     6	use NckRtl\Toolbar\Measurement;
+     7	use NckRtl\Toolbar\Traits\ControllerActionEditorUrl;
+     8	use Spatie\LaravelData\Data;
+     9	
+    10	class QueryData extends Data
+    11	{
+    12	    use ControllerActionEditorUrl;
+    13	
+    14	    public ?string $controller_action_editor_url = null;
+    15	
+    16	    public ?QueryType $type = null;
+    17	
+    18	    public function __construct(
+    19	        public string $hash,
+    20	        public string $sql,
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Enums;
+     4	
+     5	enum TimeUnit: string implements Unit
+     6	{
+     7	    case MICROSECONDS = 'microseconds';
+     8	    case MILLISECONDS = 'milliseconds';
+     9	    case SECONDS = 'seconds';
+    10	    case MINUTES = 'minutes';
+    11	    case HOURS = 'hours';
+    12	    case DAYS = 'days';
+    13	    case WEEKS = 'weeks';
+    14	    case MONTHS = 'months';
+    15	    case YEARS = 'years';
+    16	
+    17	    private function abbreviations(): array
+    18	    {
+    19	        return [
+    20	            self::MICROSECONDS->value => 'µs',
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Enums;
+     4	
+     5	enum DataSizeUnit: string implements Unit
+     6	{
+     7	    case BYTES = 'bytes';
+     8	    case KILOBYTES = 'kilobytes';
+     9	    case MEGABYTES = 'megabytes';
+    10	    case GIGABYTES = 'gigabytes';
+    11	    case TERABYTES = 'terabytes';
+    12	    case PETABYTES = 'petabytes';
+    13	
+    14	    private function abbreviations(): array
+    15	    {
+    16	        return [
+    17	            self::BYTES->value => 'B',
+    18	            self::KILOBYTES->value => 'KB',
+    19	            self::MEGABYTES->value => 'MB',
+    20	            self::GIGABYTES->value => 'GB',
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Collectors\CollectorInterface;
+     6	use NckRtl\Toolbar\Collectors\InertiaCollector;
+     7	use NckRtl\Toolbar\Collectors\LaravelCollector;
+     8	use NckRtl\Toolbar\Collectors\ModelsCollector;
+     9	use NckRtl\Toolbar\Collectors\PhpCollector;
+    10	use NckRtl\Toolbar\Collectors\ProfilerCollector;
+    11	use NckRtl\Toolbar\Collectors\QueriesCollector;
+    12	use NckRtl\Toolbar\Collectors\RequestCollector;
+    13	use NckRtl\Toolbar\Collectors\ResponseCollector;
+    14	use NckRtl\Toolbar\Collectors\TailwindCollector;
+    15	use NckRtl\Toolbar\Collectors\VueCollector;
+    16	use NckRtl\Toolbar\Data\Configurations\CollectorConfig;
+    17	use NckRtl\Toolbar\Data\Configurations\MiddlewareConfig;
+    18	use NckRtl\Toolbar\Data\Layout\GroupConfig;
+    19	use NckRtl\Toolbar\Data\Layout\LayoutConfig;
+    20	use NckRtl\Toolbar\Data\Tools\BreakpointIndicatorTool;
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Controllers/AssetController.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/routes/toolbar.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Toolbar.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Controllers;
+     4	
+     5	use Illuminate\Http\Response;
+     6	use Illuminate\Routing\Controller;
+     7	
+     8	class AssetController extends Controller
+     9	{
+    10	    /**
+    11	     * Serve toolbar assets from Vite's build output
+    12	     */
+    13	    public function __invoke(string $asset): Response
+    14	    {
+    15	        $assetPath = __DIR__.'/../../build/assets/'.$asset;
+    16	
+    17	        if (! file_exists($assetPath)) {
+    18	            abort(404);
+    19	        }
+    20	
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	use Illuminate\Support\Facades\Route;
+     4	use NckRtl\Toolbar\Controllers\AssetController;
+     5	use NckRtl\Toolbar\Controllers\HorizonController;
+     6	
+     7	Route::prefix('_toolbar')->middleware(['web'])->group(function () {
+     8	    // Existing asset route
+     9	    Route::get('/{asset}', AssetController::class)->name('toolbar.assets');
+    10	
+    11	    // New: Horizon control
+    12	    Route::prefix('horizon')->group(function () {
+    13	        Route::get('/status', [HorizonController::class, 'status']);
+    14	        Route::post('/start', [HorizonController::class, 'start']);
+    15	        Route::post('/stop', [HorizonController::class, 'stop']);
+    16	    });
+    17	});
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	// src/Controllers/HorizonController.php
+     4	
+     5	namespace NckRtl\Toolbar\Controllers;
+     6	
+     7	use Illuminate\Http\JsonResponse;
+     8	use Laravel\Horizon\Contracts\MasterSupervisorRepository;
+     9	
+    10	class HorizonController
+    11	{
+    12	    public function status(): JsonResponse
+    13	    {
+    14	        if (! $this->isAvailable()) {
+    15	            return response()->json([
+    16	                'available' => false,
+    17	                'reason' => 'Horizon not installed',
+    18	            ]);
+    19	        }
+    20	
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar;
+     4	
+     5	use NckRtl\Toolbar\Console\CustomizeToolbarCommand;
+     6	use NckRtl\Toolbar\Console\StartMcpServerCommand;
+     7	use Spatie\LaravelPackageTools\Package;
+     8	use Spatie\LaravelPackageTools\PackageServiceProvider;
+     9	
+    10	class ToolbarServiceProvider extends PackageServiceProvider
+    11	{
+    12	    public function configurePackage(Package $package): void
+    13	    {
+    14	        $package
+    15	            ->name('laravel-toolbar')
+    16	            ->hasRoutes(['toolbar', 'ai'])
+    17	            ->publishesServiceProvider('ToolbarConfigProvider')
+    18	            ->hasCommands([
+    19	                StartMcpServerCommand::class,
+    20	                CustomizeToolbarCommand::class,
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar;
+     4	
+     5	use NckRtl\Toolbar\Data\ToolbarConfig;
+     6	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     7	
+     8	class Toolbar
+     9	{
+    10	    public static bool $enabled = true;
+    11	
+    12	    public static bool $visible = true;
+    13	
+    14	    public static function enable(): void
+    15	    {
+    16	        self::$enabled = true;
+    17	    }
+    18	
+    19	    public static function disable(): void
+    20	    {
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/resources/js/core/interceptors.ts' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/resources/js/core/mount.base.ts' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/resources/js/composables/useToolbar.ts' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/resources/js/core/utils/cache.ts' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	import { log, logData } from '@/core/utils/logger'
+     2	import type { ToolbarData } from '@/types'
+     3	
+     4	type ResponseLike = Response | XMLHttpRequest
+     5	
+     6	export const setupInterceptors = (): void => {
+     7	  log('Setting up interceptors BEFORE Inertia loads')
+     8	
+     9	  setupFetchInterceptor()
+    10	  setupXHRInterceptor()
+    11	
+    12	  log('Interceptors installed successfully')
+    13	}
+    14	
+    15	const setupFetchInterceptor = (): void => {
+    16	  const originalFetch = window.fetch
+    17	
+    18	  window.fetch = async function (...args: Parameters<typeof fetch>): Promise<Response> {
+    19	    const response = await originalFetch.apply(this, args)
+    20	
+ succeeded in 51ms:
+     1	import { createApp, type App } from 'vue';
+     2	import Toolbar from '@/Toolbar.vue';
+     3	import { log, logData } from '@/core/utils/logger';
+     4	
+     5	let isToolbarMounted = false;
+     6	let shadowRootRef: ShadowRoot | null = null;
+     7	
+     8	export interface ShadowDOMSetupResult {
+     9	    shadowRoot: ShadowRoot;
+    10	    appContainer: HTMLElement;
+    11	}
+    12	
+    13	export function setShadowRoot(shadowRoot: ShadowRoot): void {
+    14	    log('Storing shadowRoot reference');
+    15	    shadowRootRef = shadowRoot;
+    16	}
+    17	
+    18	export function getShadowRoot(): ShadowRoot | null {
+    19	    return shadowRootRef;
+    20	}
+ succeeded in 50ms:
+     1	import { ref, type Ref } from 'vue'
+     2	import type { ToolbarData, ToolbarUpdateEvent } from '@/types'
+     3	
+     4	// ✅ Initialize with data BEFORE any component mounts
+     5	const data: Ref<ToolbarData> = ref(window.__LARAVEL_TOOLBAR_DATA__)
+     6	
+     7	window.addEventListener('laravel-toolbar:update', (event: ToolbarUpdateEvent) => {
+     8	  if (event.detail?.data) {
+     9	    data.value = event.detail.data
+    10	  }
+    11	})
+    12	
+    13	export const useToolbar = (): { data: Ref<ToolbarData> } => {
+    14	  return {
+    15	    data,
+    16	  }
+    17	}
+ succeeded in 50ms:
+     1	// cache.ts - HTML and CSS shell caching utilities
+     2	
+     3	const HTML_KEY = 'laravel-toolbar-html-cache'
+     4	const CSS_KEY = 'laravel-toolbar-css-cache'
+     5	
+     6	/**
+     7	 * Save toolbar HTML and CSS to sessionStorage before page unload
+     8	 */
+     9	export function setupCacheSaving(shadowRoot: ShadowRoot): void {
+    10	  const saveCache = (): void => {
+    11	    const toolbarRoot = shadowRoot.getElementById('laravel-toolbar-root')
+    12	    if (toolbarRoot) {
+    13	      try {
+    14	        sessionStorage.setItem(HTML_KEY, toolbarRoot.innerHTML)
+    15	
+    16	        const sheet = shadowRoot.adoptedStyleSheets[0]
+    17	        if (sheet) {
+    18	          const rules = Array.from(sheet.cssRules || [])
+    19	          const cssText = rules.map((rule) => rule.cssText).join('\n')
+    20	          if (cssText) {
+
+thinking
+**Inspecting middleware and request handling**
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Http/Middleware/MiddlewareStart.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Http/Middleware/MiddlewareEnd.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Enums/RequestCheckpointId.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Collectors/RequestCollector.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Data/RequestCheckpointData.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Http\Middleware;
+     4	
+     5	use Closure;
+     6	use Illuminate\Http\Request;
+     7	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     8	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     9	
+    10	class MiddlewareEnd
+    11	{
+    12	    public function handle(Request $request, Closure $next)
+    13	    {
+    14	        if (! Profiler::getCheckpoint(RequestCheckpointId::BEFORE_CONTROLLER)) {
+    15	            Profiler::record(RequestCheckpointId::BEFORE_CONTROLLER);
+    16	        }
+    17	
+    18	        $response = $next($request);
+    19	
+    20	        if (! Profiler::getCheckpoint(RequestCheckpointId::AFTER_VIEW_RENDERING)) {
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Enums;
+     4	
+     5	enum RequestCheckpointId: string
+     6	{
+     7	    case LARAVEL_START = 'laravel_start';
+     8	    case BEFORE_SERVICES_PROVIDERS = 'before_services_providers';
+     9	    case AFTER_SERVICES_PROVIDERS = 'after_services_providers';
+    10	    case BEFORE_ROUTING = 'before_routing';
+    11	    case AFTER_ROUTING = 'after_routing';
+    12	    case BEFORE_MIDDLEWARE = 'before_middleware';
+    13	    case AFTER_MIDDLEWARE = 'after_middleware';
+    14	    case BEFORE_CONTROLLER = 'before_controller';
+    15	    case BEFORE_VIEW_RENDERING = 'before_view_rendering';
+    16	    case AFTER_VIEW_RENDERING = 'after_view_rendering';
+    17	    case REQUEST_HANDLED = 'request_handled';
+    18	}
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Http\Middleware;
+     4	
+     5	use Closure;
+     6	use Illuminate\Http\Request;
+     7	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     8	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     9	
+    10	class MiddlewareStart
+    11	{
+    12	    public function handle(Request $request, Closure $next)
+    13	    {
+    14	        if (! Profiler::getCheckpoint(RequestCheckpointId::BEFORE_MIDDLEWARE)) {
+    15	            Profiler::record(RequestCheckpointId::BEFORE_MIDDLEWARE);
+    16	        }
+    17	
+    18	        $response = $next($request);
+    19	
+    20	        if (! Profiler::getCheckpoint(RequestCheckpointId::AFTER_MIDDLEWARE)) {
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     6	use NckRtl\Toolbar\Enums\TimeUnit;
+     7	use NckRtl\Toolbar\Measurement;
+     8	use Spatie\LaravelData\Data;
+     9	
+    10	class RequestCheckpointData extends Data
+    11	{
+    12	    public function __construct(
+    13	        public ?Measurement $memory_real = null,
+    14	        public ?Measurement $time = null,
+    15	        public bool $measureMemory = true,
+    16	    ) {
+    17	        if ($this->measureMemory) {
+    18	            $this->memory_real = $this->memory_real ?? new Measurement(memory_get_usage(), DataSizeUnit::BYTES);
+    19	        }
+    20	        $this->time = $this->time ?? new Measurement(microtime(true), TimeUnit::SECONDS);
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Collectors;
+     4	
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Data\Configurations\RequestConfig;
+     7	use NckRtl\Toolbar\Data\RequestData;
+     8	
+     9	/**
+    10	 * @property RequestConfig $config
+    11	 */
+    12	class RequestCollector extends Collector implements CollectorInterface
+    13	{
+    14	    public function key(): string
+    15	    {
+    16	        return 'request';
+    17	    }
+    18	
+    19	    public function configClass(): string
+    20	    {
+
+thinking
+**Planning inspection of measurement conversions**
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Measurement.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Data/RequestStagePropertyData.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Data/SubstageData.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Data/ProfileMarkerData.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar;
+     4	
+     5	use NckRtl\Toolbar\Enums\Unit;
+     6	
+     7	class Measurement
+     8	{
+     9	    public string $formattedValue;
+    10	
+    11	    public function __construct(
+    12	        public int|float $value,
+    13	        public Unit $unit
+    14	    ) {
+    15	        $this->formatValue();
+    16	    }
+    17	
+    18	    public function convertTo(Unit $unit): self
+    19	    {
+    20	        $this->value = $this->unit->convertValueTo($this->value, $unit);
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Enums\Unit;
+     6	use NckRtl\Toolbar\Measurement;
+     7	use Spatie\LaravelData\Data;
+     8	
+     9	class RequestStagePropertyData extends Data
+    10	{
+    11	    public float $percentage = 0;
+    12	
+    13	    public Measurement $measurement;
+    14	
+    15	    public function __construct(
+    16	        float $value,
+    17	        Unit $unit
+    18	    ) {
+    19	        $this->measurement = new Measurement($value, $unit);
+    20	    }
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     6	use NckRtl\Toolbar\Enums\TimeUnit;
+     7	use NckRtl\Toolbar\Measurement;
+     8	use Spatie\LaravelData\Data;
+     9	
+    10	class SubstageData extends Data
+    11	{
+    12	    public ?RequestStagePropertyData $wall_time = null;
+    13	
+    14	    public ?RequestStagePropertyData $memory_real_delta = null;
+    15	
+    16	    public function __construct(
+    17	        public string $label,
+    18	        public ProfileMarkerData $start,
+    19	        public ProfileMarkerData $end,
+    20	    ) {
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Data;
+     4	
+     5	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     6	use NckRtl\Toolbar\Enums\TimeUnit;
+     7	use NckRtl\Toolbar\Measurement;
+     8	use Spatie\LaravelData\Data;
+     9	
+    10	class ProfileMarkerData extends Data
+    11	{
+    12	    public function __construct(
+    13	        public string $label,
+    14	        public ?Measurement $memory_real = null,
+    15	        public ?Measurement $time = null,
+    16	    ) {
+    17	        $this->memory_real = $this->memory_real ?? new Measurement(memory_get_usage(), DataSizeUnit::BYTES);
+    18	        $this->time = $this->time ?? new Measurement(microtime(true), TimeUnit::SECONDS);
+    19	    }
+    20	}
+
+thinking
+**Inspecting test coverage**
+exec
+/usr/bin/zsh -lc "rg -n \"collectors\\(|observers\\(|getRequestStages|convertValueTo|replaceBindings|horizon|AssetController|nonce|x-toolbar|reset\\(|REQUEST_HANDLED|BEFORE_VIEW_RENDERING|QueryObserver|ModelObserver|ProfilerCollector\" /home/nckrtl/projects/laravel-toolbar/tests" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "rg -n \"collectors\\(|observers\\(|convertValueTo|replaceBindings|getTotals|fillInMissingStartAndEnd|FetchesStackTrace|ToolbarConfig\" /home/nckrtl/projects/laravel-toolbar/src" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+/home/nckrtl/projects/laravel-toolbar/tests/Feature/ToolbarIntegrationTest.php:45:it('adds x-toolbar header for inertia requests', function () {
+/home/nckrtl/projects/laravel-toolbar/tests/Feature/ToolbarIntegrationTest.php:55:    $response->assertHeader('x-toolbar');
+/home/nckrtl/projects/laravel-toolbar/tests/Feature/ToolbarIntegrationTest.php:57:    $toolbarData = $response->headers->get('x-toolbar');
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/ToolbarInjectorTest.php:20:    $toolbar->config->collectors([]);
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/ToolbarInjectorTest.php:102:    expect($response->headers->has('x-toolbar'))->toBeTrue();
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/ToolbarInjectorTest.php:105:it('adds x-toolbar header for inertia requests', function () {
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/ToolbarInjectorTest.php:113:    $header = $response->headers->get('x-toolbar');
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/ToolbarInjectorTest.php:125:    $header = $response->headers->get('x-toolbar');
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/ToolbarInjectorTest.php:147:it('includes csp nonce when available', function () {
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/ToolbarInjectorTest.php:148:    Vite::useCspNonce('test-nonce');
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/ToolbarInjectorTest.php:156:    expect($response->getContent())->toContain('nonce="test-nonce"');
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/CollectorManagerTest.php:14:    $toolbar->config->collectors([]);
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/CollectorManagerTest.php:29:    $toolbar->config->collectors([]);
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/CollectorManagerTest.php:44:    $toolbar->config->collectors([
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/CollectorManagerTest.php:65:    $toolbar->config->collectors([
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/CollectorManagerTest.php:79:    $toolbar->config->collectors([
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/CollectorManagerTest.php:95:    $toolbar->config->collectors([
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/CollectorManagerTest.php:111:    $toolbar->config->collectors([
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/CollectorManagerTest.php:126:    $toolbar->config->collectors([
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/CollectorManagerTest.php:150:    $toolbar->config->collectors([
+ succeeded in 51ms:
+/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php:17:            ->publishesServiceProvider('ToolbarConfigProvider')
+/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php:25:            'Registering config provider' => fn () => $this->registerToolbarConfigProvider(),
+/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php:31:        $providerPath = app_path('Providers/ToolbarConfigProvider.php');
+/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php:44:            'Configure collectors: <fg=yellow>$toolbarConfig->collectors([...])</>',
+/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php:52:    protected function registerToolbarConfigProvider(): bool
+/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php:57:            ServiceProvider::addProviderToBootstrapFile("{$namespace}\\Providers\\ToolbarConfigProvider");
+/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php:64:        if (Str::contains($appConfig, $namespace.'\\Providers\\ToolbarConfigProvider::class')) {
+/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php:70:            "{$namespace}\\Providers\\EventServiceProvider::class,".PHP_EOL."        {$namespace}\\Providers\\ToolbarConfigProvider::class,".PHP_EOL,
+/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php:74:        file_put_contents(app_path('Providers/ToolbarConfigProvider.php'), str_replace(
+/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php:77:            file_get_contents(app_path('Providers/ToolbarConfigProvider.php'))
+/home/nckrtl/projects/laravel-toolbar/src/Toolbar.php:5:use NckRtl\Toolbar\Data\ToolbarConfig;
+/home/nckrtl/projects/laravel-toolbar/src/Toolbar.php:38:    public ToolbarConfig $config;
+/home/nckrtl/projects/laravel-toolbar/src/Toolbar.php:44:        $this->config = new ToolbarConfig;
+/home/nckrtl/projects/laravel-toolbar/src/Measurement.php:20:        $this->value = $this->unit->convertValueTo($this->value, $unit);
+/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:37:class ToolbarConfig extends Data
+/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:64:            ->observers([
+/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:70:            ->collectors([
+/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:140:    public function observers(?array $observers = null): self
+/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:156:    public function collectors(?array $collectors = null): self
+/home/nckrtl/projects/laravel-toolbar/src/Observers/FetchesStackTrace.php:7:trait FetchesStackTrace
+
+thinking
+**Analyzing singleton state and Octane cloning effects**
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Providers;
+     4	
+     5	use Illuminate\Support\ServiceProvider;
+     6	use NckRtl\Toolbar\Data\ToolbarConfig;
+     7	use NckRtl\Toolbar\Toolbar;
+     8	
+     9	class ToolbarProvider extends ServiceProvider
+    10	{
+    11	    public function boot(Toolbar $toolbar): void
+    12	    {
+    13	        $this->update($toolbar->config);
+    14	    }
+    15	
+    16	    public function update(ToolbarConfig $toolbarConfig): void {}
+    17	}
+
+thinking
+**Inspecting route conflicts potential**
+codex
+I’m drilling into unit tests next to check whether suspected bugs are already constrained by test assumptions or if they remain genuinely user-visible in runtime paths.
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/tests/Unit/Observers/QueryObserverTest.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/tests/Unit/Observers/ModelObserverTest.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/tests/Unit/StateAccumulationTest.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/ToolbarConfigTest.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	use Illuminate\Database\Events\QueryExecuted;
+     4	use Illuminate\Support\Facades\DB;
+     5	use Illuminate\Support\Facades\Schema;
+     6	use NckRtl\Toolbar\Observers\QueryObserver;
+     7	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     8	
+     9	beforeEach(function () {
+    10	    // Initialize the Profiler to avoid errors
+    11	    Profiler::initialize();
+    12	
+    13	    // Create a simple table for testing
+    14	    Schema::create('test_users', function ($table) {
+    15	        $table->id();
+    16	        $table->string('name');
+    17	        $table->string('email')->nullable();
+    18	        $table->timestamps();
+    19	    });
+    20	});
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	use NckRtl\Toolbar\Data\ModelData;
+     4	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     5	use NckRtl\Toolbar\Measurement;
+     6	use NckRtl\Toolbar\Observers\ModelObserver;
+     7	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     8	
+     9	beforeEach(function () {
+    10	    Profiler::$requestCheckpoints = [];
+    11	    Profiler::initialize();
+    12	});
+    13	
+    14	it('has empty hydration entries on construction', function () {
+    15	    $observer = new ModelObserver;
+    16	
+    17	    expect($observer->hydrationEntries)->toBeEmpty();
+    18	});
+    19	
+    20	it('resets state correctly', function () {
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	/**
+     4	 * Tests for state accumulation issues that occur in long-running processes
+     5	 * like Laravel Octane (Swoole/RoadRunner) where the same PHP process handles
+     6	 * multiple requests without restarting.
+     7	 *
+     8	 * These tests verify that observers and the profiler properly reset their state
+     9	 * between requests to prevent data from one request leaking into another.
+    10	 */
+    11	
+    12	use Illuminate\Support\Facades\DB;
+    13	use Illuminate\Support\Facades\Schema;
+    14	use NckRtl\Toolbar\Observers\ModelObserver;
+    15	use NckRtl\Toolbar\Observers\QueryObserver;
+    16	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    17	
+    18	beforeEach(function () {
+    19	    // Create a test table
+    20	    Schema::create('test_items', function ($table) {
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	use NckRtl\Toolbar\Collectors\CollectorInterface;
+     4	use NckRtl\Toolbar\Collectors\LaravelCollector;
+     5	use NckRtl\Toolbar\Collectors\PhpCollector;
+     6	use NckRtl\Toolbar\Data\ToolbarConfig;
+     7	use NckRtl\Toolbar\Observers\QueryObserver;
+     8	use NckRtl\Toolbar\Observers\RequestObserver;
+     9	use NckRtl\Toolbar\Toolbar;
+    10	
+    11	beforeEach(function () {
+    12	    Toolbar::enable();
+    13	});
+    14	
+    15	afterEach(function () {
+    16	    Toolbar::enable();
+    17	});
+    18	
+    19	it('can be instantiated', function () {
+    20	    $config = new ToolbarConfig;
+
+thinking
+**Reviewing test coverage for accumulation**
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/tests/Unit/Observers/RequestObserverTest.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/tests/Unit/ToolbarInjectorTest.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/tests/Unit/Services/ProfilerTest.php' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/tests/Unit/EdgeCasesTest.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	use Illuminate\Foundation\Http\Events\RequestHandled;
+     4	use Illuminate\Http\Request;
+     5	use Illuminate\Http\Response;
+     6	use Illuminate\Support\Facades\Event;
+     7	use Illuminate\Support\Facades\Route;
+     8	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     9	use NckRtl\Toolbar\Observers\RequestObserver;
+    10	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+    11	use NckRtl\Toolbar\Toolbar;
+    12	
+    13	beforeEach(function () {
+    14	    // Reset profiler checkpoints
+    15	    Profiler::$requestCheckpoints = [];
+    16	    Profiler::initialize();
+    17	
+    18	    // Setup toolbar
+    19	    Toolbar::enable();
+    20	    $toolbar = new Toolbar;
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	use Illuminate\Http\Request;
+     4	use Illuminate\Support\Facades\Config;
+     5	use Illuminate\Support\Facades\Route;
+     6	use Illuminate\Support\Facades\Vite;
+     7	use NckRtl\Toolbar\Tests\Helpers\MockResponse;
+     8	use NckRtl\Toolbar\Toolbar;
+     9	use NckRtl\Toolbar\ToolbarInjector;
+    10	use Symfony\Component\HttpFoundation\BinaryFileResponse;
+    11	use Symfony\Component\HttpFoundation\StreamedResponse;
+    12	
+    13	beforeEach(function () {
+    14	    // Ensure toolbar is enabled by default
+    15	    Config::set('toolbar.enabled', true);
+    16	    Toolbar::enable();
+    17	
+    18	    // Register a singleton Toolbar with no collectors to avoid Profiler exceptions
+    19	    $toolbar = new Toolbar;
+    20	    $toolbar->config->collectors([]);
+ succeeded in 51ms:
+     1	<?php
+     2	
+     3	use NckRtl\Toolbar\Data\RequestCheckpointData;
+     4	use NckRtl\Toolbar\Enums\DataSizeUnit;
+     5	use NckRtl\Toolbar\Enums\RequestCheckpointId;
+     6	use NckRtl\Toolbar\Enums\TimeUnit;
+     7	use NckRtl\Toolbar\Measurement;
+     8	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     9	
+    10	beforeEach(function () {
+    11	    // Use getRequestStages() to clear ALL state including private $latestMemoryCheckpoint
+    12	    // This is necessary because initialize() registers callbacks that fire immediately
+    13	    // in the test environment (since Laravel is already booted)
+    14	    Profiler::getRequestStages();
+    15	
+    16	    // Ensure public arrays are clean for test isolation
+    17	    Profiler::$requestCheckpoints = [];
+    18	    Profiler::$viewRenders = [];
+    19	    Profiler::$profileMarkers = [];
+    20	});
+ succeeded in 50ms:
+     1	<?php
+     2	
+     3	use Illuminate\Http\Request;
+     4	use Illuminate\Support\Facades\Route;
+     5	use NckRtl\Toolbar\CollectorManager;
+     6	use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+     7	use NckRtl\Toolbar\Tests\Helpers\MockResponse;
+     8	use NckRtl\Toolbar\Toolbar;
+     9	use NckRtl\Toolbar\ToolbarInjector;
+    10	
+    11	beforeEach(function () {
+    12	    Toolbar::enable();
+    13	    Profiler::$requestCheckpoints = [];
+    14	    Profiler::$viewRenders = [];
+    15	
+    16	    $toolbar = new Toolbar;
+    17	    $toolbar->config->collectors([]);
+    18	    $toolbar->config->enableInConsole();
+    19	    app()->instance(Toolbar::class, $toolbar);
+    20	
+
+thinking
+**Inspecting collector tests**
+exec
+/usr/bin/zsh -lc 'rg -n "DataSizeUnit|TimeUnit|convertValueTo|formatMaxFractionDigits" /home/nckrtl/projects/laravel-toolbar/tests/Unit' in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "ls -la /home/nckrtl/projects/laravel-toolbar/tests/Unit/Enums && for f in /home/nckrtl/projects/laravel-toolbar/tests/Unit/Enums/*.php; do echo '---' "'$f; nl -ba $f; done' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/EdgeCasesTest.php:330:            time: new \NckRtl\Toolbar\Measurement(microtime(true), \NckRtl\Toolbar\Enums\TimeUnit::SECONDS),
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/ProfileMarkerDataTest.php:4:use NckRtl\Toolbar\Enums\DataSizeUnit;
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/ProfileMarkerDataTest.php:5:use NckRtl\Toolbar\Enums\TimeUnit;
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/ProfileMarkerDataTest.php:18:    expect($marker->time->unit)->toBe(TimeUnit::SECONDS);
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/ProfileMarkerDataTest.php:26:    expect($marker->memory_real->unit)->toBe(DataSizeUnit::BYTES);
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/ProfileMarkerDataTest.php:31:    $customTime = new Measurement(1234.5678, TimeUnit::SECONDS);
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/ProfileMarkerDataTest.php:42:    $customMemory = new Measurement(123456789, DataSizeUnit::BYTES);
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Collectors/ModelsCollectorTest.php:7:use NckRtl\Toolbar\Enums\DataSizeUnit;
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Collectors/ModelsCollectorTest.php:58:        memory_used: new Measurement(2048, DataSizeUnit::BYTES),
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Collectors/ModelsCollectorTest.php:102:        memory_used: new Measurement(2048, DataSizeUnit::BYTES),
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Collectors/ModelsCollectorTest.php:109:        memory_used: new Measurement(4096, DataSizeUnit::BYTES),
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Collectors/ModelsCollectorTest.php:130:        memory_used: new Measurement(2048, DataSizeUnit::BYTES),
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Collectors/ModelsCollectorTest.php:149:        memory_used: new Measurement(8192, DataSizeUnit::BYTES),
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Observers/ModelObserverTest.php:4:use NckRtl\Toolbar\Enums\DataSizeUnit;
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Observers/ModelObserverTest.php:28:        memory_used: new Measurement(1024, DataSizeUnit::BYTES),
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/SubstageDataTest.php:5:use NckRtl\Toolbar\Enums\DataSizeUnit;
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/SubstageDataTest.php:6:use NckRtl\Toolbar\Enums\TimeUnit;
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/SubstageDataTest.php:12:        time: new Measurement(1000.0, TimeUnit::SECONDS),
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/SubstageDataTest.php:13:        memory_real: new Measurement(100000, DataSizeUnit::BYTES)
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/Data/SubstageDataTest.php:18:        time: new Measurement(1000.5, TimeUnit::SECONDS),
+ exited 2 in 51ms:
+ls: cannot access '/home/nckrtl/projects/laravel-toolbar/tests/Unit/Enums': No such file or directory
+
+thinking
+**Planning PHP behavior test**
+exec
+/usr/bin/zsh -lc "php -r 'class A{}; "'$a=new A; var_dump($a->x["y"] ?? []);'"'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+array(0) {
+}
+
+thinking
+**Confirming state leak and memory bug in observer**
+exec
+/usr/bin/zsh -lc "php -r '"'$s="a'"\\\\\\'b\"; echo strtr("'$s,[chr(26)=>"'"\\\\Z\",chr(8)=>\"\\\\b\", \"\\\"\"=>\"\\\\\\\"\", \"\\'\"=>\"\\\\\\'\", \"\\\\\"=>\"\\\\\\\\\"]),\"\\n\";'" in /home/nckrtl/projects/laravel-toolbar exited 1 in 51ms:
+zsh:1: unmatched "
+
+thinking
+**Fixing heredoc quoting**
+
+thinking
+**Planning shell quoting approach**
+exec
+/usr/bin/zsh -lc "php -r '"'$s="a'"\\\\\\\\\\'b\"; "'$out=strtr($s,[chr(26)=>"'"\\\\\\\\Z\",chr(8)=>\"\\\\\\\\b\",\"\\\"\"=>\"\\\\\\\\\\\"\",\"'\"=>\"\\\\\\\\'\",\"\\\\\\\\\"=>\"\\\\\\\\\\\\\\\\\"]); var_export("'$s); echo "'"\\n\"; var_export("'$out); echo "'"\\n\";'" in /home/nckrtl/projects/laravel-toolbar exited 1 in 51ms:
+zsh:1: unmatched "
+
+thinking
+**Identifying critical unit conversion bugs**
+exec
+/usr/bin/zsh -lc "rg -n \"formatValue\\(|formatMaxFractionDigits\\(|decimals\\(\" /home/nckrtl/projects/laravel-toolbar/src" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+/home/nckrtl/projects/laravel-toolbar/src/Measurement.php:15:        $this->formatValue();
+/home/nckrtl/projects/laravel-toolbar/src/Measurement.php:23:        $this->formatValue($unit);
+/home/nckrtl/projects/laravel-toolbar/src/Measurement.php:28:    public function decimals(int $decimals): self
+/home/nckrtl/projects/laravel-toolbar/src/Measurement.php:35:    public function formatValue(?Unit $formatToUnit = null): self
+/home/nckrtl/projects/laravel-toolbar/src/Measurement.php:37:        $this->formattedValue = $this->unit->formatMaxFractionDigits(2, $this->value, $formatToUnit);
+/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php:76:            $model->memory_used->formatValue();
+/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:148:                new Measurement(0, TimeUnit::MILLISECONDS)->decimals(0),
+/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:181:            new Measurement($totalWallTime, TimeUnit::MILLISECONDS)->decimals(0),
+/home/nckrtl/projects/laravel-toolbar/src/Collectors/ResponseCollector.php:35:            )->formatValue()
+/home/nckrtl/projects/laravel-toolbar/src/Enums/DataSizeUnit.php:66:    public function formatMaxFractionDigits(int $maxFractionDigits, int|float $value, ?Unit $formatToUnit = null): string
+/home/nckrtl/projects/laravel-toolbar/src/Enums/TimeUnit.php:79:    public function formatMaxFractionDigits(int $maxFractionDigits, int|float $value, ?Unit $formatToUnit = null): string
+/home/nckrtl/projects/laravel-toolbar/src/Enums/Unit.php:13:    public function formatMaxFractionDigits(int $maxFractionDigits, int|float $value, ?Unit $formatToUnit = null): string;
+
+thinking
+**Analyzing format parameter usage**
+exec
+/usr/bin/zsh -lc "rg -n \"->reset\\(|reset\\(\\)\" /home/nckrtl/projects/laravel-toolbar/src" in /home/nckrtl/projects/laravel-toolbar exited 2 in 51ms:
+rg: unrecognized flag ->
+
+thinking
+**Refining search pattern for escapes**
+exec
+/usr/bin/zsh -lc "rg -n \"reset\\(\" /home/nckrtl/projects/laravel-toolbar/src" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php:45:    public function reset(): void
+/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php:32:    public function reset(): void
+
+thinking
+**Analyzing state reset and data collection leaks**
+exec
+/usr/bin/zsh -lc "php -r 'function f(string "'$s){var_dump($s);} f(false);'"'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+string(0) ""
+
+thinking
+**Analyzing JSON encoding impact on toolbar injection**
+exec
+/usr/bin/zsh -lc "php -r 'function f(string "'$s){var_dump($s);} try{f(null);}catch(Throwable $e){echo get_class($e),": ",$e->getMessage(),"'"\\n\";}'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+TypeError: f(): Argument #1 ($s) must be of type string, null given, called in Command line code on line 1
+
+thinking
+**Assessing PHP type and error edge cases**
+codex
+I’m validating a few ambiguous items with quick runtime checks (unit conversion and type coercion) so the final list only includes confirmed correctness failures.
+exec
+/usr/bin/zsh -lc "php -r \"require '/home/nckrtl/projects/laravel-toolbar/vendor/autoload.php'; use NckRtl\\Toolbar\\Enums\\DataSizeUnit; echo DataSizeUnit::BYTES->convertValueTo(1024, DataSizeUnit::KILOBYTES), PHP_EOL; echo DataSizeUnit::KILOBYTES->convertValueTo(1, DataSizeUnit::BYTES), PHP_EOL;\"" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "php -r \"require '/home/nckrtl/projects/laravel-toolbar/vendor/autoload.php'; use NckRtl\\Toolbar\\Enums\\TimeUnit; echo TimeUnit::SECONDS->convertValueTo(0.001, TimeUnit::MILLISECONDS), PHP_EOL; echo TimeUnit::MILLISECONDS->convertValueTo(1000, TimeUnit::SECONDS), PHP_EOL;\"" in /home/nckrtl/projects/laravel-toolbarexec
+/usr/bin/zsh -lc "php -r \"require '/home/nckrtl/projects/laravel-toolbar/vendor/autoload.php'; use NckRtl\\Toolbar\\Enums\\TimeUnit; echo TimeUnit::MICROSECONDS->formatMaxFractionDigits(2, 1000), PHP_EOL; echo TimeUnit::MICROSECONDS->formatMaxFractionDigits(2, 1000000), PHP_EOL;\"" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+1
+0.0009765625
+ succeeded in 51ms:
+1
+1000000
+ succeeded in 51ms:
+1ms
+1s
+
+thinking
+**Confirming unit conversion edge cases**
+exec
+/usr/bin/zsh -lc "rg -n \"toolbar\\.enabled|LARAVEL_TOOLBAR_ENABLED|LARAVEL_TOOLBAR_VISIBLE|config\\('toolbar\" /home/nckrtl/projects/laravel-toolbar/src /home/nckrtl/projects/laravel-toolbar/workbench /home/nckrtl/projects/laravel-toolbar/config" in /home/nckrtl/projects/laravel-toolbar exited 2 in 50ms:
+rg: /home/nckrtl/projects/laravel-toolbar/config: No such file or directory (os error 2)
+/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php:26:        if (! env('LARAVEL_TOOLBAR_ENABLED', true)) {
+/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php:32:        if (! env('LARAVEL_TOOLBAR_VISIBLE', true)) {
+/home/nckrtl/projects/laravel-toolbar/src/Mcp/Tools/GetRequestDataTool.php:22:        return config('toolbar.enabled', false);
+/home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService/Profiler.php:93:        if (! config('toolbar.enabled', true)) {
+
+thinking
+**Inspecting potential cache collisions**
+exec
+/usr/bin/zsh -lc 'nl -ba /home/nckrtl/projects/laravel-toolbar/src/Mcp/Tools/GetRequestDataTool.php' in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+     1	<?php
+     2	
+     3	namespace NckRtl\Toolbar\Mcp\Tools;
+     4	
+     5	use Illuminate\Contracts\JsonSchema\JsonSchema;
+     6	use Illuminate\Http\Request as HttpRequest;
+     7	use Illuminate\Routing\Route;
+     8	use Illuminate\Support\Facades\Cache;
+     9	use Illuminate\Support\Facades\Http;
+    10	use Illuminate\Support\Facades\Route as RouteFacade;
+    11	use Illuminate\Support\Str;
+    12	use Laravel\Mcp\Request;
+    13	use Laravel\Mcp\Response;
+    14	use Laravel\Mcp\Server\Tool;
+    15	use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
+    16	
+    17	#[IsReadOnly]
+    18	class GetRequestDataTool extends Tool
+    19	{
+    20	    public function shouldRegister(Request $request): bool
+
+thinking
+**Checking config default behavior**
+exec
+/usr/bin/zsh -lc "rg -n \"toolbar\\.enabled|LARAVEL_TOOLBAR|config\\(\\['toolbar|Config::set\\('toolbar\" /home/nckrtl/projects/laravel-toolbar/src /home/nckrtl/projects/laravel-toolbar/build /home/nckrtl/projects/laravel-toolbar/workbench" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+Total output lines: 8
+
+/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php:26:        if (! env('LARAVEL_TOOLBAR_ENABLED', true)) {
+/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php:32:        if (! env('LARAVEL_TOOLBAR_VISIBLE', true)) {
+/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:270:            window.__LARAVEL_TOOLBAR_DATA__ = {$data};
+/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:271:            window.__LARAVEL_TOOLBAR_CSS_URL__ = "{$cssUrl}";
+/home/nckrtl/projects/laravel-toolbar/build/assets/toolbar.prod-ABeN43TU.js:1:const Qn=(e,t={})=>{},Xn=e=>{e?.metadata?.debug&&console.log("Data available:",e)},ar=()=>{ur(),cr()},ur=()=>{const e=window.fetch;window.fetch=async function(...t){const s=await e.apply(this,t);return el(s),s}},cr=()=>{const e=XMLHttpRequest.prototype.send;XMLHttpRequest.prototype.send=function(...t){return this.addEventListener("load",function(){el(this)}),e.apply(this,t)}},el=e=>{const t=e instanceof Response?e.headers.get("x-toolbar"):e.getResponseHeader("x-toolbar");if(t)try{const s=atob(t),n=JSON.parse(s);Qn("🟢 Toolbar data updated from response"),window.dispatchEvent(new CustomEvent("laravel-toolbar:update",{detail:{data:n}})),Xn(n)}catch{}};ar();async function fr(e){try{await e()}catch(t){throw console.error("[Laravel Toolbar] Failed to mount:",t),t}}function Gs(e){const t=Object.create(null);for(const s of e.split(","))t[s]=1;return s=>s in t}const Q={},bt=[],Ve=()=>{},tl=()=>!1,ds=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&(e.charCodeAt(2)>122||e.charCodeAt(2)<97),Js=e=>e.startsWith("onUpdate:"),de=Object.assign,Ys=(e,t)=>{const s=e.indexOf(t);s>-1&&e.splice(s,1)},dr=Object.prototype.hasOwnProperty,Z=(e,t)=>dr.call(e,t),V=Array.isArray,xt=e=>ps(e)==="[object Map]",sl=e=>ps(e)==="[object Set]",D=e=>typeof e=="function",re=e=>typeof e=="string",Ye=e=>typeof e=="symbol",te=e=>e!==null&&typeof e=="object",nl=e=>(te(e)||D(e))&&D(e.then)&&D(e.catch),ll=Object.prototype.toString,ps=e=>ll.call(e),pr=e=>ps(e).slice(8,-1),rl=e=>ps(e)==="[object Object]",Qs=e=>re(e)&&e!=="NaN"&&e[0]!=="-"&&""+parseInt(e,10)===e,Ht=Gs(",key,ref,ref_for,ref_key,onVnodeBeforeMount,onVnodeMounted,onVnodeBeforeUpdate,onVnodeUpdated,onVnodeBeforeUnmount,onVnodeUnmounted"),hs=e=>{const t=Object.create(null);return(s=>t[s]||(t[s]=e(s)))},hr=/-\w/g,Se=hs(e=>e.replace(hr,t=>t.slice(1).toUpperCase())),_r=/\B([A-Z])/g,gt=hs(e=>e.replace(_r,"-$1").toLowerCase()),_s=hs(e=>e.charAt(0).toUpperCase()+e.slice(1)),Os=hs(e=>e?`on${_s(e)}`:""),ot=(e,t)=>!Object.is(e,t),$s=(e,...t)=>{for(let s=0;s<e.length;s++)e[s](...t)},ol=(e,t,s,n=!1)=>{Object.defineProperty(e,t,{configurable:!0,enumerable:!1,writable:n,value:s})},gr=e=>{const t=parseFloat(e);return isNaN(t)?e:t};let wn;const gs=()=>wn||(wn=typeof globalThis<"u"?globalThis:typeof self<"u"?self:typeof window<"u"?window:typeof global<"u"?global:{});function De(e){if(V(e)){const t={};for(let s=0;s<e.length;s++){const n=e[s],l=re(n)?xr(n):De(n);if(l)for(const r in l)t[r]=l[r]}return t}else if(re(e)||te(e))return e}const vr=/;(?![^(]*\))/g,mr=/:([^]+)/,br=/\/\*[^]*?\*\//g;function xr(e){const t={};return e.replace(br,"").split(vr).forEach(s=>{if(s){const n=s.split(mr);n.length>1&&(t[n[0].trim()]=n[1].trim())}}),t}function F(e){let t="";if(re(e))t=e;else if(V(e))for(let s=0;s<e.length;s++){const n=F(e[s]);n&&(t+=n+" ")}else if(te(e))for(const s in e)e[s]&&(t+=s+" ");return t.trim()}const yr="itemscope,allowfullscreen,formnovalidate,ismap,nomodule,novalidate,readonly",wr=Gs(yr);function il(e){return!!e||e===""}const al=e=>!!(e&&e.__v_isRef===!0),E=e=>re(e)?e:e==null?"":V(e)||te(e)&&(e.toString===ll||!D(e.toString))?al(e)?E(e.value):JSON.stringify(e,ul,2):String(e),ul=(e,t)=>al(t)?ul(e,t.value):xt(t)?{[`Map(${t.size})`]:[...t.entries()].reduce((s,[n,l],r)=>(s[Ts(n,r)+" =>"]=l,s),{})}:sl(t)?{[`Set(${t.size})`]:[...t.values()].map(s=>Ts(s))}:Ye(t)?Ts(t):te(t)&&!V(t)&&!rl(t)?String(t):t,Ts=(e,t="")=>{var s;return Ye(e)?`Symbol(${(s=e.description)!=null?s:t})`:e};let be;class Cr{constructor(t=!1){this.detached=t,this._active=!0,this._on=0,this.effects=[],this.cleanups=[],this._isPaused=!1,this.parent=be,!t&&be&&(this.index=(be.scopes||(be.scopes=[])).push(this)-1)}get active(){return this._active}pause(){if(this._active){this._isPaused=!0;let t,s;if(this.scopes)for(t=0,s=this.scopes.length;t<s;t++)this.scopes[t].pause();for(t=0,s=this.effects.length;t<s;t++)this.effects[t].pause()}}resume(){if(this._active&&this._isPaused){this._isPaused=!1;let t,s;if(this.scopes)for(t=0,s=this.scopes.length;t<s;t++)this.scopes[t].resume();for(t=0,s=this.effects.length;t<s;t++)this.effects[t].resume()}}run(t){if(this._active){const s=be;try{return be=this,t()}finally{be=s}}}on(){++this._on===1&&(this.prevScope=be,be=this)}off(){this._on>0&&--this._on===0&&(be=this.prevScope,this.prevScope=void 0)}stop(t){if(this._active){this._active=!1;let s,n;for(s=0,n=this.effects.length;s<n;s++)this.effects[s].stop();for(this.effects.length=0,s=0,n=this.cleanups.length;s<n;s++)this.cleanups[s]();if(this.cleanups.length=0,this.scopes){for(s=0,n=this.scopes.length;s<n;s++)this.scopes[s].stop(!0);this.scopes.length=0}if(!this.detached&&this.parent&&!t){const l=this.parent.scopes.pop();l&&l!==this&&(this.parent.scopes[this.index]=l,l.index=this.index)}this.parent=void 0}}}function Sr(){return be}let Y;const As=new WeakSet;class cl{constructor(t){this.fn=t,this.deps=void 0,this.depsTail=void 0,this.flags=5,this.next=void 0,this.cleanup=void 0,this.scheduler=void 0,be&&be.active&&be.effects.push(this)}pause(){this.flags|=64}resume(){this.flags&64&&(this.flags&=-65,As.has(this)&&(As.delete(this),this.trigger()))}notify(){this.flags&2&&!(this.flags&32)||this.flags&8||dl(this)}run(){if(!(this.flags&1))return this.fn();this.flags|=2,Cn(this),pl(this);const t=Y,s=$e;Y=this,$e=!0;try{return this.fn()}finally{hl(this),Y=t,$e=s,this.flags&=-3}}stop(){if(this.flags&1){for(let t=this.deps;t;t=t.nextDep)tn(t);this.deps=this.depsTail=void 0,Cn(this),this.onStop&&this.onStop(),this.flags&=-2}}trigger(){this.flags&64?As.add(this):this.scheduler?this.scheduler():this.runIfDirty()}runIfDirty(){js(this)&&this.run()}get dirty(){return js(this)}}let fl=0,Rt,It;function dl(e,t=!1){if(e.flags|=8,t){e.next=It,It=e;return}e.next=Rt,Rt=e}function Xs(){fl++}function en(){if(--fl>0)return;if(It){let t=It;for(It=void 0;t;){const s=t.next;t.next=void 0,t.flags&=-9,t=s}}let e;for(;Rt;){let t=Rt;for(Rt=void 0;t;){const s=t.next;if(t.next=void 0,t.flags&=-9,t.flags&1)try{t.trigger()}catch(n){e||(e=n)}t=s}}if(e)throw e}function pl(e){for(let t=e.deps;t;t=t.nextDep)t.version=-1,t.prevActiveLink=t.dep.activeLink,t.dep.activeLink=t}function hl(e){let t,s=e.depsTail,n=s;for(;n;){const l=n.prevDep;n.version===-1?(n===s&&(s=l),tn(n),Mr(n)):t=n,n.dep.activeLink=n.prevActiveLink,n.prevActiveLink=void 0,n=l}e.deps=t,e.depsTail=s}function js(e){for(let t=e.deps;t;t=t.nextDep)if(t.dep.version!==t.version||t.dep.computed&&(_l(t.dep.computed)||t.dep.version!==t.version))return!0;return!!e._dirty}function _l(e){if(e.flags&4&&!(e.flags&16)||(e.flags&=-17,e.globalVersion===kt)||(e.globalVersion=kt,!e.isSSR&&e.flags&128&&(!e.deps&&!e._dirty||!js(e))))return;e.flags|=2;const t=e.dep,s=Y,n=$e;Y=e,$e=!0;try{pl(e);const l=e.fn(e._value);(t.version===0||ot(l,e._value))&&(e.flags|=128,e._value=l,t.version++)}catch(l){throw t.version++,l}finally{Y=s,$e=n,hl(e),e.flags&=-3}}function tn(e,t=!1){const{dep:s,prevSub:n,nextSub:l}=e;if(n&&(n.nextSub=l,e.prevSub=void 0),l&&(l.prevSub=n,e.nextSub=void 0),s.subs===e&&(s.subs=n,!n&&s.computed)){s.computed.flags&=-5;for(let r=s.computed.deps;r;r=r.nextDep)tn(r,!0)}!t&&!--s.sc&&s.map&&s.map.delete(s.key)}function Mr(e){const{prevDep:t,nextDep:s}=e;t&&(t.nextDep=s,e.prevDep=void 0),s&&(s.prevDep=t,e.nextDep=void 0)}let $e=!0;const gl=[];function We(){gl.push($e),$e=!1}function Ke(){const e=gl.pop();$e=e===void 0?!0:e}function Cn(e){const{cleanup:t}=e;if(e.cleanup=void 0,t){const s=Y;Y=void 0;try{t()}finally{Y=s}}}let kt=0;class Or{constructor(t,s){this.sub=t,this.dep=s,this.version=s.version,this.nextDep=this.prevDep=this.nextSub=this.prevSub=this.prevActiveLink=void 0}}class sn{constructor(t){this.computed=t,this.version=0,this.activeLink=void 0,this.subs=void 0,this.map=void 0,this.key=void 0,this.sc=0,this.__v_skip=!0}track(t){if(!Y||!$e||Y===this.computed)return;let s=this.activeLink;if(s===void 0||s.sub!==Y)s=this.activeLink=new Or(Y,this),Y.deps?(s.prevDep=Y.depsTail,Y.depsTail.nextDep=s,Y.depsTail=s):Y.deps=Y.depsTail=s,vl(s);else if(s.version===-1&&(s.version=this.version,s.nextDep)){const n=s.nextDep;n.prevDep=s.prevDep,s.prevDep&&(s.prevDep.nextDep=n),s.prevDep=Y.depsTail,s.nextDep=void 0,Y.depsTail.nextDep=s,Y.depsTail=s,Y.deps===s&&(Y.deps=n)}return s}trigger(t){this.version++,kt++,this.notify(t)}notify(t){Xs();try{for(let s=this.subs;s;s=s.prevSub)s.sub.notify()&&s.sub.dep.notify()}finally{en()}}}function vl(e){if(e.dep.sc++,e.sub.flags&4){const t=e.dep.computed;if(t&&!e.dep.subs){t.flags|=20;for(let n=t.deps;n;n=n.nextDep)vl(n)}const s=e.dep.subs;s!==e&&(e.prevSub=s,s&&(s.nextSub=e)),e.dep.subs=e}}const Vs=new WeakMap,ht=Symbol(""),Ds=Symbol(""),Ft=Symbol("");function ue(e,t,s){if($e&&Y){let n=Vs.get(e);n||Vs.set(e,n=new Map);let l=n.get(s);l||(n.set(s,l=new sn),l.map=n,l.key=s),l.track()}}function Ze(e,t,s,n,l,r){const o=Vs.get(e);if(!o){kt++;return}const i=a=>{a&&a.trigger()};if(Xs(),t==="clear")o.forEach(i);else{const a=V(e),d=a&&Qs(s);if(a&&s==="length"){const c=Number(n);o.forEach((h,O)=>{(O==="length"||O===Ft||!Ye(O)&&O>=c)&&i(h)})}else switch((s!==void 0||o.has(void 0))&&i(o.get(s)),d&&i(o.get(Ft)),t){case"add":a?d&&i(o.get("length")):(i(o.get(ht)),xt(e)&&i(o.get(Ds)));break;case"delete":a||(i(o.get(ht)),xt(e)&&i(o.get(Ds)));break;case"set":xt(e)&&i(o.get(ht));break}}en()}function vt(e){const t=z(e);return t===e?t:(ue(t,"iterate",Ft),Ce(e)?t:t.map(Te))}function vs(e){return ue(e=z(e),"iterate",Ft),e}function st(e,t){return Ge(e)?St(_t(e)?Te(t):t):Te(t)}const $r={__proto__:null,[Symbol.iterator](){return Ls(this,Symbol.iterator,e=>st(this,e))},concat(...e){return vt(this).concat(...e.map(t=>V(t)?vt(t):t))},entries(){return Ls(this,"entries",e=>(e[1]=st(this,e[1]),e))},every(e,t){return Be(this,"every",e,t,void 0,arguments)},filter(e,t){return Be(this,"filter",e,t,s=>s.map(n=>st(this,n)),arguments)},find(e,t){return Be(this,"find",e,t,s=>st(this,s),arguments)},findIndex(e,t){return Be(this,"findIndex",e,t,void 0,arguments)},findLast(e,t){return Be(this,"findLast",e,t,s=>st(this,s),arguments)},findLastIndex(e,t){return Be(this,"findLastIndex",e,t,void 0,arguments)},forEach(e,t){return Be(this,"forEach",e,t,void 0,arguments)},includes(...e){return Es(this,"includes",e)},indexOf(...e){return Es(this,"indexOf",e)},join(e){return vt(this).join(e)},lastIndexOf(...e){return Es(this,"lastIndexOf",e)},map(e,t){return Be(this,"map",e,t,void 0,arguments)},pop(){return Lt(this,"pop")},push(...e){return Lt(this,"push",e)},reduce(e,...t){return Sn(this,"reduce",e,t)},reduceRight(e,...t){return Sn(this,"reduceRight",e,t)},shift(){return Lt(this,"shift")},some(e,t){return Be(this,"some",e,t,void 0,arguments)},splice(...e){return Lt(this,"splice",e)},toReversed(){return vt(this).toReversed()},toSorted(e){return vt(this).toSorted(e)},toSpliced(...e){return vt(this).toSpliced(...e)},unshift(...e){return Lt(this,"unshift",e)},values(){return Ls(this,"values",e=>st(this,e))}};function Ls(e,t,s){const n=vs(e),l=n[t]();return n!==e&&!Ce(e)&&(l._next=l.next,l.next=()=>{const r=l._next();return r.done||(r.value=s(r.value)),r}),l}const Tr=Array.prototype;function Be(e,t,s,n,l,r){const o=vs(e),i=o!==e&&!Ce(e),a=o[t];if(a!==Tr[t]){const h=a.apply(e,r);return i?Te(h):h}let d=s;o!==e&&(i?d=function(h,O){return s.call(this,st(e,h),O,e)}:s.length>2&&(d=function(h,O){return s.call(this,h,O,e)}));const c=a.call(o,d,n);return i&&l?l(c):c}function Sn(e,t,s,n){const l=vs(e);let r=s;return l!==e&&(Ce(e)?s.length>3&&(r=function(o,i,a){return s.call(this,o,i,a,e)}):r=function(o,i,a){return s.call(this,o,st(e,i),a,e)}),l[t](r,...n)}function Es(e,t,s){const n=z(e);ue(n,"iterate",Ft);const l=n[t](...s);return(l===-1||l===!1)&&on(s[0])?(s[0]=z(s[0]),n[t](...s)):l}function Lt(e,t,s=[]){We(),Xs();const n=z(e)[t].apply(e,s);return en(),Ke(),n}const Ar=Gs("__proto__,__v_isRef,__isVue"),ml=new Set(Object.getOwnPropertyNames(Symbol).filter(e=>e!=="arguments"&&e!=="caller").map(e=>Symbol[e]).filter(Ye));function Lr(e){Ye(e)||(e=String(e));const t=z(this);return ue(t,"has",e),t.hasOwnProperty(e)}class bl{constructor(t=!1,s=!1){this._isReadonly=t,this._isShallow=s}get(t,s,n){if(s==="__v_skip")return t.__v_skip;const l=this._isReadonly,r=this._isShallow;if(s==="__v_isReactive")return!l;if(s==="__v_isReadonly")return l;if(s==="__v_isShallow")return r;if(s==="__v_raw")return n===(l?r?Fr:Cl:r?wl:yl).get(t)||Object.getPrototypeOf(t)===Object.getPrototypeOf(n)?t:void 0;const o=V(t);if(!l){let a;if(o&&(a=$r[s]))return a;if(s==="hasOwnProperty")return Lr}const i=Reflect.get(t,s,fe(t)?t:n);if((Ye(s)?ml.has(s):Ar(s))||(l||ue(t,"get",s),r))return i;if(fe(i)){const a=o&&Qs(s)?i:i.value;return l&&te(a)?Fs(a):a}return te(i)?l?Fs(i):ln(i):i}}class xl extends bl{constructor(t=!1){super(!1,t)}set(t,s,n,l){let r=t[s];const o=V(t)&&Qs(s);if(!this._isShallow){const d=Ge(r);if(!Ce(n)&&!Ge(n)&&(r=z(r),n=z(n)),!o&&fe(r)&&!fe(n))return d||(r.value=n),!0}const i=o?Number(s)<t.length:Z(t,s),a=Reflect.set(t,s,n,fe(t)?t:l);return t===z(l)&&(i?ot(n,r)&&Ze(t,"set",s,n):Ze(t,"add",s,n)),a}deleteProperty(t,s){const n=Z(t,s);t[s];const l=Reflect.deleteProperty(t,s);return l&&n&&Ze(t,"delete",s,void 0),l}has(t,s){const n=Reflect.has(t,s);return(!Ye(s)||!ml.has(s))&&ue(t,"has",s),n}ownKeys(t){return ue(t,"iterate",V(t)?"length":ht),Reflect.ownKeys(t)}}class Er extends bl{constructor(t=!1){super(!0,t)}set(t,s){return!0}deleteProperty(t,s){return!0}}const Pr=new xl,Hr=new Er,Rr=new xl(!0);const ks=e=>e,Yt=e=>Reflect.getPrototypeOf(e);function Ir(e,t,s){return function(...n){const l=this.__v_raw,r=z(l),o=xt(r),i=e==="entries"||e===Symbol.iterator&&o,a=e==="keys"&&o,d=l[e](...n),c=s?ks:t?St:Te;return!t&&ue(r,"iterate",a?Ds:ht),de(Object.create(d),{next(){const{value:h,done:O}=d.next();return O?{value:h,done:O}:{value:i?[c(h[0]),c(h[1])]:c(h),done:O}}})}}function Qt(e){return function(...t){return e==="delete"?!1:e==="clear"?void 0:this}}function jr(e,t){const s={get(l){const r=this.__v_raw,o=z(r),i=z(l);e||(ot(l,i)&&ue(o,"get",l),ue(o,"get",i));const{has:a}=Yt(o),d=t?ks:e?St:Te;if(a.call(o,l))return d(r.get(l));if(a.call(o,i))return d(r.get(i));r!==o&&r.get(l)},get size(){const l=this.__v_raw;return!e&&ue(z(l),"iterate",ht),l.size},has(l){const r=this.__v_raw,o=z(r),i=z(l);return e||(ot(l,i)&&ue(o,"has",l),ue(o,"has",i)),l===i?r.has(l):r.has(l)||r.has(i)},forEach(l,r){const o=this,i=o.__v_raw,a=z(i),d=t?ks:e?St:Te;return!e&&ue(a,"iterate",ht),i.forEach((c,h)=>l.call(r,d(c),d(h),o))}};return de(s,e?{add:Qt("add"),set:Qt("set"),delete:Qt("delete"),clear:Qt("clear")}:{add(l){!t&&!Ce(l)&&!Ge(l)&&(l=z(l));const r=z(this);return Yt(r).has.call(r,l)||(r.add(l),Ze(r,"add",l,l)),this},set(l,r){!t&&!Ce(r)&&!Ge(r)&&(r=z(r));const o=z(this),{has:i,get:a}=Yt(o);let d=i.call(o,l);d||(l=z(l),d=i.call(o,l));const c=a.call(o,l);return o.set(l,r),d?ot(r,c)&&Ze(o,"set",l,r):Ze(o,"add",l,r),this},delete(l){const r=z(this),{has:o,get:i}=Yt(r);let a=o.call(r,l);a||(l=z(l),a=o.call(r,l)),i&&i.call(r,l);const d=r.delete(l);return a&&Ze(r,"delete",l,void 0),d},clear(){const l=z(this),r=l.size!==0,o=l.clear();return r&&Ze(l,"clear",void 0,void 0),o}}),["keys","values","entries",Symbol.iterator].forEach(l=>{s[l]=Ir(l,e,t)}),s}function nn(e,t){const s=jr(e,t);return(n,l,r)=>l==="__v_isReactive"?!e:l==="__v_isReadonly"?e:l==="__v_raw"?n:Reflect.get(Z(s,l)&&l in n?s:n,l,r)}const Vr={get:nn(!1,!1)},Dr={get:nn(!1,!0)},kr={get:nn(!0,!1)};const yl=new WeakMap,wl=new WeakMap,Cl=new WeakMap,Fr=new WeakMap;function Ur(e){switch(e){case"Object":case"Array":return 1;case"Map":case"Set":case"WeakMap":case"WeakSet":return 2;default:return 0}}function Nr(e){return e.__v_skip||!Object.isExtensible(e)?0:Ur(pr(e))}function ln(e){return Ge(e)?e:rn(e,!1,Pr,Vr,yl)}function Br(e){return rn(e,!1,Rr,Dr,wl)}function Fs(e){return rn(e,!0,Hr,kr,Cl)}function rn(e,t,s,n,l){if(!te(e)||e.__v_raw&&!(t&&e.__v_isReactive))return e;const r=Nr(e);if(r===0)return e;const o=l.get(e);if(o)return o;const i=new Proxy(e,r===2?n:s);return l.set(e,i),i}function _t(e){return Ge(e)?_t(e.__v_raw):!!(e&&e.__v_isReactive)}function Ge(e){return!!(e&&e.__v_isReadonly)}function Ce(e){return!!(e&&e.__v_isShallow)}function on(e){return e?!!e.__v_raw:!1}function z(e){const t=e&&e.__v_raw;return t?z(t):e}function zr(e){return!Z(e,"__v_skip")&&Object.isExtensible(e)&&ol(e,"__v_skip",!0),e}const Te=e=>te(e)?ln(e):e,St=e=>te(e)?Fs(e):e;function fe(e){return e?e.__v_isRef===!0:!1}function X(e){return Zr(e,!1)}function Zr(e,t){return fe(e)?e:new qr(e,t)}class qr{constructor(t,s){this.dep=new sn,this.__v_isRef=!0,this.__v_isShallow=!1,this._rawValue=s?t:z(t),this._value=s?t:Te(t),this.__v_isShallow=s}get value(){return this.dep.track(),this._value}set value(t){const s=this._rawValue,n=this.__v_isShallow||Ce(t)||Ge(t);t=n?t:z(t),ot(t,s)&&(this._rawValue=t,this._value=n?t:Te(t),this.dep.trigger())}}function y(e){return fe(e)?e.value:e}const Wr={get:(e,t,s)=>t==="__v_raw"?e:y(Reflect.get(e,t,s)),set:(e,t,s,n)=>{const l=e[t];return fe(l)&&!fe(s)?(l.value=s,!0):Reflect.set(e,t,s,n)}};function Sl(e){return _t(e)?e:new Proxy(e,Wr)}class Kr{constructor(t,s,n){this.fn=t,this.setter=s,this._value=void 0,this.dep=new sn(this),this.__v_isRef=!0,this.deps=void 0,this.depsTail=void 0,this.flags=16,this.globalVersion=kt-1,this.next=void 0,this.effect=this,this.__v_isReadonly=!s,this.isSSR=n}notify(){if(this.flags|=16,!(this.flags&8)&&Y!==this)return dl(this,!0),!0}get value(){const t=this.dep.track();return _l(this),t&&(t.version=this.dep.version),this._value}set value(t){this.setter&&this.setter(t)}}function Gr(e,t,s=!1){let n,l;return D(e)?n=e:(n=e.get,l=e.set),new Kr(n,l,s)}const Xt={},rs=new WeakMap;let pt;function Jr(e,t=!1,s=pt){if(s){let n=rs.get(s);n||rs.set(s,n=[]),n.push(e)}}function Yr(e,t,s=Q){const{immediate:n,deep:l,once:r,scheduler:o,augmentJob:i,call:a}=s,d=I=>l?I:Ce(I)||l===!1||l===0?rt(I,1):rt(I);let c,h,O,A,k=!1,U=!1;if(fe(e)?(h=()=>e.value,k=Ce(e)):_t(e)?(h=()=>d(e),k=!0):V(e)?(U=!0,k=e.some(I=>_t(I)||Ce(I)),h=()=>e.map(I=>{if(fe(I))return I.value;if(_t(I))return d(I);if(D(I))return a?a(I,2):I()})):D(e)?t?h=a?()=>a(e,2):e:h=()=>{if(O){We();try{O()}finally{Ke()}}const I=pt;pt=c;try{return a?a(e,3,[A]):e(A)}finally{pt=I}}:h=Ve,t&&l){const I=h,ie=l===!0?1/0:l;h=()=>rt(I(),ie)}const ae=Sr(),N=()=>{c.stop(),ae&&ae.active&&Ys(ae.effects,c)};if(r&&t){const I=t;t=(...ie)=>{I(...ie),N()}}let W=U?new Array(e.length).fill(Xt):Xt;const K=I=>{if(!(!(c.flags&1)||!c.dirty&&!I))if(t){const ie=c.run();if(l||k||(U?ie.some((et,Ae)=>ot(et,W[Ae])):ot(ie,W))){O&&O();const et=pt;pt=c;try{const Ae=[ie,W===Xt?void 0:U&&W[0]===Xt?[]:W,A];W=ie,a?a(t,3,Ae):t(...Ae)}finally{pt=et}}}else c.run()};return i&&i(K),c=new cl(h),c.scheduler=o?()=>o(K,!1):K,A=I=>Jr(I,!1,c),O=c.onStop=()=>{const I=rs.get(c);if(I){if(a)a(I,4);else for(const ie of I)ie();rs.delete(c)}},t?n?K(!0):W=c.run():o?o(K.bind(null,!0),!0):c.run(),N.pause=c.pause.bind(c),N.resume=c.resume.bind(c),N.stop=N,N}function rt(e,t=1/0,s){if(t<=0||!te(e)||e.__v_skip||(s=s||new Map,(s.get(e)||0)>=t))return e;if(s.set(e,t),t--,fe(e))rt(e.value,t,s);else if(V(e))for(let n=0;n<e.length;n++)rt(e[n],t,s);else if(sl(e)||xt(e))e.forEach(n=>{rt(n,t,s)});else if(rl(e)){for(const n in e)rt(e[n],t,s);for(const n of Object.getOwnPropertySymbols(e))Object.prototype.propertyIsEnumerable.call(e,n)&&rt(e[n],t,s)}return e}function zt(e,t,s,n){try{return n?e(...n):e()}catch(l){ms(l,t,s)}}function ke(e,t,s,n){if(D(e)){const l=zt(e,t,s,n);return l&&nl(l)&&l.catch(r=>{ms(r,t,s)}),l}if(V(e)){const l=[];for(let r=0;r<e.length;r++)l.push(ke(…21633 tokens truncated…l Reasons",500:"Internal Server Error",501:"Not Implemented",502:"Bad Gateway",503:"Service Unavailable",504:"Gateway Timeout",505:"HTTP Version Not Supported",506:"Variant Also Negotiates",507:"Insufficient Storage",508:"Loop Detected",510:"Not Extended",511:"Network Authentication Required"})[i]??"Unknown",l=i=>i>=200&&i<300?"text-emerald-300":i>=300&&i<400?"text-yellow-500":"text-danger",r=i=>({GET:"text-lime-400",POST:"text-blue-400",PUT:"text-yellow-300",DELETE:"text-danger",PATCH:"text-indigo-400",OPTIONS:"text-gray-400",HEAD:"text-gray-400"})[i]??"text-gray-400",o=i=>{i&&window.open(i,"_blank")};return(i,a)=>(w(),L("div",Ha,[s.value?(w(),le(Ue,{key:0,onMouseenter:a[2]||(a[2]=d=>s.value=!0),onMouseleave:a[3]||(a[3]=d=>s.value=!1)},{default:g(()=>[M(Oe,null,{icon:g(()=>[...a[6]||(a[6]=[f("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 16 16",fill:"currentColor",class:"absolute size-3"},[f("path",{"fill-rule":"evenodd",d:"M2 8c0 .414.336.75.75.75h8.69l-1.22 1.22a.75.75 0 1 0 1.06 1.06l2.5-2.5a.75.75 0 0 0 0-1.06l-2.5-2.5a.75.75 0 1 0-1.06 1.06l1.22 1.22H2.75A.75.75 0 0 0 2 8Z","clip-rule":"evenodd"})],-1)])]),label:g(()=>[...a[7]||(a[7]=[R(" Request ",-1)])]),secondaryLabel:g(()=>[y(t).request?.uuid?(w(),L("a",{key:0,class:"hover:underline",href:`/telescope/requests/${y(t).request?.uuid}`},E(y(t).request?.uuid?.slice(0,6))+"..."+E(y(t).request?.uuid?.slice(-6)),9,Ra)):oe("",!0)]),_:1}),M(it,null,{default:g(()=>[M(ne,null,{label:g(()=>[...a[8]||(a[8]=[R(" Method ",-1)])]),value:g(()=>[f("span",{class:F(["uppercase",r(y(t).request?.method)])},E(y(t).request?.method),3)]),_:1}),M(ne,null,{label:g(()=>[...a[9]||(a[9]=[R(" URI ",-1)])]),value:g(()=>[f("span",{class:"whitespace-nowrap",title:y(t).request?.uri},E(y(t).request?.uri),9,Ia)]),_:1}),M(ne,null,{label:g(()=>[...a[10]||(a[10]=[R(" Name ",-1)])]),value:g(()=>[f("span",{class:F(y(t).request?.route_editor_url?"cursor-pointer hover:underline":""),onClick:a[0]||(a[0]=d=>o(y(t).request?.route_editor_url)),title:y(t).request?.route_editor_url},E(y(t).request?.route_name),11,ja)]),_:1}),M(ne,null,{label:g(()=>[...a[11]||(a[11]=[R(" Middleware ",-1)])]),value:g(()=>[f("span",{title:y(t).request?.middleware.join(", ")},E(y(t).request?.middleware.length),9,Va)]),_:1}),M(ne,null,{label:g(()=>[...a[12]||(a[12]=[R(" Action ",-1)])]),value:g(()=>[f("span",{class:F(y(t).request?.controller_action_editor_url?"cursor-pointer hover:underline":""),onClick:a[1]||(a[1]=d=>o(y(t).request?.controller_action_editor_url)),title:y(t).request?.controller_action_editor_url},E(y(t).request?.controller_action.split("\\")[y(t).request?.controller_action.split("\\").length-1]),11,Da)]),_:1})]),_:1}),M(Oe,{class:"mt-3"},{icon:g(()=>[...a[13]||(a[13]=[f("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 16 16",fill:"currentColor",class:"absolute size-3 rotate-180"},[f("path",{"fill-rule":"evenodd",d:"M2 8c0 .414.336.75.75.75h8.69l-1.22 1.22a.75.75 0 1 0 1.06 1.06l2.5-2.5a.75.75 0 0 0 0-1.06l-2.5-2.5a.75.75 0 1 0-1.06 1.06l1.22 1.22H2.75A.75.75 0 0 0 2 8Z","clip-rule":"evenodd"})],-1)])]),label:g(()=>[...a[14]||(a[14]=[R("Response",-1)])]),secondaryLabel:g(()=>[R(E(y(t).profiler?.total_wall_time?.formattedValue),1)]),_:1}),M(it,null,{default:g(()=>[M(ne,null,{label:g(()=>[...a[15]||(a[15]=[R("Status",-1)])]),value:g(()=>[f("span",{class:F(["uppercase",l(y(t).response?.status_code)])},E(y(t).response?.status_code)+" - "+E(n(y(t).response?.status_code)),3)]),_:1}),M(ne,null,{label:g(()=>[...a[16]||(a[16]=[R("Size",-1)])]),value:g(()=>[f("span",null,E(y(t).response?.size.formattedValue),1)]),_:1})]),_:1})]),_:1})):oe("",!0),M(Me,{onMouseenter:a[4]||(a[4]=d=>s.value=!0),onMouseleave:a[5]||(a[5]=d=>s.value=!1),isActive:s.value,class:F(e.itemClasses),innerPadding:"pl-0.5"},{default:g(()=>[M(Pa,{color:"green"},{default:g(()=>[R(E(y(t).response?.status_code),1)]),_:1})]),_:1},8,["isActive","class"])]))}},Fa=Object.freeze(Object.defineProperty({__proto__:null,default:ka},Symbol.toStringTag,{value:"Module"})),Ua={},Na={viewBox:"0 0 24 14",fill:"none",xmlns:"http://www.w3.org/2000/svg"};function Ba(e,t){return w(),L("svg",Na,[...t[0]||(t[0]=[f("path",{d:"M6.90146 0.0312195H0L6.66883 6.70005L0 13.3689H6.90146L13.5703 6.70005L6.90146 0.0312195Z",fill:"currentColor"},null,-1),f("path",{d:"M17.3311 0.0312195H10.4297L17.0985 6.70005L10.4297 13.3689H17.3311L24 6.70005L17.3311 0.0312195Z",fill:"currentColor"},null,-1)])])}const za=Xe(Ua,[["render",Ba]]),Za={},qa={class:"h-4",viewBox:"0 0 14 16",fill:"currentColor",xmlns:"http://www.w3.org/2000/svg"};function Wa(e,t){return w(),L("svg",qa,[...t[0]||(t[0]=[f("path",{d:"M2.7998 1.98438L7 9.20312L11.2002 1.98438H14L7 14.0156L0 1.98438H2.7998Z",fill:"currentColor"},null,-1),f("path",{d:"M8.61856 1.98438L6.9998 4.7625L5.38105 1.98438H2.7998L7 9.20312L11.2002 1.98438H8.61856Z",fill:"currentColor","fill-opacity":"0.5"},null,-1)])])}const fs=Xe(Za,[["render",Wa]]),Ka={},Ga={viewBox:"0 0 35 21",fill:"none",xmlns:"http://www.w3.org/2000/svg"};function Ja(e,t){return w(),L("svg",Ga,[...t[0]||(t[0]=[f("path",{d:"M17.183 0C12.6 0 9.737 2.291 8.59 6.873C10.309 4.583 12.313 3.723 14.604 4.296C15.911 4.622 16.846 5.57 17.879 6.62C19.564 8.33 21.514 10.309 25.773 10.309C30.355 10.309 33.218 8.018 34.364 3.437C32.646 5.727 30.641 6.587 28.351 6.013C27.043 5.687 26.108 4.739 25.075 3.689C23.39 1.98 21.44 0 17.183 0ZM8.59 10.309C4.01 10.309 1.145 12.6 0 17.182C1.718 14.891 3.723 14.032 6.013 14.605C7.321 14.931 8.256 15.879 9.289 16.929C10.974 18.639 12.924 20.618 17.183 20.618C21.765 20.618 24.628 18.328 25.773 13.746C24.055 16.036 22.051 16.896 19.76 16.323C18.453 15.996 17.518 15.047 16.484 13.998C14.8 12.288 12.849 10.309 8.59 10.309Z",fill:"currentColor"},null,-1)])])}const Ya=Xe(Ka,[["render",Ja]]),Qa=["href"],Xa=["href"],eu=["href"],tu=["href"],su=["href"],nu=["href"],lu={class:"py-[3px]"},ru={__name:"TechStack",props:{config:{type:Object,required:!1},itemClasses:{type:Object,required:!1,default:{}}},setup(e){const{data:t}=Ne(),s=X(!1);return(n,l)=>(w(),L("div",{class:"flex justify-end",onMouseenter:l[0]||(l[0]=r=>s.value=!0),onMouseleave:l[1]||(l[1]=r=>s.value=!1)},[s.value?(w(),le(Ue,{key:0,align:"right",size:"xxs"},{default:g(()=>[M(Oe,null,{icon:g(()=>[M(Ws)]),label:g(()=>[...l[2]||(l[2]=[R(" Laravel ",-1)])]),secondaryLabel:g(()=>[f("a",{class:"hover:underline",href:y(t).laravel?.version_editor_url,target:"_blank"},E(y(t).laravel?.version),9,Qa)]),_:1}),M(it,null,{default:g(()=>[M(ne,null,{label:g(()=>[...l[3]||(l[3]=[R(" Environment ",-1)])]),value:g(()=>[f("a",{class:"hover:underline",href:y(t).laravel?.environment_editor_url,target:"_blank"},E(y(t).laravel?.environment),9,Xa)]),_:1}),M(ne,null,{label:g(()=>[...l[4]||(l[4]=[R(" Timezone ",-1)])]),value:g(()=>[f("a",{class:"hover:underline",href:y(t).laravel?.timezone_editor_url,target:"_blank"},E(y(t).laravel?.timezone),9,eu)]),_:1}),M(ne,null,{label:g(()=>[...l[5]||(l[5]=[R(" Locale ",-1)])]),value:g(()=>[f("a",{class:"hover:underline",href:y(t).laravel?.locale_editor_url,target:"_blank"},E(y(t).laravel?.locale),9,tu)]),_:1}),M(ne,null,{label:g(()=>[...l[6]||(l[6]=[R(" Debug ",-1)])]),value:g(()=>[f("div",{class:F(["text-xxs uppercase",{"text-emerald-300":y(t).laravel?.debug,"text-red-300":!y(t).laravel?.debug}])},[f("a",{class:"hover:underline",href:y(t).laravel?.debug_editor_url,target:"_blank"},E(y(t).laravel?.debug?"true":"false"),9,su)],2)]),_:1})]),_:1}),e.config?.inertia!==!1&&y(t).inertia?(w(),le(Oe,{key:0,class:"mt-1.5"},{icon:g(()=>[M(za,{class:"size-4"})]),label:g(()=>[...l[7]||(l[7]=[R(" Inertia ",-1)])]),secondaryLabel:g(()=>[R(E(y(t).inertia?.version),1)]),_:1})):oe("",!0),e.config?.vue!==!1&&y(t).vue?(w(),le(Oe,{key:1,class:""},{icon:g(()=>[M(fs,{class:"size-4"})]),label:g(()=>[...l[8]||(l[8]=[R(" Vue ",-1)])]),secondaryLabel:g(()=>[f("a",{class:"hover:underline",href:y(t).vue?.version_editor_url,target:"_blank"},E(y(t).vue?.version),9,nu)]),_:1})):oe("",!0),e.config?.tailwind!==!1&&y(t).tailwind?(w(),le(Oe,{key:2,class:""},{icon:g(()=>[M(Ya,{class:"size-4"})]),label:g(()=>[...l[9]||(l[9]=[R(" Tailwind ",-1)])]),secondaryLabel:g(()=>[R(E(y(t).tailwind?.version),1)]),_:1})):oe("",!0)]),_:1})):oe("",!0),M(Me,{isActive:s.value,class:F(e.itemClasses)},{default:g(()=>[f("div",lu,[M(y(zi),{class:"size-4"})])]),_:1},8,["isActive","class"])],32))}},ou=Object.freeze(Object.defineProperty({__proto__:null,default:ru},Symbol.toStringTag,{value:"Module"})),iu={class:"flex w-full px-0.5"},au=["onMouseenter"],uu={class:"flex items-center gap-1.5"},cu={key:0},fu={key:1},du={key:2},pu={class:"flex items-center gap-1 py-0.5"},hu={__name:"Timings",props:{config:{type:Object,required:!1},itemClasses:{type:Object,required:!1}},setup(e){const{data:t}=Ne(),s=X(!1),n=X(null),l=Cs(()=>t.value.profiler?.stages.filter(r=>r.wall_time.measurement.value!==0));return(r,o)=>(w(),L("div",null,[s.value?(w(),le(Ue,{key:0,size:"md",onMouseenter:o[1]||(o[1]=i=>s.value=!0),onMouseleave:o[2]||(o[2]=i=>s.value=!1)},{default:g(()=>[M(Oe,null,{icon:g(()=>[...o[5]||(o[5]=[f("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 16 16",fill:"currentColor",class:"size-3.5"},[f("path",{"fill-rule":"evenodd",d:"M1 8a7 7 0 1 1 14 0A7 7 0 0 1 1 8Zm7.75-4.25a.75.75 0 0 0-1.5 0V8c0 .414.336.75.75.75h3.25a.75.75 0 0 0 0-1.5h-2.5v-3.5Z","clip-rule":"evenodd"})],-1)])]),label:g(()=>[...o[6]||(o[6]=[R(" Timings ",-1)])]),secondaryLabel:g(()=>[R(E(y(t).profiler?.total_wall_time?.formattedValue),1)]),_:1}),M(it,null,{default:g(()=>[f("div",iu,[(w(!0),L(ee,null,Fe(l.value,(i,a)=>(w(),L("div",{key:a,onMouseenter:d=>n.value=a,onMouseleave:o[0]||(o[0]=d=>n.value=null),class:"flex min-w-2 py-1.5",style:De({width:i.wall_time.percentage+"%"})},[f("div",{class:"mx-auto h-1 rounded-full",style:De({backgroundColor:i.color,width:"calc(100% - 4px)"})},null,4)],44,au))),128))]),(w(!0),L(ee,null,Fe(y(t).profiler?.stages,(i,a)=>(w(),le(ne,{key:a,class:F(["",{"opacity-35":n.value!==a&&n.value!==null}])},{label:g(()=>[f("div",uu,[f("div",{class:"h-1.5 w-1.5 rounded-full",style:De({backgroundColor:i.color})},null,4),f("span",null,E(i.label),1)])]),value:g(()=>[i.wall_time.measurement.value===0?(w(),L("span",cu,"N/A")):n.value!==a?(w(),L("span",fu,E(i.wall_time.measurement.formattedValue),1)):(w(),L("span",du,E(i.wall_time.percentage)+"%",1))]),_:2},1032,["class"]))),128))]),_:1})]),_:1})):oe("",!0),M(Me,{onMouseenter:o[3]||(o[3]=i=>s.value=!0),onMouseleave:o[4]||(o[4]=i=>s.value=!1),isActive:s.value,class:F(e.itemClasses)},{default:g(()=>[f("div",pu,[o[7]||(o[7]=f("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 16 16",fill:"currentColor",class:"size-3.5"},[f("path",{"fill-rule":"evenodd",d:"M1 8a7 7 0 1 1 14 0A7 7 0 0 1 1 8Zm7.75-4.25a.75.75 0 0 0-1.5 0V8c0 .414.336.75.75.75h3.25a.75.75 0 0 0 0-1.5h-2.5v-3.5Z","clip-rule":"evenodd"})],-1)),f("span",null,E(y(t).profiler?.total_wall_time?.formattedValue),1)])]),_:1},8,["isActive","class"])]))}},_u=Object.freeze(Object.defineProperty({__proto__:null,default:hu},Symbol.toStringTag,{value:"Module"})),gu={class:"py-[3px]"},vu={__name:"Vue",props:{config:{type:Object,required:!1},itemClasses:{type:Object,required:!1,default:{}}},setup(e){const{data:t}=Ne(),s=X(!1),n=()=>{let l=document.getElementById("__vue-devtools-container__");l&&(l.style.display==="none"?l.style.cssText="display: block !important; opacity: 1 !important":l.style.cssText="display: none !important; opacity: 1 !important")};return(l,r)=>(w(),L("div",{class:"",onMouseenter:r[0]||(r[0]=o=>s.value=!0),onMouseleave:r[1]||(r[1]=o=>s.value=!1)},[s.value?(w(),le(Ue,{key:0,size:"xxs"},{default:g(()=>[M(Oe,null,{icon:g(()=>[M(fs)]),label:g(()=>[...r[2]||(r[2]=[R(" Vue ",-1)])]),secondaryLabel:g(()=>[...r[3]||(r[3]=[R(" Docs ",-1)])]),_:1}),M(it,null,{default:g(()=>[M(ne,null,{label:g(()=>[...r[4]||(r[4]=[R(" Version ",-1)])]),value:g(()=>[f("span",{onClick:n},E(y(t).vue?.version),1)]),_:1})]),_:1})]),_:1})):oe("",!0),M(Me,{isActive:s.value,class:F(e.itemClasses)},{default:g(()=>[f("div",gu,[M(fs)])]),_:1},8,["isActive","class"])],32))}},mu=Object.freeze(Object.defineProperty({__proto__:null,default:vu},Symbol.toStringTag,{value:"Module"})),bu={class:"relative h-full w-full"},xu={class:"py-[3px]"},yu={__name:"VueDevtools",props:{config:{type:Object,required:!1},itemClasses:{type:Object,required:!1,default:()=>({})}},setup(e){const t=X(!1),s=X(null),n=X(null),l=X(!1);let r=null;function o(c,h=()=>!0,O=5e3){return new Promise((A,k)=>{const U=document.querySelector(c);if(U&&h(U))return A(U);const ae=new MutationObserver((N,W)=>{const K=document.querySelector(c);K&&h(K)&&(W.disconnect(),A(K))});ae.observe(document.body,{childList:!0,subtree:!0,attributes:!0,attributeFilter:["src"]}),setTimeout(()=>{ae.disconnect();const N=document.querySelector(c);N&&h(N)?A(N):k(new Error(`Timeout waiting for ${c}`))},O)})}function i(c,h){c.setAttribute("style","width: 100% !important; height: 100% !important; z-index: 99999 !important;"),h&&h.setAttribute("style","width: 100%; height: 100%;")}function a(c,h){r=new MutationObserver(()=>{c.style.width.includes("100%")||i(c,h)}),r.observe(c,{attributes:!0,attributeFilter:["style"]})}async function d(){try{const c=await o(".vue-devtools-frame");let h=c.querySelector("iframe");h||(document.querySelector("#__vue-devtools-container__ .panel-entry-btn")?.click(),h=await o(".vue-devtools-frame iframe",A=>A.hasAttribute("src")&&A.src!=="")),n.value=c,s.value.appendChild(c),i(c,h),a(c,h),setTimeout(()=>{l.value=!0},500)}catch(c){console.warn("Vue DevTools initialization failed:",c)}}return cn(()=>{d()}),xs(()=>{r&&(r.disconnect(),r=null)}),(c,h)=>(w(),L("div",null,[M(Ue,{onMouseenter:h[0]||(h[0]=O=>t.value=!0),onMouseleave:h[1]||(h[1]=O=>t.value=!1),size:"full",minHeight:"h-[480px] !p-0 rounded-2xl overflow-hidden",class:F(["transition-[opacity,visibility] duration-0",t.value?"visible opacity-100":"invisible opacity-0"])},{default:g(()=>[f("div",bu,[f("div",{class:F(["absolute top-0 left-0 h-full w-full",{invisible:!l.value}]),ref_key:"vueDevtoolsContainer",ref:s},null,2)])]),_:1},8,["class"]),M(Me,{onMouseenter:h[2]||(h[2]=O=>t.value=!0),onMouseleave:h[3]||(h[3]=O=>t.value=!1),isActive:t.value,class:F(e.itemClasses)},{default:g(()=>[f("div",xu,[M(fs)])]),_:1},8,["isActive","class"])]))}},wu=Object.freeze(Object.defineProperty({__proto__:null,default:yu},Symbol.toStringTag,{value:"Module"})),Cu={},Su={viewBox:"0 0 11 11",fill:"none",xmlns:"http://www.w3.org/2000/svg"};function Mu(e,t){return w(),L("svg",Su,[...t[0]||(t[0]=[f("path",{d:"M5.25 4.5C5.66421 4.5 6 4.83579 6 5.25C6 5.66421 5.66421 6 5.25 6C4.83579 6 4.5 5.66421 4.5 5.25C4.5 4.83579 4.83579 4.5 5.25 4.5Z",fill:"currentColor"},null,-1),f("path",{"fill-rule":"evenodd","clip-rule":"evenodd",d:"M5.25 0C5.66421 0 6 0.335786 6 0.75V1.32031C7.60763 1.62528 8.87367 2.89239 9.17871 4.5H9.75C10.1642 4.5 10.5 4.83579 10.5 5.25C10.5 5.66421 10.1642 6 9.75 6H9.17871C8.87369 7.60755 7.60755 8.87369 6 9.17871V9.75C6 10.1642 5.66421 10.5 5.25 10.5C4.83579 10.5 4.5 10.1642 4.5 9.75V9.17871C2.89245 8.87369 1.62631 7.60755 1.32129 6H0.75C0.335786 6 4.09531e-08 5.66421 0 5.25C1.81058e-08 4.83579 0.335786 4.5 0.75 4.5H1.32129C1.62633 2.89239 2.89237 1.62528 4.5 1.32031V0.75C4.5 0.335786 4.83579 0 5.25 0ZM5.25 2.5C3.73122 2.5 2.5 3.73122 2.5 5.25C2.5 6.76878 3.73122 8 5.25 8C6.76878 8 8 6.76878 8 5.25C8 3.73122 6.76878 2.5 5.25 2.5Z",fill:"currentColor"},null,-1)])])}const Ou=Xe(Cu,[["render",Mu]]),$u={class:"py-[3px]"},Tu={__name:"VueInspector",props:{config:{type:Object,required:!1},itemClasses:{type:Object,required:!1,default:()=>({})}},setup(e){const t=X(!1),s=X(!1),n=()=>{if(window.__VUE_INSPECTOR__.enabled)window.__VUE_INSPECTOR__.disable(),s.value=!1;else{window.__VUE_INSPECTOR__.enable(),s.value=!0;const l=document.querySelector(".vue-devtools-frame");l&&l.setAttribute("style","width: 100% !important; height: 100% !important; z-index: 99999 !important;")}};return(l,r)=>(w(),L("div",null,[M(Me,{onMouseenter:r[0]||(r[0]=o=>t.value=!0),onMouseleave:r[1]||(r[1]=o=>t.value=!1),isActive:t.value,class:F(e.itemClasses),onClick:r[2]||(r[2]=o=>n())},{default:g(()=>[f("div",$u,[M(Ou,{class:F(["size-4",s.value?"text-green-500":"text-white"])},null,8,["class"])])]),_:1},8,["isActive","class"])]))}},Au=Object.freeze(Object.defineProperty({__proto__:null,default:Tu},Symbol.toStringTag,{value:"Module"})),Lu={class:"relative flex overflow-hidden rounded-full"},Eu={__name:"Group",props:{config:{type:Object,required:!0}},setup(e){const t=Object.assign({"../tools/BreakpointIndicator.vue":Fi,"../tools/Database.vue":M1,"../tools/Laravel.vue":Z1,"../tools/MemoryUsage.vue":ta,"../tools/Models.vue":Ma,"../tools/PHP.vue":Ea,"../tools/Request.vue":Fa,"../tools/TechStack.vue":ou,"../tools/Timings.vue":_u,"../tools/Vue.vue":mu,"../tools/VueDevtools.vue":wu,"../tools/VueInspector.vue":Au}),s=n=>t[`../tools/${n}.vue`].default;return(n,l)=>(w(),L("div",Lu,[l[0]||(l[0]=f("div",{class:"absolute h-full w-full rounded-full bg-[#101010]/95 backdrop-blur-sm dark:border dark:border-white/8"},null,-1)),(w(!0),L(ee,null,Fe(e.config.tools,(r,o,i)=>(w(),le(wo(s(o)),{key:o,config:r,itemClasses:{"pl-[3px] rounded-l-full border-l":i===0,"pr-[3px] rounded-r-full border-r":i===Object.keys(e.config.tools).length-1,"border-x-0":i>0&&i<Object.keys(e.config.tools).length-1}},null,8,["config","itemClasses"]))),128))]))}},Pu={id:"toolbar",class:"fixed bottom-0 left-0 z-999999 flex w-full justify-between font-mono font-medium"},Hu={__name:"Toolbar",setup(e){const{data:t}=Ne();return(s,n)=>(w(),L("div",Pu,[(w(!0),L(ee,null,Fe(y(t).layout.sections,(l,r)=>(w(),L("div",{class:F(["flex gap-1",{"absolute bottom-0 left-0 min-h-9.5 justify-start p-[5px]":r==="left","justify-center p-[5px]":r==="center","absolute right-0 bottom-0 min-h-9.5 justify-end p-[5px]":r==="right","w-full":r==="center"}])},[(w(!0),L(ee,null,Fe(l,o=>(w(),le(Eu,{config:o},null,8,["config"]))),256))],2))),256))]))}};let Ks=!1;function Ru(){const e=document.getElementById("laravel-toolbar-shadow-host");if(!e)throw new Error("Shadow host not found - toolbar HTML not injected?");let t=e.shadowRoot;if(!t){t=e.attachShadow({mode:"open"});const n=document.createElement("div");n.id="laravel-toolbar-root",t.appendChild(n)}const s=t.getElementById("laravel-toolbar-root");if(!s)throw new Error("Toolbar root not found in shadow DOM");return{shadowRoot:t,appContainer:s}}function Iu(e){const t=Ri({...Hu,devtools:{hide:!0}});return t.config.errorHandler=(s,n,l)=>{},t.mount(e),t}function ju(){const e=document.getElementById("laravel-toolbar-shadow-host");e&&e.remove(),Ks=!1}function Vu(){return Ks?!1:(Ks=!0,!0)}function Du(){Xn(window.__LARAVEL_TOOLBAR_DATA__)}const ku="laravel-toolbar-html-cache",Fu="laravel-toolbar-css-cache";function Uu(e){const t=()=>{const s=e.getElementById("laravel-toolbar-root");if(s)try{sessionStorage.setItem(ku,s.innerHTML);const n=e.adoptedStyleSheets[0];if(n){const r=Array.from(n.cssRules||[]).map(o=>o.cssText).join(`
+/home/nckrtl/projects/laravel-toolbar/build/assets/toolbar.prod-ABeN43TU.js:2:`);r&&sessionStorage.setItem(Fu,r)}}catch(n){console.error("❌ Error saving cache:",n)}};setTimeout(t,2e3),window.addEventListener("beforeunload",t)}const Nu=async()=>{if(Vu())try{let e,t;if(window.__TOOLBAR_SHADOW_PRECREATED__){Qn("⚡ Using pre-created shadow DOM from cache"),e=window.__TOOLBAR_SHADOW_PRECREATED__;const s=e.getElementById("laravel-toolbar-root");if(!s)throw new Error("Toolbar root not found in pre-created shadow DOM");t=s}else{const s=Ru();e=s.shadowRoot,t=s.appContainer,await Bu(e)}Iu(t),Uu(e),Du()}catch(e){throw ju(),e}};async function Bu(e){const t=window.__LARAVEL_TOOLBAR_CSS_URL__;if(!t)return;const n=await(await fetch(t)).text(),l=new CSSStyleSheet;l.replaceSync(n),e.adoptedStyleSheets=[l]}fr(Nu);
+/home/nckrtl/projects/laravel-toolbar/src/Mcp/Tools/GetRequestDataTool.php:22:        return config('toolbar.enabled', false);
+/home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService/Profiler.php:93:        if (! config('toolbar.enabled', true)) {
+
+thinking
+**Investigating toolbar config inconsistency**
+exec
+/usr/bin/zsh -lc "rg -n \"class ToolbarConfigProvider|toolbar\\.enabled|ToolbarProvider\" /home/nckrtl/projects/laravel-toolbar -g'*.php'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+/home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService/Profiler.php:93:        if (! config('toolbar.enabled', true)) {
+/home/nckrtl/projects/laravel-toolbar/src/Mcp/Tools/GetRequestDataTool.php:22:        return config('toolbar.enabled', false);
+/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php:9:class ToolbarProvider extends ServiceProvider
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/resultCache.php:3584:      3 => '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php',
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/resultCache.php:3914:  '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php' => 
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/resultCache.php:3947:      5 => '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php',
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/resultCache.php:13863:  '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php' => 
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/resultCache.php:13867:       'name' => 'NckRtl\\Toolbar\\Providers\\ToolbarProvider',
+/home/nckrtl/projects/laravel-toolbar/tests/Unit/ToolbarInjectorTest.php:15:    Config::set('toolbar.enabled', true);
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/cache/PHPStan/d7/d6/d7d63d37530bd005020604358a75843e8184dc90.php:1098:    '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php' => 
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/cache/PHPStan/81/21/81213f968fc303563a57c83a419bc5c5f95cc8a286b91c65ebb5994c34bb83c7.php:1418:    '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php' => 
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/cache/PHPStan/5c/d6/5cd6c68c6c84f1ae26c623ed0e3b4fadf1703a416c166e560477d5c92ca7a02e.php:3:// odsl-/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php-PHPStan\BetterReflection\Reflection\ReflectionClass-NckRtl\Toolbar\Providers\ToolbarProvider
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/cache/PHPStan/5c/d6/5cd6c68c6c84f1ae26c623ed0e3b4fadf1703a416c166e560477d5c92ca7a02e.php:13:        'name' => 'NckRtl\\Toolbar\\Providers\\ToolbarProvider',
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/cache/PHPStan/5c/d6/5cd6c68c6c84f1ae26c623ed0e3b4fadf1703a416c166e560477d5c92ca7a02e.php:14:        'filename' => '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php',
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/cache/PHPStan/5c/d6/5cd6c68c6c84f1ae26c623ed0e3b4fadf1703a416c166e560477d5c92ca7a02e.php:18:    'name' => 'NckRtl\\Toolbar\\Providers\\ToolbarProvider',
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/cache/PHPStan/5c/d6/5cd6c68c6c84f1ae26c623ed0e3b4fadf1703a416c166e560477d5c92ca7a02e.php:19:    'shortName' => 'ToolbarProvider',
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/cache/PHPStan/5c/d6/5cd6c68c6c84f1ae26c623ed0e3b4fadf1703a416c166e560477d5c92ca7a02e.php:104:        'declaringClassName' => 'NckRtl\\Toolbar\\Providers\\ToolbarProvider',
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/cache/PHPStan/5c/d6/5cd6c68c6c84f1ae26c623ed0e3b4fadf1703a416c166e560477d5c92ca7a02e.php:105:        'implementingClassName' => 'NckRtl\\Toolbar\\Providers\\ToolbarProvider',
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/cache/PHPStan/5c/d6/5cd6c68c6c84f1ae26c623ed0e3b4fadf1703a416c166e560477d5c92ca7a02e.php:106:        'currentClassName' => 'NckRtl\\Toolbar\\Providers\\ToolbarProvider',
+/home/nckrtl/projects/laravel-toolbar/build/phpstan/cache/PHPStan/5c/d6/5cd6c68c6c84f1ae26c623ed0e3b4fadf1703a416c166e560477d5c92ca7a02e.php:165:        'declaringClassName' => 'NckRtl\\Toolbar\\Providers\\ToolbarProvider',
+
+thinking
+**Finalizing prioritized findings list**
+exec
+/usr/bin/zsh -lc "rg -n \"toolbar\\.enabled|LARAVEL_TOOLBAR_ENABLED|ToolbarConfigProvider|CustomizeToolbar\" /home/nckrtl/projects/laravel-toolbar/README.md /home/nckrtl/projects/laravel-toolbar/CONTRIBUTING.md /home/nckrtl/projects/laravel-toolbar/TESTING_PLAN.md" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+/home/nckrtl/projects/laravel-toolbar/README.md:70:1. Publish a `ToolbarConfigProvider` to `app/Providers/ToolbarConfigProvider.php`
+/home/nckrtl/projects/laravel-toolbar/README.md:92:class ToolbarConfigProvider extends ToolbarProvider
+
+thinking
+**Checking README for config updates**
+exec
+/usr/bin/zsh -lc "nl -ba /home/nckrtl/projects/laravel-toolbar/README.md | sed -n '50,140p'" in /home/nckrtl/projects/laravel-toolbar succeeded in 51ms:
+    50	- The `ModelsCollector` can track Eloquent model operations
+    51	- Additional request data can be sourced from Telescope entries
+    52	
+    53	**Note:** All other collectors work independently without Telescope. The toolbar will automatically detect if Telescope is installed and enable enhanced features accordingly.
+    54	
+    55	## Configuration
+    56	
+    57	### Basic Setup
+    58	
+    59	By default, the toolbar will work out of the box with sensible defaults. All collectors are enabled and will start gathering data immediately.
+    60	
+    61	### Advanced Customization
+    62	
+    63	To customize the toolbar configuration, run the customize command:
+    64	
+    65	```bash
+    66	php artisan toolbar:customize
+    67	```
+    68	
+    69	This will:
+
+thinking
+**Searching for environment toggles**
+exec
+/usr/bin/zsh -lc "rg -n \"LARAVEL_TOOLBAR_ENABLED|LARAVEL_TOOLBAR_VISIBLE|env\\(\" /home/nckrtl/projects/laravel-toolbar/README.md" in /home/nckrtl/projects/laravel-toolbar exited 1 in 51ms:
+
+
+thinking
+**Summarizing detailed findings and test ideas**
+codex
+1. **severity:** critical  
+**confidence:** high  
+**status:** refined  
+**location:** [RequestObserver::__construct](/home/nckrtl/projects/laravel-toolbar/src/Observers/RequestObserver.php:13), [ToolbarInjector::injectToolbarHtml](/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:125), [ToolbarInjector::shouldInjectHtml](/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:89), [QueryObserver::reset](/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php:45), [ModelObserver::reset](/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php:32)  
+**evidence:** observer reset methods exist but are never invoked; for AJAX/non-HTML responses `injectToolbarHtml()` returns early and never runs collection/cleanup. In Octane, singleton/static state persists between requests.  
+**impact:** cross-request query/model/profiler leakage and stale data shown to later users/requests.  
+**minimal fix:** add unconditional request-boundary reset (observer resets + profiler reset) in a terminating hook, independent of HTML/header injection path.  
+**test idea:** request A = JSON (no injection), request B = HTML in same process; B must not include A’s queries/checkpoints.
+
+2. **severity:** high  
+**confidence:** high  
+**status:** confirmed  
+**location:** [ProfilerCollector::getTotals](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:142), [ProfilerCollector::fillInMissingStartAndEnd](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php:198), [CollectorManager::collectData](/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php:32)  
+**evidence:** collector throws uncaught `\Exception` on timing inconsistencies/missing end stages.  
+**impact:** toolbar can 500 the app request.  
+**minimal fix:** fail open (graceful fallback values) or catch collector exceptions in `CollectorManager`.  
+**test idea:** provide stages with missing terminal checkpoint; expect collection to succeed with degraded profiler data.
+
+3. **severity:** high  
+**confidence:** high  
+**status:** confirmed  
+**location:** [QueriesCollector::setEntries](/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php:49), [ModelsCollector::setEntries](/home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php:31), [ToolbarConfig::getObserver](/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:147)  
+**evidence:** nullable `getObserver()` result is dereferenced directly.  
+**impact:** removing an observer while keeping its collector enabled causes fatal null dereference.  
+**minimal fix:** null-guard and return empty defaults.  
+**test idea:** configure observers without `QueryObserver`/`ModelObserver`; collectors should return empty data, not crash.
+
+4. **severity:** high  
+**confidence:** high  
+**status:** refined  
+**location:** [TimeUnit::convertValueTo](/home/nckrtl/projects/laravel-toolbar/src/Enums/TimeUnit.php:66), [DataSizeUnit::convertValueTo](/home/nckrtl/projects/laravel-toolbar/src/Enums/DataSizeUnit.php:57)  
+**evidence:** reverse-direction conversions are wrong. Runtime checks: `1000 ms -> s` returns `1000000`; `1 KB -> B` returns `0.0009765625`.  
+**impact:** incorrect duration/memory values in toolbar output.  
+**minimal fix:** use one formula both directions: `value * fromFactor / toFactor` (with same-unit early return).  
+**test idea:** bidirectional assertions for bytes↔KB and ms↔s.
+
+5. **severity:** medium  
+**confidence:** high  
+**status:** confirmed  
+**location:** [Profiler::setupViewProfiling anonymous get()](/home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService/Profiler.php:106)  
+**evidence:** `BEFORE_VIEW_RENDERING` is recorded after `parent::get()` returns.  
+**impact:** controller/view stage timings are misattributed.  
+**minimal fix:** record `BEFORE_VIEW_RENDERING` before calling `parent::get()`.  
+**test idea:** render a deliberately slow view; “view rendering” stage should reflect that time.
+
+6. **severity:** medium  
+**confidence:** high  
+**status:** confirmed  
+**location:** [QueryObserver::recordQuery](/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php:56), [ModelObserver::recordHydrations](/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php:63)  
+**evidence:** query baseline memory is never updated after each query; model hydration increments count but never adds new memory delta.  
+**impact:** memory metrics shown to users are wrong.  
+**minimal fix:** update query baseline per event; accumulate model `memory_used->value += delta` then format.  
+**test idea:** two known memory events should yield per-query deltas and cumulative model memory.
+
+7. **severity:** medium  
+**confidence:** high  
+**status:** refined  
+**location:** [ToolbarConfig::observers](/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:140), [ToolbarConfig::collectors](/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php:156)  
+**evidence:** `observers(null)` assigns `null` to typed `array`; `collectors(null)` iterates `null` and then assigns `null` to typed `array`.  
+**impact:** runtime type/warning failures during valid “clear config” style usage.  
+**minimal fix:** normalize null to `[]` and early return.  
+**test idea:** call both methods with `null`; expect no exception and empty arrays.
+
+8. **severity:** medium  
+**confidence:** high  
+**status:** refined  
+**location:** [QueryObserver::replaceBindings](/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php:144)  
+**evidence:** replacement uses raw binding in `preg_replace`; `$1`/`\1` in bindings are treated as backreferences. Also no guard for `preg_replace()` returning `null`.  
+**impact:** displayed SQL can be corrupted; rare PCRE failures can propagate bad state/type issues.  
+**minimal fix:** switch to `preg_replace_callback()` with literal replacement handling and null-safe fallback.  
+**test idea:** binding `'$100'` must remain literal in rendered SQL; force PCRE failure case and ensure no crash.
+
+9. **severity:** medium  
+**confidence:** medium  
+**status:** refined  
+**location:** [ToolbarInjector::injectToolbarHtml](/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:140), [ToolbarInjector::toolbarHtml](/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:270)  
+**evidence:** `json_encode()` failure returns `false`; coerced into empty string in `getToolbarHtml(string $data)`, yielding JS like `window.__LARAVEL_TOOLBAR_DATA__ = ;`.  
+**impact:** injected script becomes invalid JS; toolbar fails to boot for that response.  
+**minimal fix:** `JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE` with fallback payload on exception.  
+**test idea:** include invalid UTF-8 in collected payload; injected HTML should still contain valid JS assignment.
+
+10. **severity:** high  
+**confidence:** high  
+**status:** refined  
+**location:** [routes/toolbar.php](/home/nckrtl/projects/laravel-toolbar/routes/toolbar.php:7), [HorizonController::start](/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php:28), [HorizonController::stop](/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php:68)  
+**evidence:** Horizon control routes are under `web` only (no authz). `start()` returns success without confirming availability/start outcome.  
+**impact:** local-environment users on network can start/stop Horizon; false-positive success responses.  
+**minimal fix:** add authorization middleware/gate and verify Horizon availability + post-start state before success.  
+**test idea:** unauthenticated POST should be forbidden; when Horizon missing, `start()` should return failure.
+
+11. **severity:** low  
+**confidence:** high  
+**status:** confirmed  
+**location:** [ToolbarInjector::toolbarHtml](/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php:280)  
+**evidence:** `if("{$nonce}" !== null)` is always true in JS (`"" !== null`).  
+**impact:** cached inline styles are stripped even when no CSP nonce exists.  
+**minimal fix:** emit boolean/null JS variable and branch on that real value.  
+**test idea:** no CSP nonce + cached HTML with style attrs should preserve styles.
+
+**Invalidated / narrowed prior leads**
+1. `FetchesStackTrace` undefined `$this->options` fatal: invalidated (null-coalescing access does not error here).  
+2. `AssetController` traversal via `/{asset}`: not confirmed with current single-segment route shape.  
+3. `Toolbar::isEnabled()` unbound-container crash: invalidated (short-circuit `app()->bound(...) && ...`).  
+4. `quoteStringBinding()` escape-order bug: not confirmed (`strtr` replacement semantics avoid claimed double-escape sequence issue).
+
+I could not run the full test suite in this environment (read-only sandbox).
+tokens used
+138,427

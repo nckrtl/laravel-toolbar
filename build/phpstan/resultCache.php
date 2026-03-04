@@ -1,11 +1,15 @@
 <?php declare(strict_types = 1);
 
 return [
-	'lastFullAnalysisTime' => 1771493837,
+	'lastFullAnalysisTime' => 1772523107,
 	'meta' => array (
   'cacheVersion' => 'v12-linesToIgnore',
-  'phpstanVersion' => '2.0.0',
-  'phpVersion' => 80417,
+  'phpstanVersion' => '2.1.39',
+  'fnsr' => false,
+  'metaExtensions' => 
+  array (
+  ),
+  'phpVersion' => 80418,
   'projectConfig' => '{parameters: {level: 5, paths: [/home/nckrtl/projects/laravel-toolbar/src, /home/nckrtl/projects/laravel-toolbar/database], tmpDir: /home/nckrtl/projects/laravel-toolbar/build/phpstan, checkOctaneCompatibility: true, checkModelProperties: true}}',
   'analysedPaths' => 
   array (
@@ -17,7 +21,7 @@ return [
   ),
   'composerLocks' => 
   array (
-    '/home/nckrtl/projects/laravel-toolbar/composer.lock' => '649494270f3b2ffead02b1079ade2c5324bfea8d',
+    '/home/nckrtl/projects/laravel-toolbar/composer.lock' => 'ffc0ac4850d24ccc9b5cc90bca318741731a08093322b0af0b190e6065eae65d',
   ),
   'composerInstalled' => 
   array (
@@ -25,155 +29,11 @@ return [
     array (
       'versions' => 
       array (
-        'amphp/amp' => 
-        array (
-          'pretty_version' => 'v3.0.0',
-          'version' => '3.0.0.0',
-          'reference' => 'aaf0ec1d5a2c20b523258995a10e80c1fb765871',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/amp',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'amphp/byte-stream' => 
-        array (
-          'pretty_version' => 'v2.0.0',
-          'version' => '2.0.0.0',
-          'reference' => 'c102b620c14f44e83436b6f9bced6f40ca482bff',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/byte-stream',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'amphp/cache' => 
-        array (
-          'pretty_version' => 'v2.0.0',
-          'version' => '2.0.0.0',
-          'reference' => '218bb3888d380eb9dd926cd06f803573c84391d3',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/cache',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'amphp/dns' => 
-        array (
-          'pretty_version' => 'v2.0.0',
-          'version' => '2.0.0.0',
-          'reference' => 'ac877da1685741723f8227b10bc4fb0a1e460f05',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/dns',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'amphp/parallel' => 
-        array (
-          'pretty_version' => 'v2.2.0',
-          'version' => '2.2.0.0',
-          'reference' => '37850ff591155c6f5c662173c3fc75682752c918',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/parallel',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'amphp/parser' => 
-        array (
-          'pretty_version' => 'v1.1.0',
-          'version' => '1.1.0.0',
-          'reference' => 'ff1de4144726c5dad5fab97f66692ebe8de3e151',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/parser',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'amphp/pipeline' => 
-        array (
-          'pretty_version' => 'v1.0.0',
-          'version' => '1.0.0.0',
-          'reference' => '810dee498d2fd7d2c9247b32d95f38c92c13169e',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/pipeline',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'amphp/process' => 
-        array (
-          'pretty_version' => 'v2.0.0',
-          'version' => '2.0.0.0',
-          'reference' => '9c9247fe8283b22e00a254746bf822da4b0b5ea4',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/process',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'amphp/serialization' => 
-        array (
-          'pretty_version' => 'v1.0.0',
-          'version' => '1.0.0.0',
-          'reference' => '693e77b2fb0b266c3c7d622317f881de44ae94a1',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/serialization',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'amphp/socket' => 
-        array (
-          'pretty_version' => 'v2.2.0',
-          'version' => '2.2.0.0',
-          'reference' => '3418a0c5c0d4978b0e8e0619ce1da0851c4053d3',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/socket',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'amphp/sync' => 
-        array (
-          'pretty_version' => 'v2.0.0',
-          'version' => '2.0.0.0',
-          'reference' => 'ad8a0e80cc586cece4f8ce57460f8bbf442ba8fc',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/sync',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'amphp/windows-registry' => 
-        array (
-          'pretty_version' => 'v1.0.0',
-          'version' => '1.0.0.0',
-          'reference' => '8248247a41af7f97b88e4716c0f8de39696ef111',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../amphp/windows-registry',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
         'brianium/paratest' => 
         array (
-          'pretty_version' => 'v7.16.1',
-          'version' => '7.16.1.0',
-          'reference' => 'f0fdfd8e654e0d38bc2ba756a6cabe7be287390b',
+          'pretty_version' => 'v7.19.0',
+          'version' => '7.19.0.0',
+          'reference' => '7c6c29af7c4b406b49ce0c6b0a3a81d3684474e6',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../brianium/paratest',
           'aliases' => 
@@ -183,9 +43,9 @@ return [
         ),
         'brick/math' => 
         array (
-          'pretty_version' => '0.9.3',
-          'version' => '0.9.3.0',
-          'reference' => 'ca57d18f028f84f777b2168cd1911b0dee2343ae',
+          'pretty_version' => '0.14.8',
+          'version' => '0.14.8.0',
+          'reference' => '63422359a44b7f06cae63c3b429b59e8efcc0629',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../brick/math',
           'aliases' => 
@@ -195,9 +55,9 @@ return [
         ),
         'carbonphp/carbon-doctrine-types' => 
         array (
-          'pretty_version' => '1.0.0',
-          'version' => '1.0.0.0',
-          'reference' => '3c430083d0b41ceed84ecccf9dac613241d7305d',
+          'pretty_version' => '3.2.0',
+          'version' => '3.2.0.0',
+          'reference' => '18ba5ddfec8976260ead6e866180bd5d2f71aa1d',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../carbonphp/carbon-doctrine-types',
           'aliases' => 
@@ -207,19 +67,19 @@ return [
         ),
         'composer/semver' => 
         array (
-          'pretty_version' => '3.0.0',
-          'version' => '3.0.0.0',
-          'reference' => '3426bd5efa8a12d230824536c42a8a4ad30b7940',
+          'pretty_version' => '3.4.4',
+          'version' => '3.4.4.0',
+          'reference' => '198166618906cb2de69b95d7d47e5fa8aa1b2b95',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/./semver',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'cordoval/hamcrest-php' => 
         array (
-          'dev_requirement' => false,
+          'dev_requirement' => true,
           'replaced' => 
           array (
             0 => '*',
@@ -227,29 +87,17 @@ return [
         ),
         'davedevelopment/hamcrest-php' => 
         array (
-          'dev_requirement' => false,
+          'dev_requirement' => true,
           'replaced' => 
           array (
             0 => '*',
           ),
         ),
-        'daverandom/libdns' => 
-        array (
-          'pretty_version' => 'v2.0.2',
-          'version' => '2.0.2.0',
-          'reference' => 'e8b6d6593d18ac3a6a14666d8a68a4703b2e05f9',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../daverandom/libdns',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
         'dflydev/dot-access-data' => 
         array (
-          'pretty_version' => 'v3.0.1',
-          'version' => '3.0.1.0',
-          'reference' => '0992cc19268b259a39e86f296da5f0677841f42c',
+          'pretty_version' => 'v3.0.3',
+          'version' => '3.0.3.0',
+          'reference' => 'a23a2bf4f31d3518f3ecb38660c95715dfead60f',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../dflydev/dot-access-data',
           'aliases' => 
@@ -257,11 +105,23 @@ return [
           ),
           'dev_requirement' => false,
         ),
+        'doctrine/deprecations' => 
+        array (
+          'pretty_version' => '1.1.6',
+          'version' => '1.1.6.0',
+          'reference' => 'd4fe3e6fd9bb9e72557a19674f44d8ac7db4c6ca',
+          'type' => 'library',
+          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../doctrine/deprecations',
+          'aliases' => 
+          array (
+          ),
+          'dev_requirement' => false,
+        ),
         'doctrine/inflector' => 
         array (
-          'pretty_version' => '2.0.5',
-          'version' => '2.0.5.0',
-          'reference' => 'ade2b3bbfb776f27f0558e26eed43b5d9fe1b392',
+          'pretty_version' => '2.1.0',
+          'version' => '2.1.0.0',
+          'reference' => '6d6c96277ea252fc1304627204c3d5e6e15faa3b',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../doctrine/inflector',
           'aliases' => 
@@ -271,9 +131,9 @@ return [
         ),
         'doctrine/lexer' => 
         array (
-          'pretty_version' => '1.2.1',
-          'version' => '1.2.1.0',
-          'reference' => 'e864bbf5904cb8f5bb334f99209b48018522f042',
+          'pretty_version' => '3.0.1',
+          'version' => '3.0.1.0',
+          'reference' => '31ad66abc0fc9e1a1f2d9bc6a42668d2fbbcd6dd',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../doctrine/lexer',
           'aliases' => 
@@ -283,9 +143,9 @@ return [
         ),
         'dragonmantank/cron-expression' => 
         array (
-          'pretty_version' => 'v3.4.0',
-          'version' => '3.4.0.0',
-          'reference' => '8c784d071debd117328803d86b2097615b457500',
+          'pretty_version' => 'v3.6.0',
+          'version' => '3.6.0.0',
+          'reference' => 'd61a8a9604ec1f8c3d150d09db6ce98b32675013',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../dragonmantank/cron-expression',
           'aliases' => 
@@ -295,9 +155,9 @@ return [
         ),
         'egulias/email-validator' => 
         array (
-          'pretty_version' => '3.2.1',
-          'version' => '3.2.1.0',
-          'reference' => 'f88dcf4b14af14a98ad96b14b2b317969eab6715',
+          'pretty_version' => '4.0.4',
+          'version' => '4.0.4.0',
+          'reference' => 'd42c8731f0624ad6bdc8d3e5e9a4524f68801cfa',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../egulias/email-validator',
           'aliases' => 
@@ -307,15 +167,15 @@ return [
         ),
         'fakerphp/faker' => 
         array (
-          'pretty_version' => 'v1.23.0',
-          'version' => '1.23.0.0',
-          'reference' => 'e3daa170d00fde61ea7719ef47bb09bb8f1d9b01',
+          'pretty_version' => 'v1.24.1',
+          'version' => '1.24.1.0',
+          'reference' => 'e0ee18eb1e6dc3cda3ce9fd97e5a0689a88a64b5',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../fakerphp/faker',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'fidry/cpu-core-counter' => 
         array (
@@ -331,21 +191,21 @@ return [
         ),
         'filp/whoops' => 
         array (
-          'pretty_version' => '2.18.3',
-          'version' => '2.18.3.0',
-          'reference' => '59a123a3d459c5a23055802237cb317f609867e5',
+          'pretty_version' => '2.18.4',
+          'version' => '2.18.4.0',
+          'reference' => 'd2102955e48b9fd9ab24280a7ad12ed552752c4d',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../filp/whoops',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'fruitcake/php-cors' => 
         array (
-          'pretty_version' => 'v1.3.0',
-          'version' => '1.3.0.0',
-          'reference' => '3d158f36e7875e2f040f37bc0573956240a5a38b',
+          'pretty_version' => 'v1.4.0',
+          'version' => '1.4.0.0',
+          'reference' => '38aaa6c3fd4c157ffe2a4d10aa8b9b16ba8de379',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../fruitcake/php-cors',
           'aliases' => 
@@ -355,9 +215,9 @@ return [
         ),
         'graham-campbell/result-type' => 
         array (
-          'pretty_version' => 'v1.1.3',
-          'version' => '1.1.3.0',
-          'reference' => '3ba905c11371512af9d9bdd27d99b782216b6945',
+          'pretty_version' => 'v1.1.4',
+          'version' => '1.1.4.0',
+          'reference' => 'e01f4a821471308ba86aa202fed6698b6b695e3b',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../graham-campbell/result-type',
           'aliases' => 
@@ -367,9 +227,9 @@ return [
         ),
         'guzzlehttp/guzzle' => 
         array (
-          'pretty_version' => '7.8.2',
-          'version' => '7.8.2.0',
-          'reference' => 'f4152d9eb85c445fe1f992001d1748e8bec070d2',
+          'pretty_version' => '7.10.0',
+          'version' => '7.10.0.0',
+          'reference' => 'b51ac707cfa420b7bfd4e4d5e510ba8008e822b4',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../guzzlehttp/guzzle',
           'aliases' => 
@@ -379,9 +239,9 @@ return [
         ),
         'guzzlehttp/promises' => 
         array (
-          'pretty_version' => '1.5.3',
-          'version' => '1.5.3.0',
-          'reference' => '67ab6e18aaa14d753cc148911d273f6e6cb6721e',
+          'pretty_version' => '2.3.0',
+          'version' => '2.3.0.0',
+          'reference' => '481557b130ef3790cf82b713667b43030dc9c957',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../guzzlehttp/promises',
           'aliases' => 
@@ -391,9 +251,9 @@ return [
         ),
         'guzzlehttp/psr7' => 
         array (
-          'pretty_version' => '1.9.1',
-          'version' => '1.9.1.0',
-          'reference' => 'e4490cabc77465aaee90b20cfc9a770f8c04be6b',
+          'pretty_version' => '2.8.0',
+          'version' => '2.8.0.0',
+          'reference' => '21dc724a0583619cd1652f673303492272778051',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../guzzlehttp/psr7',
           'aliases' => 
@@ -403,9 +263,9 @@ return [
         ),
         'guzzlehttp/uri-template' => 
         array (
-          'pretty_version' => 'v1.0.0',
-          'version' => '1.0.0.0',
-          'reference' => '88fcf8a3ea7489a8af6b25c9dfd3f688ddb51966',
+          'pretty_version' => 'v1.0.5',
+          'version' => '1.0.5.0',
+          'reference' => '4f4bbd4e7172148801e76e3decc1e559bdee34e1',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../guzzlehttp/uri-template',
           'aliases' => 
@@ -415,22 +275,34 @@ return [
         ),
         'hamcrest/hamcrest-php' => 
         array (
-          'pretty_version' => 'v2.0.1',
-          'version' => '2.0.1.0',
-          'reference' => '8c3d0a3f6af734494ad8f6fbbee0ba92422859f3',
+          'pretty_version' => 'v2.1.1',
+          'version' => '2.1.1.0',
+          'reference' => 'f8b1c0173b22fa6ec77a81fe63e5b01eba7e6487',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../hamcrest/hamcrest-php',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
+        ),
+        'iamcal/sql-parser' => 
+        array (
+          'pretty_version' => 'v0.7',
+          'version' => '0.7.0.0',
+          'reference' => '610392f38de49a44dab08dc1659960a29874c4b8',
+          'type' => 'library',
+          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../iamcal/sql-parser',
+          'aliases' => 
+          array (
+          ),
+          'dev_requirement' => true,
         ),
         'illuminate/auth' => 
         array (
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/broadcasting' => 
@@ -438,7 +310,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/bus' => 
@@ -446,7 +318,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/cache' => 
@@ -454,7 +326,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/collections' => 
@@ -462,7 +334,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/concurrency' => 
@@ -470,7 +342,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/conditionable' => 
@@ -478,7 +350,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/config' => 
@@ -486,7 +358,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/console' => 
@@ -494,7 +366,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/container' => 
@@ -502,7 +374,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/contracts' => 
@@ -510,7 +382,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/cookie' => 
@@ -518,7 +390,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/database' => 
@@ -526,7 +398,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/encryption' => 
@@ -534,7 +406,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/events' => 
@@ -542,7 +414,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/filesystem' => 
@@ -550,7 +422,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/hashing' => 
@@ -558,7 +430,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/http' => 
@@ -566,27 +438,23 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/json-schema' => 
         array (
-          'pretty_version' => 'v12.41.1',
-          'version' => '12.41.1.0',
-          'reference' => 'd161f398dab36f08cf131997362bc2e3ecb0309a',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../illuminate/json-schema',
-          'aliases' => 
-          array (
-          ),
           'dev_requirement' => false,
+          'replaced' => 
+          array (
+            0 => 'v12.52.0',
+          ),
         ),
         'illuminate/log' => 
         array (
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/macroable' => 
@@ -594,7 +462,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/mail' => 
@@ -602,7 +470,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/notifications' => 
@@ -610,7 +478,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/pagination' => 
@@ -618,7 +486,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/pipeline' => 
@@ -626,7 +494,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/process' => 
@@ -634,7 +502,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/queue' => 
@@ -642,7 +510,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/redis' => 
@@ -650,7 +518,15 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
+          ),
+        ),
+        'illuminate/reflection' => 
+        array (
+          'dev_requirement' => false,
+          'replaced' => 
+          array (
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/routing' => 
@@ -658,7 +534,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/session' => 
@@ -666,7 +542,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/support' => 
@@ -674,7 +550,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/testing' => 
@@ -682,7 +558,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/translation' => 
@@ -690,7 +566,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/validation' => 
@@ -698,7 +574,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'illuminate/view' => 
@@ -706,7 +582,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => 'v11.47.0',
+            0 => 'v12.52.0',
           ),
         ),
         'jean85/pretty-package-versions' => 
@@ -721,21 +597,9 @@ return [
           ),
           'dev_requirement' => true,
         ),
-        'kelunik/certificate' => 
-        array (
-          'pretty_version' => 'v1.1.2',
-          'version' => '1.1.2.0',
-          'reference' => '56542e62d51533d04d0a9713261fea546bff80f6',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../kelunik/certificate',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
         'kodova/hamcrest-php' => 
         array (
-          'dev_requirement' => false,
+          'dev_requirement' => true,
           'replaced' => 
           array (
             0 => '*',
@@ -743,9 +607,9 @@ return [
         ),
         'larastan/larastan' => 
         array (
-          'pretty_version' => 'v3.0.0',
-          'version' => '3.0.0.0',
-          'reference' => '88f46e3f2cd9d2a14dba13ef293b822a75832e62',
+          'pretty_version' => 'v3.9.2',
+          'version' => '3.9.2.0',
+          'reference' => '2e9ed291bdc1969e7f270fb33c9cdf3c912daeb2',
           'type' => 'phpstan-extension',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../larastan/larastan',
           'aliases' => 
@@ -755,9 +619,9 @@ return [
         ),
         'laravel/framework' => 
         array (
-          'pretty_version' => 'v11.47.0',
-          'version' => '11.47.0.0',
-          'reference' => '86693ffa1ba32f56f8c44e31416c6665095a62c5',
+          'pretty_version' => 'v12.52.0',
+          'version' => '12.52.0.0',
+          'reference' => 'd5511fa74f4608dbb99864198b1954042aa8d5a7',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../laravel/framework',
           'aliases' => 
@@ -767,9 +631,9 @@ return [
         ),
         'laravel/mcp' => 
         array (
-          'pretty_version' => 'v0.5.1',
-          'version' => '0.5.1.0',
-          'reference' => '10dedea054fa4eeaa9ef2ccbfdad6c3e1dbd17a4',
+          'pretty_version' => 'v0.5.9',
+          'version' => '0.5.9.0',
+          'reference' => '39e8da60eb7bce4737c5d868d35a3fe78938c129',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../laravel/mcp',
           'aliases' => 
@@ -779,21 +643,21 @@ return [
         ),
         'laravel/pail' => 
         array (
-          'pretty_version' => 'v1.2.0',
-          'version' => '1.2.0.0',
-          'reference' => '085a2306b520c3896afa361c25704e5fa3c27bf0',
+          'pretty_version' => 'v1.2.6',
+          'version' => '1.2.6.0',
+          'reference' => 'aa71a01c309e7f66bc2ec4fb1a59291b82eb4abf',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../laravel/pail',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'laravel/pint' => 
         array (
-          'pretty_version' => 'v1.14.0',
-          'version' => '1.14.0.0',
-          'reference' => '6b127276e3f263f7bb17d5077e9e0269e61b2a0e',
+          'pretty_version' => 'v1.27.1',
+          'version' => '1.27.1.0',
+          'reference' => '54cca2de13790570c7b6f0f94f37896bee4abcb5',
           'type' => 'project',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../laravel/pint',
           'aliases' => 
@@ -803,9 +667,9 @@ return [
         ),
         'laravel/prompts' => 
         array (
-          'pretty_version' => 'v0.1.18',
-          'version' => '0.1.18.0',
-          'reference' => '3b5e6b03f1f1175574b5a32331d99c9819da9848',
+          'pretty_version' => 'v0.3.13',
+          'version' => '0.3.13.0',
+          'reference' => 'ed8c466571b37e977532fb2fd3c272c784d7050d',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../laravel/prompts',
           'aliases' => 
@@ -815,9 +679,9 @@ return [
         ),
         'laravel/serializable-closure' => 
         array (
-          'pretty_version' => 'v1.3.0',
-          'version' => '1.3.0.0',
-          'reference' => 'f23fe9d4e95255dacee1bf3525e0810d1a1b0f37',
+          'pretty_version' => 'v2.0.9',
+          'version' => '2.0.9.0',
+          'reference' => '8f631589ab07b7b52fead814965f5a800459cb3e',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../laravel/serializable-closure',
           'aliases' => 
@@ -827,21 +691,21 @@ return [
         ),
         'laravel/tinker' => 
         array (
-          'pretty_version' => 'v2.9.0',
-          'version' => '2.9.0.0',
-          'reference' => '502e0fe3f0415d06d5db1f83a472f0f3b754bafe',
+          'pretty_version' => 'v2.11.1',
+          'version' => '2.11.1.0',
+          'reference' => 'c9f80cc835649b5c1842898fb043f8cc098dd741',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../laravel/tinker',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'league/commonmark' => 
         array (
-          'pretty_version' => '2.7.0',
-          'version' => '2.7.0.0',
-          'reference' => '6fbb36d44824ed4091adbcf4c7d4a3923cdb3405',
+          'pretty_version' => '2.8.0',
+          'version' => '2.8.0.0',
+          'reference' => '4efa10c1e56488e658d10adf7b7b7dcd19940bfb',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../league/commonmark',
           'aliases' => 
@@ -851,9 +715,9 @@ return [
         ),
         'league/config' => 
         array (
-          'pretty_version' => 'v1.1.1',
-          'version' => '1.1.1.0',
-          'reference' => 'a9d39eeeb6cc49d10a6e6c36f22c4c1f4a767f3e',
+          'pretty_version' => 'v1.2.0',
+          'version' => '1.2.0.0',
+          'reference' => '754b3604fb2984c71f4af4a9cbe7b57f346ec1f3',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../league/config',
           'aliases' => 
@@ -863,9 +727,9 @@ return [
         ),
         'league/flysystem' => 
         array (
-          'pretty_version' => '3.25.1',
-          'version' => '3.25.1.0',
-          'reference' => 'abbd664eb4381102c559d358420989f835208f18',
+          'pretty_version' => '3.31.0',
+          'version' => '3.31.0.0',
+          'reference' => '1717e0b3642b0df65ecb0cc89cdd99fa840672ff',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../league/flysystem',
           'aliases' => 
@@ -875,9 +739,9 @@ return [
         ),
         'league/flysystem-local' => 
         array (
-          'pretty_version' => '3.25.1',
-          'version' => '3.25.1.0',
-          'reference' => '61a6a90d6e999e4ddd9ce5adb356de0939060b92',
+          'pretty_version' => '3.31.0',
+          'version' => '3.31.0.0',
+          'reference' => '2f669db18a4c20c755c2bb7d3a7b0b2340488079',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../league/flysystem-local',
           'aliases' => 
@@ -887,9 +751,9 @@ return [
         ),
         'league/mime-type-detection' => 
         array (
-          'pretty_version' => '1.4.0',
-          'version' => '1.4.0.0',
-          'reference' => 'fda190b62b962d96a069fcc414d781db66d65b69',
+          'pretty_version' => '1.16.0',
+          'version' => '1.16.0.0',
+          'reference' => '2d6702ff215bf922936ccc1ad31007edc76451b9',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../league/mime-type-detection',
           'aliases' => 
@@ -899,9 +763,9 @@ return [
         ),
         'league/uri' => 
         array (
-          'pretty_version' => '7.5.1',
-          'version' => '7.5.1.0',
-          'reference' => '81fb5145d2644324614cc532b28efd0215bda430',
+          'pretty_version' => '7.8.0',
+          'version' => '7.8.0.0',
+          'reference' => '4436c6ec8d458e4244448b069cc572d088230b76',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../league/uri',
           'aliases' => 
@@ -911,9 +775,9 @@ return [
         ),
         'league/uri-interfaces' => 
         array (
-          'pretty_version' => '7.5.0',
-          'version' => '7.5.0.0',
-          'reference' => '08cfc6c4f3d811584fb09c37e2849e6a7f9b0742',
+          'pretty_version' => '7.8.0',
+          'version' => '7.8.0.0',
+          'reference' => 'c5c5cd056110fc8afaba29fa6b72a43ced42acd4',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../league/uri-interfaces',
           'aliases' => 
@@ -923,21 +787,21 @@ return [
         ),
         'mockery/mockery' => 
         array (
-          'pretty_version' => '1.6.10',
-          'version' => '1.6.10.0',
-          'reference' => '47065d1be1fa05def58dc14c03cf831d3884ef0b',
+          'pretty_version' => '1.6.12',
+          'version' => '1.6.12.0',
+          'reference' => '1f4efdd7d3beafe9807b08156dfcb176d18f1699',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../mockery/mockery',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'monolog/monolog' => 
         array (
-          'pretty_version' => '3.0.0',
-          'version' => '3.0.0.0',
-          'reference' => '60ad5183b5e5d6c9d4047e9f3072d36071dcc161',
+          'pretty_version' => '3.10.0',
+          'version' => '3.10.0.0',
+          'reference' => 'b321dd6749f0bf7189444158a3ce785cc16d69b0',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../monolog/monolog',
           'aliases' => 
@@ -963,13 +827,13 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'nesbot/carbon' => 
         array (
-          'pretty_version' => '2.72.6',
-          'version' => '2.72.6.0',
-          'reference' => '1e9d50601e7035a4c61441a208cb5bed73e108c5',
+          'pretty_version' => '3.11.1',
+          'version' => '3.11.1.0',
+          'reference' => 'f438fcc98f92babee98381d399c65336f3a3827f',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../nesbot/carbon',
           'aliases' => 
@@ -979,9 +843,9 @@ return [
         ),
         'nette/schema' => 
         array (
-          'pretty_version' => 'v1.3.3',
-          'version' => '1.3.3.0',
-          'reference' => '2befc2f42d7c715fd9d95efc31b1081e5d765004',
+          'pretty_version' => 'v1.3.4',
+          'version' => '1.3.4.0',
+          'reference' => '086497a2f34b82fede9b5a41cc8e131d087cd8f7',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../nette/schema',
           'aliases' => 
@@ -991,9 +855,9 @@ return [
         ),
         'nette/utils' => 
         array (
-          'pretty_version' => 'v4.0.8',
-          'version' => '4.0.8.0',
-          'reference' => 'c930ca4e3cf4f17dcfb03037703679d2396d2ede',
+          'pretty_version' => 'v4.1.3',
+          'version' => '4.1.3.0',
+          'reference' => 'bb3ea637e3d131d72acc033cfc2746ee893349fe',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../nette/utils',
           'aliases' => 
@@ -1015,21 +879,21 @@ return [
         ),
         'nunomaduro/collision' => 
         array (
-          'pretty_version' => 'v8.8.3',
-          'version' => '8.8.3.0',
-          'reference' => '1dc9e88d105699d0fee8bb18890f41b274f6b4c4',
+          'pretty_version' => 'v8.9.1',
+          'version' => '8.9.1.0',
+          'reference' => 'a1ed3fa530fd60bc515f9303e8520fcb7d4bd935',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../nunomaduro/collision',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'nunomaduro/termwind' => 
         array (
-          'pretty_version' => 'v2.3.3',
-          'version' => '2.3.3.0',
-          'reference' => '6fb2a640ff502caace8e05fd7be3b503a7e1c017',
+          'pretty_version' => 'v2.4.0',
+          'version' => '2.4.0.0',
+          'reference' => '712a31b768f5daea284c2169a7d227031001b9a8',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../nunomaduro/termwind',
           'aliases' => 
@@ -1039,93 +903,81 @@ return [
         ),
         'orchestra/canvas' => 
         array (
-          'pretty_version' => 'v9.2.2',
-          'version' => '9.2.2.0',
-          'reference' => '002d948834c0899e511f5ac0381669363d7881e5',
+          'pretty_version' => 'v10.1.1',
+          'version' => '10.1.1.0',
+          'reference' => '6e63f56acd46b0ee842e922d0ebb18af8f7a60f6',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../orchestra/canvas',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'orchestra/canvas-core' => 
         array (
-          'pretty_version' => 'v9.1.1',
-          'version' => '9.1.1.0',
-          'reference' => 'a8ebfa6c2e50f8c6597c489b4dfaf9af6789f62a',
+          'pretty_version' => 'v10.1.2',
+          'version' => '10.1.2.0',
+          'reference' => 'af1ac73bb0e4f5a65eeb3aadc1030983c6ea0aea',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../orchestra/canvas-core',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'orchestra/sidekick' => 
         array (
-          'pretty_version' => 'v1.1.23',
-          'version' => '1.1.23.0',
-          'reference' => '82584e5b60882b90f108b45d11e6ae1c48fca72e',
+          'pretty_version' => 'v1.2.20',
+          'version' => '1.2.20.0',
+          'reference' => '267a71b56cb2fe1a634d69fc99889c671b77ff43',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../orchestra/sidekick',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'orchestra/testbench' => 
         array (
-          'pretty_version' => 'v9.13.0',
-          'version' => '9.13.0.0',
-          'reference' => 'f3392f33b5135a37c11d47dbc43c77a6287857d8',
+          'pretty_version' => 'v10.9.0',
+          'version' => '10.9.0.0',
+          'reference' => '040a37b60e1a9d7ae10b496407b6c3bb63b47038',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../orchestra/testbench',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'orchestra/testbench-core' => 
         array (
-          'pretty_version' => 'v9.18.1',
-          'version' => '9.18.1.0',
-          'reference' => 'c3d35db076830039e91aa5a74a6247c03e5ffd87',
+          'pretty_version' => 'v10.9.0',
+          'version' => '10.9.0.0',
+          'reference' => '754d2b71601822d1f57f28119e4dea27ed1a5205',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../orchestra/testbench-core',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'orchestra/workbench' => 
         array (
-          'pretty_version' => 'v9.13.5',
-          'version' => '9.13.5.0',
-          'reference' => '1da2ea95089ed3516bda6f8e9cd57c81290004bf',
+          'pretty_version' => 'v10.0.8',
+          'version' => '10.0.8.0',
+          'reference' => '88bb9b5872539dd8b556b232a1b466f639c18259',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../orchestra/workbench',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
-        ),
-        'paragonie/random_compat' => 
-        array (
-          'pretty_version' => 'v2.0.0',
-          'version' => '2.0.0.0',
-          'reference' => '321a59fed499a5624b0e40cb5c824ae6116e0c18',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../paragonie/random_compat',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'pestphp/pest' => 
         array (
-          'pretty_version' => 'v4.3.2',
-          'version' => '4.3.2.0',
-          'reference' => '3a4329ddc7a2b67c19fca8342a668b39be3ae398',
+          'pretty_version' => 'v4.4.1',
+          'version' => '4.4.1.0',
+          'reference' => 'f96a1b27864b585b0b29b0ee7331176726f7e54a',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../pestphp/pest',
           'aliases' => 
@@ -1159,9 +1011,9 @@ return [
         ),
         'pestphp/pest-plugin-laravel' => 
         array (
-          'pretty_version' => 'v4.0.0',
-          'version' => '4.0.0.0',
-          'reference' => 'e12a07046b826a40b1c8632fd7b80d6b8d7b628e',
+          'pretty_version' => 'v4.1.0',
+          'version' => '4.1.0.0',
+          'reference' => '3057a36669ff11416cc0dc2b521b3aec58c488d0',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../pestphp/pest-plugin-laravel',
           'aliases' => 
@@ -1203,7 +1055,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'phar-io/version' => 
         array (
@@ -1212,6 +1064,18 @@ return [
           'reference' => '4f7fd7836c6f332bb2933569e566a0d6c4cbed74',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phar-io/version',
+          'aliases' => 
+          array (
+          ),
+          'dev_requirement' => true,
+        ),
+        'phpdocumentor/reflection' => 
+        array (
+          'pretty_version' => '6.4.4',
+          'version' => '6.4.4.0',
+          'reference' => '5e5db15b34e6eae755cb97beaa7fe076ae9e8d4c',
+          'type' => 'library',
+          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpdocumentor/reflection',
           'aliases' => 
           array (
           ),
@@ -1231,21 +1095,21 @@ return [
         ),
         'phpdocumentor/reflection-docblock' => 
         array (
-          'pretty_version' => '5.3.0',
-          'version' => '5.3.0.0',
-          'reference' => '622548b623e81ca6d78b721c5e029f4ce664f170',
+          'pretty_version' => '5.6.6',
+          'version' => '5.6.6.0',
+          'reference' => '5cee1d3dfc2d2aa6599834520911d246f656bcb8',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpdocumentor/reflection-docblock',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => true,
+          'dev_requirement' => false,
         ),
         'phpdocumentor/type-resolver' => 
         array (
-          'pretty_version' => '1.6.2',
-          'version' => '1.6.2.0',
-          'reference' => '48f445a408c131e38cab1c235aa6d2bb7a0bb20d',
+          'pretty_version' => '1.12.0',
+          'version' => '1.12.0.0',
+          'reference' => '92a98ada2b93d9b201a613cb5a33584dde25f195',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpdocumentor/type-resolver',
           'aliases' => 
@@ -1253,23 +1117,11 @@ return [
           ),
           'dev_requirement' => false,
         ),
-        'phpmyadmin/sql-parser' => 
-        array (
-          'pretty_version' => '5.9.0',
-          'version' => '5.9.0.0',
-          'reference' => '011fa18a4e55591fac6545a821921dd1d61c6984',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpmyadmin/sql-parser',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => true,
-        ),
         'phpoption/phpoption' => 
         array (
-          'pretty_version' => '1.9.3',
-          'version' => '1.9.3.0',
-          'reference' => 'e3fac8b24f56113f7cb96af14958c0dd16330f54',
+          'pretty_version' => '1.9.5',
+          'version' => '1.9.5.0',
+          'reference' => '75365b91986c2405cf5e1e012c5595cd487a98be',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpoption/phpoption',
           'aliases' => 
@@ -1289,11 +1141,23 @@ return [
           ),
           'dev_requirement' => true,
         ),
+        'phpstan/phpdoc-parser' => 
+        array (
+          'pretty_version' => '2.3.2',
+          'version' => '2.3.2.0',
+          'reference' => 'a004701b11273a26cd7955a61d67a7f1e525a45a',
+          'type' => 'library',
+          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpstan/phpdoc-parser',
+          'aliases' => 
+          array (
+          ),
+          'dev_requirement' => false,
+        ),
         'phpstan/phpstan' => 
         array (
-          'pretty_version' => '2.0.0',
-          'version' => '2.0.0.0',
-          'reference' => '72115ab2bf1e40af1f9b238938d493ba7f3221e7',
+          'pretty_version' => '2.1.39',
+          'version' => '2.1.39.0',
+          'reference' => 'c6f73a2af4cbcd99c931d0fb8f08548cc0fa8224',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpstan/phpstan',
           'aliases' => 
@@ -1303,9 +1167,9 @@ return [
         ),
         'phpstan/phpstan-deprecation-rules' => 
         array (
-          'pretty_version' => '2.0.0',
-          'version' => '2.0.0.0',
-          'reference' => '81833b5787e2e8f451b31218875e29e4ed600ab2',
+          'pretty_version' => '2.0.4',
+          'version' => '2.0.4.0',
+          'reference' => '6b5571001a7f04fa0422254c30a0017ec2f2cacc',
           'type' => 'phpstan-extension',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpstan/phpstan-deprecation-rules',
           'aliases' => 
@@ -1315,9 +1179,9 @@ return [
         ),
         'phpstan/phpstan-phpunit' => 
         array (
-          'pretty_version' => '2.0.0',
-          'version' => '2.0.0.0',
-          'reference' => '3cc855474263ad6220dfa49167cbea34ca1dd300',
+          'pretty_version' => '2.0.16',
+          'version' => '2.0.16.0',
+          'reference' => '6ab598e1bc106e6827fd346ae4a12b4a5d634c32',
           'type' => 'phpstan-extension',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpstan/phpstan-phpunit',
           'aliases' => 
@@ -1327,27 +1191,27 @@ return [
         ),
         'phpunit/php-code-coverage' => 
         array (
-          'pretty_version' => '12.5.2',
-          'version' => '12.5.2.0',
-          'reference' => '4a9739b51cbcb355f6e95659612f92e282a7077b',
+          'pretty_version' => '12.5.3',
+          'version' => '12.5.3.0',
+          'reference' => 'b015312f28dd75b75d3422ca37dff2cd1a565e8d',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpunit/php-code-coverage',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'phpunit/php-file-iterator' => 
         array (
-          'pretty_version' => '6.0.0',
-          'version' => '6.0.0.0',
-          'reference' => '961bc913d42fe24a257bfff826a5068079ac7782',
+          'pretty_version' => '6.0.1',
+          'version' => '6.0.1.0',
+          'reference' => '3d1cd096ef6bea4bf2762ba586e35dbd317cbfd5',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpunit/php-file-iterator',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'phpunit/php-invoker' => 
         array (
@@ -1359,7 +1223,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'phpunit/php-text-template' => 
         array (
@@ -1371,7 +1235,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'phpunit/php-timer' => 
         array (
@@ -1383,19 +1247,19 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'phpunit/phpunit' => 
         array (
-          'pretty_version' => '12.5.8',
-          'version' => '12.5.8.0',
-          'reference' => '37ddb96c14bfee10304825edbb7e66d341ec6889',
+          'pretty_version' => '12.5.12',
+          'version' => '12.5.12.0',
+          'reference' => '418e06b3b46b0d54bad749ff4907fc7dfb530199',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../phpunit/phpunit',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'psr/clock' => 
         array (
@@ -1419,9 +1283,9 @@ return [
         ),
         'psr/container' => 
         array (
-          'pretty_version' => '1.1.1',
-          'version' => '1.1.1.0',
-          'reference' => '8622567409010282b7aeebe4bb841fe98b58dcaf',
+          'pretty_version' => '2.0.2',
+          'version' => '2.0.2.0',
+          'reference' => 'c71ecc56dfe541dbd90c5360474fbc405f8d5963',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../psr/container',
           'aliases' => 
@@ -1459,9 +1323,9 @@ return [
         ),
         'psr/http-client' => 
         array (
-          'pretty_version' => '1.0.1',
-          'version' => '1.0.1.0',
-          'reference' => '2dfb5f6c5eff0e91e20e913f8c5452ed95b86621',
+          'pretty_version' => '1.0.3',
+          'version' => '1.0.3.0',
+          'reference' => 'bb5906edc1c324c9a05aa0873d40117941e5fa90',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../psr/http-client',
           'aliases' => 
@@ -1479,9 +1343,9 @@ return [
         ),
         'psr/http-factory' => 
         array (
-          'pretty_version' => '1.0.0',
-          'version' => '1.0.0.0',
-          'reference' => '378bfe27931ecc54ff824a20d6f6bfc303bbd04c',
+          'pretty_version' => '1.1.0',
+          'version' => '1.1.0.0',
+          'reference' => '2b4765fddfe3b508ac62f829e852b1501d3f6e8a',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../psr/http-factory',
           'aliases' => 
@@ -1489,11 +1353,19 @@ return [
           ),
           'dev_requirement' => false,
         ),
+        'psr/http-factory-implementation' => 
+        array (
+          'dev_requirement' => false,
+          'provided' => 
+          array (
+            0 => '1.0',
+          ),
+        ),
         'psr/http-message' => 
         array (
-          'pretty_version' => '1.1',
-          'version' => '1.1.0.0',
-          'reference' => 'cb6ce4845ce34a8ad9e68117c10ee90a29919eba',
+          'pretty_version' => '2.0',
+          'version' => '2.0.0.0',
+          'reference' => '402d35bcb92c70c026d1a6a9883f06b2ead23d71',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../psr/http-message',
           'aliases' => 
@@ -1511,9 +1383,9 @@ return [
         ),
         'psr/log' => 
         array (
-          'pretty_version' => '2.0.0',
-          'version' => '2.0.0.0',
-          'reference' => 'ef29f6d262798707a9edd554e2b82517ef3a9376',
+          'pretty_version' => '3.0.2',
+          'version' => '3.0.2.0',
+          'reference' => 'f16e1d5863e37f8d8c2a01719f5b34baa2b714d3',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../psr/log',
           'aliases' => 
@@ -1552,21 +1424,21 @@ return [
         ),
         'psy/psysh' => 
         array (
-          'pretty_version' => 'v0.12.0',
-          'version' => '0.12.0.0',
-          'reference' => '750bf031a48fd07c673dbe3f11f72362ea306d0d',
+          'pretty_version' => 'v0.12.20',
+          'version' => '0.12.20.0',
+          'reference' => '19678eb6b952a03b8a1d96ecee9edba518bb0373',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../psy/psysh',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'ralouphie/getallheaders' => 
         array (
-          'pretty_version' => '2.0.5',
-          'version' => '2.0.5.0',
-          'reference' => '5601c8a83fbba7ef674a7369456d12f1e0d0eafa',
+          'pretty_version' => '3.0.3',
+          'version' => '3.0.3.0',
+          'reference' => '120b605dfeb996808c31b6477290a714d356e822',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../ralouphie/getallheaders',
           'aliases' => 
@@ -1576,9 +1448,9 @@ return [
         ),
         'ramsey/collection' => 
         array (
-          'pretty_version' => '1.2.0',
-          'version' => '1.2.0.0',
-          'reference' => '4d85fbcd9d2fb1cfd6f81b2f00e687b1c6056b3a',
+          'pretty_version' => '2.1.1',
+          'version' => '2.1.1.0',
+          'reference' => '344572933ad0181accbf4ba763e85a0306a8c5e2',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../ramsey/collection',
           'aliases' => 
@@ -1588,23 +1460,11 @@ return [
         ),
         'ramsey/uuid' => 
         array (
-          'pretty_version' => '4.7.0',
-          'version' => '4.7.0.0',
-          'reference' => '5ed9ad582647bbc3864ef78db34bdc1afdcf9b49',
+          'pretty_version' => '4.9.2',
+          'version' => '4.9.2.0',
+          'reference' => '8429c78ca35a09f27565311b98101e2826affde0',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../ramsey/uuid',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'revolt/event-loop' => 
-        array (
-          'pretty_version' => 'v1.0.0',
-          'version' => '1.0.0.0',
-          'reference' => '81dd825a0a7fa7a39cae25ef731bb944f3e18295',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../revolt/event-loop',
           'aliases' => 
           array (
           ),
@@ -1615,7 +1475,7 @@ return [
           'dev_requirement' => false,
           'replaced' => 
           array (
-            0 => '4.7.0',
+            0 => '4.9.2',
           ),
         ),
         'sebastian/cli-parser' => 
@@ -1628,7 +1488,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/comparator' => 
         array (
@@ -1640,7 +1500,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/complexity' => 
         array (
@@ -1652,7 +1512,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/diff' => 
         array (
@@ -1664,7 +1524,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/environment' => 
         array (
@@ -1676,7 +1536,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/exporter' => 
         array (
@@ -1688,7 +1548,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/global-state' => 
         array (
@@ -1700,7 +1560,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/lines-of-code' => 
         array (
@@ -1712,7 +1572,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/object-enumerator' => 
         array (
@@ -1724,7 +1584,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/object-reflector' => 
         array (
@@ -1736,19 +1596,19 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/recursion-context' => 
         array (
-          'pretty_version' => '7.0.0',
-          'version' => '7.0.0.0',
-          'reference' => 'c405ae3a63e01b32eb71577f8ec1604e39858a7c',
+          'pretty_version' => '7.0.1',
+          'version' => '7.0.1.0',
+          'reference' => '0b01998a7d5b1f122911a66bebcb8d46f0c82d8c',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../sebastian/recursion-context',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/type' => 
         array (
@@ -1760,7 +1620,7 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'sebastian/version' => 
         array (
@@ -1772,13 +1632,13 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'spatie/laravel-data' => 
         array (
-          'pretty_version' => '3.12.0',
-          'version' => '3.12.0.0',
-          'reference' => 'd44e04839407bc32b029be59ba80090a5f720e91',
+          'pretty_version' => '4.19.1',
+          'version' => '4.19.1.0',
+          'reference' => '41ed0472250676f19440fb24d7b62a8d43abdb89',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../spatie/laravel-data',
           'aliases' => 
@@ -1788,9 +1648,9 @@ return [
         ),
         'spatie/laravel-package-tools' => 
         array (
-          'pretty_version' => '1.16.2',
-          'version' => '1.16.2.0',
-          'reference' => 'e62eeb1fe8a8a0b2e83227a6c279c8c59f7d3a15',
+          'pretty_version' => '1.93.0',
+          'version' => '1.93.0.0',
+          'reference' => '0d097bce95b2bf6802fb1d83e1e753b0f5a948e7',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../spatie/laravel-package-tools',
           'aliases' => 
@@ -1800,9 +1660,9 @@ return [
         ),
         'spatie/laravel-typescript-transformer' => 
         array (
-          'pretty_version' => '2.5.0',
-          'version' => '2.5.0.0',
-          'reference' => 'cdf82498b7e02f89f5a3c0eeed78ac0d633a212b',
+          'pretty_version' => '2.5.2',
+          'version' => '2.5.2.0',
+          'reference' => 'a268a08341f5a5d8f80a79493642a43275d219a5',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../spatie/laravel-typescript-transformer',
           'aliases' => 
@@ -1820,9 +1680,9 @@ return [
         ),
         'spatie/php-structure-discoverer' => 
         array (
-          'pretty_version' => '2.1.0',
-          'version' => '2.1.0.0',
-          'reference' => 'f5b3c935dda89d6c382b27e3caf348fa80bcfa88',
+          'pretty_version' => '2.3.3',
+          'version' => '2.3.3.0',
+          'reference' => '552a5b974a9853a32e5677a66e85ae615a96a90b',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../spatie/php-structure-discoverer',
           'aliases' => 
@@ -1832,9 +1692,9 @@ return [
         ),
         'spatie/typescript-transformer' => 
         array (
-          'pretty_version' => '2.4.0',
-          'version' => '2.4.0.0',
-          'reference' => '130c2447e0aa83f8d8d0ff590bc5bc402b17d641',
+          'pretty_version' => '2.5.0',
+          'version' => '2.5.0.0',
+          'reference' => 'dd7cbb90b6b8c34f2aee68701cf39c5432400c0d',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../spatie/typescript-transformer',
           'aliases' => 
@@ -1852,13 +1712,25 @@ return [
           'aliases' => 
           array (
           ),
+          'dev_requirement' => true,
+        ),
+        'symfony/clock' => 
+        array (
+          'pretty_version' => 'v8.0.0',
+          'version' => '8.0.0.0',
+          'reference' => '832119f9b8dbc6c8e6f65f30c5969eca1e88764f',
+          'type' => 'library',
+          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/clock',
+          'aliases' => 
+          array (
+          ),
           'dev_requirement' => false,
         ),
         'symfony/console' => 
         array (
-          'pretty_version' => 'v7.3.6',
-          'version' => '7.3.6.0',
-          'reference' => 'c28ad91448f86c5f6d9d2c70f0cf68bf135f252a',
+          'pretty_version' => 'v7.4.4',
+          'version' => '7.4.4.0',
+          'reference' => '41e38717ac1dd7a46b6bda7d6a82af2d98a78894',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/console',
           'aliases' => 
@@ -1868,9 +1740,9 @@ return [
         ),
         'symfony/css-selector' => 
         array (
-          'pretty_version' => 'v2.7.0',
-          'version' => '2.7.0.0',
-          'reference' => '0b5c07b516226b7dd32afbbc82fe547a469c5092',
+          'pretty_version' => 'v8.0.0',
+          'version' => '8.0.0.0',
+          'reference' => '6225bd458c53ecdee056214cb4a2ffaf58bd592b',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/css-selector',
           'aliases' => 
@@ -1880,9 +1752,9 @@ return [
         ),
         'symfony/deprecation-contracts' => 
         array (
-          'pretty_version' => 'v2.5.0',
-          'version' => '2.5.0.0',
-          'reference' => '6f981ee24cf69ee7ce9736146d1c57c2780598a8',
+          'pretty_version' => 'v3.6.0',
+          'version' => '3.6.0.0',
+          'reference' => '63afe740e99a13ba87ec199bb07bbdee937a5b62',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/deprecation-contracts',
           'aliases' => 
@@ -1892,9 +1764,9 @@ return [
         ),
         'symfony/error-handler' => 
         array (
-          'pretty_version' => 'v7.0.3',
-          'version' => '7.0.3.0',
-          'reference' => '9441608b79577176b6d8e44012cc3d20b4b45242',
+          'pretty_version' => 'v7.4.4',
+          'version' => '7.4.4.0',
+          'reference' => '8da531f364ddfee53e36092a7eebbbd0b775f6b8',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/error-handler',
           'aliases' => 
@@ -1904,9 +1776,9 @@ return [
         ),
         'symfony/event-dispatcher' => 
         array (
-          'pretty_version' => 'v6.4.0',
-          'version' => '6.4.0.0',
-          'reference' => 'd76d2632cfc2206eecb5ad2b26cd5934082941b6',
+          'pretty_version' => 'v8.0.4',
+          'version' => '8.0.4.0',
+          'reference' => '99301401da182b6cfaa4700dbe9987bb75474b47',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/event-dispatcher',
           'aliases' => 
@@ -1916,9 +1788,9 @@ return [
         ),
         'symfony/event-dispatcher-contracts' => 
         array (
-          'pretty_version' => 'v2.5.0',
-          'version' => '2.5.0.0',
-          'reference' => '66bea3b09be61613cd3b4043a65a8ec48cfa6d2a',
+          'pretty_version' => 'v3.6.0',
+          'version' => '3.6.0.0',
+          'reference' => '59eb412e93815df44f05f342958efa9f46b1e586',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/event-dispatcher-contracts',
           'aliases' => 
@@ -1936,9 +1808,9 @@ return [
         ),
         'symfony/finder' => 
         array (
-          'pretty_version' => 'v7.0.7',
-          'version' => '7.0.7.0',
-          'reference' => '4d58f0f4fe95a30d7b538d71197135483560b97c',
+          'pretty_version' => 'v7.4.5',
+          'version' => '7.4.5.0',
+          'reference' => 'ad4daa7c38668dcb031e63bc99ea9bd42196a2cb',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/finder',
           'aliases' => 
@@ -1948,9 +1820,9 @@ return [
         ),
         'symfony/http-foundation' => 
         array (
-          'pretty_version' => 'v7.3.7',
-          'version' => '7.3.7.0',
-          'reference' => 'db488a62f98f7a81d5746f05eea63a74e55bb7c4',
+          'pretty_version' => 'v7.4.5',
+          'version' => '7.4.5.0',
+          'reference' => '446d0db2b1f21575f1284b74533e425096abdfb6',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/http-foundation',
           'aliases' => 
@@ -1960,9 +1832,9 @@ return [
         ),
         'symfony/http-kernel' => 
         array (
-          'pretty_version' => 'v7.0.3',
-          'version' => '7.0.3.0',
-          'reference' => '6352029d6667e8ac5b54aae95afe10b2706b31ac',
+          'pretty_version' => 'v7.4.5',
+          'version' => '7.4.5.0',
+          'reference' => '229eda477017f92bd2ce7615d06222ec0c19e82a',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/http-kernel',
           'aliases' => 
@@ -1972,9 +1844,9 @@ return [
         ),
         'symfony/mailer' => 
         array (
-          'pretty_version' => 'v7.0.3',
-          'version' => '7.0.3.0',
-          'reference' => '2f71c0f6d62d28784783fdc5477e19dd57065d78',
+          'pretty_version' => 'v7.4.4',
+          'version' => '7.4.4.0',
+          'reference' => '7b750074c40c694ceb34cb926d6dffee231c5cd6',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/mailer',
           'aliases' => 
@@ -1984,9 +1856,9 @@ return [
         ),
         'symfony/mime' => 
         array (
-          'pretty_version' => 'v7.0.3',
-          'version' => '7.0.3.0',
-          'reference' => 'c1ffe24ba6fdc3e3f0f3fcb93519103b326a3716',
+          'pretty_version' => 'v7.4.5',
+          'version' => '7.4.5.0',
+          'reference' => 'b18c7e6e9eee1e19958138df10412f3c4c316148',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/mime',
           'aliases' => 
@@ -1996,9 +1868,9 @@ return [
         ),
         'symfony/polyfill-ctype' => 
         array (
-          'pretty_version' => 'v1.24.0',
-          'version' => '1.24.0.0',
-          'reference' => '30885182c981ab175d4d034db0f6f469898070ab',
+          'pretty_version' => 'v1.33.0',
+          'version' => '1.33.0.0',
+          'reference' => 'a3cc8b044a6ea513310cbd48ef7333b384945638',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/polyfill-ctype',
           'aliases' => 
@@ -2008,9 +1880,9 @@ return [
         ),
         'symfony/polyfill-intl-grapheme' => 
         array (
-          'pretty_version' => 'v1.0.0',
-          'version' => '1.0.0.0',
-          'reference' => '9332d285b58a16b144b3bf0bfd3b6334d9a43006',
+          'pretty_version' => 'v1.33.0',
+          'version' => '1.33.0.0',
+          'reference' => '380872130d3a5dd3ace2f4010d95125fde5d5c70',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/polyfill-intl-grapheme',
           'aliases' => 
@@ -2020,9 +1892,9 @@ return [
         ),
         'symfony/polyfill-intl-idn' => 
         array (
-          'pretty_version' => 'v1.15.0',
-          'version' => '1.15.0.0',
-          'reference' => '47bd6aa45beb1cd7c6a16b7d1810133b728bdfcf',
+          'pretty_version' => 'v1.33.0',
+          'version' => '1.33.0.0',
+          'reference' => '9614ac4d8061dc257ecc64cba1b140873dce8ad3',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/polyfill-intl-idn',
           'aliases' => 
@@ -2032,9 +1904,9 @@ return [
         ),
         'symfony/polyfill-intl-normalizer' => 
         array (
-          'pretty_version' => 'v1.0.0',
-          'version' => '1.0.0.0',
-          'reference' => 'b0235b9e98e224821e23018a9487764ad6dec859',
+          'pretty_version' => 'v1.33.0',
+          'version' => '1.33.0.0',
+          'reference' => '3833d7255cc303546435cb650316bff708a1c75c',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/polyfill-intl-normalizer',
           'aliases' => 
@@ -2044,9 +1916,9 @@ return [
         ),
         'symfony/polyfill-mbstring' => 
         array (
-          'pretty_version' => 'v1.24.0',
-          'version' => '1.24.0.0',
-          'reference' => '0abb51d2f102e00a4eefcf46ba7fec406d245825',
+          'pretty_version' => 'v1.33.0',
+          'version' => '1.33.0.0',
+          'reference' => '6d857f4d76bd4b343eac26d6b539585d2bc56493',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/polyfill-mbstring',
           'aliases' => 
@@ -2054,37 +1926,13 @@ return [
           ),
           'dev_requirement' => false,
         ),
-        'symfony/polyfill-php72' => 
-        array (
-          'pretty_version' => 'v1.10.0',
-          'version' => '1.10.0.0',
-          'reference' => '9050816e2ca34a8e916c3a0ae8b9c2fccf68b631',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/polyfill-php72',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
         'symfony/polyfill-php80' => 
         array (
-          'pretty_version' => 'v1.24.0',
-          'version' => '1.24.0.0',
-          'reference' => '57b712b08eddb97c762a8caa32c84e037892d2e9',
+          'pretty_version' => 'v1.33.0',
+          'version' => '1.33.0.0',
+          'reference' => '0cc9dd0f17f61d8131e7df6b84bd344899fe2608',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/polyfill-php80',
-          'aliases' => 
-          array (
-          ),
-          'dev_requirement' => false,
-        ),
-        'symfony/polyfill-php81' => 
-        array (
-          'pretty_version' => 'v1.23.0',
-          'version' => '1.23.0.0',
-          'reference' => 'e66119f3de95efc359483f810c4c3e6436279436',
-          'type' => 'library',
-          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/polyfill-php81',
           'aliases' => 
           array (
           ),
@@ -2104,9 +1952,9 @@ return [
         ),
         'symfony/polyfill-php84' => 
         array (
-          'pretty_version' => 'v1.31.0',
-          'version' => '1.31.0.0',
-          'reference' => 'e5493eb51311ab0b1cc2243416613f06ed8f18bd',
+          'pretty_version' => 'v1.33.0',
+          'version' => '1.33.0.0',
+          'reference' => 'd8ced4d875142b6a7426000426b8abc631d6b191',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/polyfill-php84',
           'aliases' => 
@@ -2114,11 +1962,23 @@ return [
           ),
           'dev_requirement' => false,
         ),
+        'symfony/polyfill-php85' => 
+        array (
+          'pretty_version' => 'v1.33.0',
+          'version' => '1.33.0.0',
+          'reference' => 'd4e5fcd4ab3d998ab16c0db48e6cbb9a01993f91',
+          'type' => 'library',
+          'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/polyfill-php85',
+          'aliases' => 
+          array (
+          ),
+          'dev_requirement' => false,
+        ),
         'symfony/polyfill-uuid' => 
         array (
-          'pretty_version' => 'v1.15.0',
-          'version' => '1.15.0.0',
-          'reference' => '2318f7f470a892867f3de602e403d006b1b9c9aa',
+          'pretty_version' => 'v1.33.0',
+          'version' => '1.33.0.0',
+          'reference' => '21533be36c24be3f4b1669c4725c7d1d2bab4ae2',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/polyfill-uuid',
           'aliases' => 
@@ -2140,9 +2000,9 @@ return [
         ),
         'symfony/routing' => 
         array (
-          'pretty_version' => 'v7.0.3',
-          'version' => '7.0.3.0',
-          'reference' => '858b26756ffc35a11238b269b484ee3a393a74d3',
+          'pretty_version' => 'v7.4.4',
+          'version' => '7.4.4.0',
+          'reference' => '0798827fe2c79caeed41d70b680c2c3507d10147',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/routing',
           'aliases' => 
@@ -2152,9 +2012,9 @@ return [
         ),
         'symfony/service-contracts' => 
         array (
-          'pretty_version' => 'v2.5.0',
-          'version' => '2.5.0.0',
-          'reference' => '1ab11b933cd6bc5464b08e81e2c5b07dec58b0fc',
+          'pretty_version' => 'v3.6.1',
+          'version' => '3.6.1.0',
+          'reference' => '45112560a3ba2d715666a509a0bc9521d10b6c43',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/service-contracts',
           'aliases' => 
@@ -2164,9 +2024,9 @@ return [
         ),
         'symfony/string' => 
         array (
-          'pretty_version' => 'v7.2.0',
-          'version' => '7.2.0.0',
-          'reference' => '446e0d146f991dde3e73f45f2c97a9faad773c82',
+          'pretty_version' => 'v8.0.4',
+          'version' => '8.0.4.0',
+          'reference' => '758b372d6882506821ed666032e43020c4f57194',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/string',
           'aliases' => 
@@ -2176,9 +2036,9 @@ return [
         ),
         'symfony/translation' => 
         array (
-          'pretty_version' => 'v6.4.0',
-          'version' => '6.4.0.0',
-          'reference' => 'b1035dbc2a344b21f8fa8ac451c7ecec4ea45f37',
+          'pretty_version' => 'v8.0.4',
+          'version' => '8.0.4.0',
+          'reference' => 'db70c8ce7db74fd2da7b1d268db46b2a8ce32c10',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/translation',
           'aliases' => 
@@ -2188,9 +2048,9 @@ return [
         ),
         'symfony/translation-contracts' => 
         array (
-          'pretty_version' => 'v2.5.0',
-          'version' => '2.5.0.0',
-          'reference' => 'd28150f0f44ce854e942b671fc2620a98aae1b1e',
+          'pretty_version' => 'v3.6.1',
+          'version' => '3.6.1.0',
+          'reference' => '65a8bc82080447fae78373aa10f8d13b38338977',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/translation-contracts',
           'aliases' => 
@@ -2208,9 +2068,9 @@ return [
         ),
         'symfony/uid' => 
         array (
-          'pretty_version' => 'v7.0.3',
-          'version' => '7.0.3.0',
-          'reference' => '87cedaf3fabd7b733859d4d77aa4ca598259054b',
+          'pretty_version' => 'v7.4.4',
+          'version' => '7.4.4.0',
+          'reference' => '7719ce8aba76be93dfe249192f1fbfa52c588e36',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/uid',
           'aliases' => 
@@ -2220,9 +2080,9 @@ return [
         ),
         'symfony/var-dumper' => 
         array (
-          'pretty_version' => 'v7.0.3',
-          'version' => '7.0.3.0',
-          'reference' => 'a7a061abbf6fe3d4a79032cbc5149a4d65a10234',
+          'pretty_version' => 'v7.4.4',
+          'version' => '7.4.4.0',
+          'reference' => '0e4769b46a0c3c62390d124635ce59f66874b282',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/var-dumper',
           'aliases' => 
@@ -2232,21 +2092,21 @@ return [
         ),
         'symfony/yaml' => 
         array (
-          'pretty_version' => 'v7.0.3',
-          'version' => '7.0.3.0',
-          'reference' => '2d4fca631c00700597e9442a0b2451ce234513d3',
+          'pretty_version' => 'v7.4.1',
+          'version' => '7.4.1.0',
+          'reference' => '24dd4de28d2e3988b311751ac49e684d783e2345',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../symfony/yaml',
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'ta-tikoma/phpunit-architecture-test' => 
         array (
-          'pretty_version' => '0.8.5',
-          'version' => '0.8.5.0',
-          'reference' => 'cf6fb197b676ba716837c886baca842e4db29005',
+          'pretty_version' => '0.8.7',
+          'version' => '0.8.7.0',
+          'reference' => '1248f3f506ca9641d4f68cebcd538fa489754db8',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../ta-tikoma/phpunit-architecture-test',
           'aliases' => 
@@ -2264,13 +2124,13 @@ return [
           'aliases' => 
           array (
           ),
-          'dev_requirement' => false,
+          'dev_requirement' => true,
         ),
         'tijsverkoyen/css-to-inline-styles' => 
         array (
-          'pretty_version' => '2.2.5',
-          'version' => '2.2.5.0',
-          'reference' => '4348a3a06651827a27d989ad1d13efec6bb49b19',
+          'pretty_version' => 'v2.4.0',
+          'version' => '2.4.0.0',
+          'reference' => 'f0292ccf0ec75843d65027214426b6b163b48b41',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../tijsverkoyen/css-to-inline-styles',
           'aliases' => 
@@ -2280,9 +2140,9 @@ return [
         ),
         'vlucas/phpdotenv' => 
         array (
-          'pretty_version' => 'v5.6.1',
-          'version' => '5.6.1.0',
-          'reference' => 'a59a13791077fe3d44f90e7133eb68e7d22eaff2',
+          'pretty_version' => 'v5.6.3',
+          'version' => '5.6.3.0',
+          'reference' => '955e7815d677a3eaa7075231212f2110983adecc',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../vlucas/phpdotenv',
           'aliases' => 
@@ -2292,9 +2152,9 @@ return [
         ),
         'voku/portable-ascii' => 
         array (
-          'pretty_version' => '2.0.2',
-          'version' => '2.0.2.0',
-          'reference' => '16c17671a804bb92602822113dd91fbc8a35d2af',
+          'pretty_version' => '2.0.3',
+          'version' => '2.0.3.0',
+          'reference' => 'b1d923f88091c6bf09699efcd7c8a1b1bfd7351d',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../voku/portable-ascii',
           'aliases' => 
@@ -2304,9 +2164,9 @@ return [
         ),
         'webmozart/assert' => 
         array (
-          'pretty_version' => '1.11.0',
-          'version' => '1.11.0.0',
-          'reference' => '11cb2199493b2f8a3b53e7f19068fc6aac760991',
+          'pretty_version' => '1.12.1',
+          'version' => '1.12.1.0',
+          'reference' => '9be6926d8b485f55b9229203f962b51ed377ba68',
           'type' => 'library',
           'install_path' => '/home/nckrtl/projects/laravel-toolbar/vendor/composer/../webmozart/assert',
           'aliases' => 
@@ -2319,11 +2179,11 @@ return [
   ),
   'executedFilesHashes' => 
   array (
-    '/home/nckrtl/projects/laravel-toolbar/vendor/larastan/larastan/bootstrap.php' => '28392079817075879815f110287690e80398fe5e',
-    'phar:///home/nckrtl/projects/laravel-toolbar/vendor/phpstan/phpstan/phpstan.phar/stubs/runtime/Attribute.php' => 'eaf9127f074e9c7ebc65043ec4050f9fed60c2bb',
-    'phar:///home/nckrtl/projects/laravel-toolbar/vendor/phpstan/phpstan/phpstan.phar/stubs/runtime/ReflectionAttribute.php' => '0b4b78277eb6545955d2ce5e09bff28f1f8052c8',
-    'phar:///home/nckrtl/projects/laravel-toolbar/vendor/phpstan/phpstan/phpstan.phar/stubs/runtime/ReflectionIntersectionType.php' => 'a3e6299b87ee5d407dae7651758edfa11a74cb11',
-    'phar:///home/nckrtl/projects/laravel-toolbar/vendor/phpstan/phpstan/phpstan.phar/stubs/runtime/ReflectionUnionType.php' => '1b349aa997a834faeafe05fa21bc31cae22bf2e2',
+    '/home/nckrtl/projects/laravel-toolbar/vendor/larastan/larastan/bootstrap.php' => '5a3eacbf63b3e41659adfee92facededf8e020a932800f93c9a8b0e67f235805',
+    'phar:///home/nckrtl/projects/laravel-toolbar/vendor/phpstan/phpstan/phpstan.phar/stubs/runtime/Attribute85.php' => 'cb8b31e82c61ce197871c9e8a6f122256751f2ab606dd2be90846d4fa5f8933e',
+    'phar:///home/nckrtl/projects/laravel-toolbar/vendor/phpstan/phpstan/phpstan.phar/stubs/runtime/ReflectionAttribute.php' => 'c0068e383717870a304781d462f7e2afe1c6f24e9133851852a2aca96b4fa26f',
+    'phar:///home/nckrtl/projects/laravel-toolbar/vendor/phpstan/phpstan/phpstan.phar/stubs/runtime/ReflectionIntersectionType.php' => '65fe0a8bc6fe285d8ddc8798ab5b9299920af70db5ad74596bc08df823e7c5d9',
+    'phar:///home/nckrtl/projects/laravel-toolbar/vendor/phpstan/phpstan/phpstan.phar/stubs/runtime/ReflectionUnionType.php' => '1e2fe940e4ba4e00d9ee6adb2af3ee1bf333e6f8afe61c61deb038886d293427',
   ),
   'phpExtensions' => 
   array (
@@ -2354,35 +2214,33 @@ return [
     24 => 'json',
     25 => 'libxml',
     26 => 'mbstring',
-    27 => 'mysqli',
-    28 => 'mysqlnd',
-    29 => 'openssl',
-    30 => 'pcntl',
-    31 => 'pcre',
-    32 => 'pdo_mysql',
-    33 => 'pdo_pgsql',
-    34 => 'pdo_sqlite',
-    35 => 'pgsql',
-    36 => 'posix',
-    37 => 'random',
-    38 => 'readline',
-    39 => 'redis',
-    40 => 'session',
-    41 => 'shmop',
-    42 => 'sockets',
-    43 => 'sodium',
-    44 => 'sqlite3',
-    45 => 'standard',
-    46 => 'sysvmsg',
-    47 => 'sysvsem',
-    48 => 'sysvshm',
-    49 => 'tokenizer',
-    50 => 'xml',
-    51 => 'xmlreader',
-    52 => 'xmlwriter',
-    53 => 'xsl',
-    54 => 'zip',
-    55 => 'zlib',
+    27 => 'openssl',
+    28 => 'pcntl',
+    29 => 'pcov',
+    30 => 'pcre',
+    31 => 'pdo_pgsql',
+    32 => 'pdo_sqlite',
+    33 => 'pgsql',
+    34 => 'posix',
+    35 => 'random',
+    36 => 'readline',
+    37 => 'redis',
+    38 => 'session',
+    39 => 'shmop',
+    40 => 'sockets',
+    41 => 'sodium',
+    42 => 'sqlite3',
+    43 => 'standard',
+    44 => 'sysvmsg',
+    45 => 'sysvsem',
+    46 => 'sysvshm',
+    47 => 'tokenizer',
+    48 => 'xml',
+    49 => 'xmlreader',
+    50 => 'xmlwriter',
+    51 => 'xsl',
+    52 => 'zip',
+    53 => 'zlib',
   ),
   'stubFiles' => 
   array (
@@ -2398,71 +2256,55 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to static property $entriesQueue on an unknown class Laravel\\Telescope\\Telescope.',
        'file' => '/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php',
-       'line' => 89,
+       'line' => 95,
        'canBeIgnored' => true,
        'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more at https://phpstan.org/user-guide/discovering-symbols',
-       'nodeLine' => 89,
+       'nodeLine' => 95,
        'nodeType' => 'PhpParser\\Node\\Expr\\StaticPropertyFetch',
        'identifier' => 'class.notFound',
        'metadata' => 
       array (
       ),
+       'fixedErrorDiff' => NULL,
     )),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php' => 
   array (
     0 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Class Laravel\\Horizon\\Contracts\\MasterSupervisorRepository not found.',
+       'message' => 'Call to method all() on an unknown class Laravel\\Horizon\\Contracts\\MasterSupervisorRepository.',
        'file' => '/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php',
-       'line' => 105,
+       'line' => 94,
        'canBeIgnored' => true,
        'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more at https://phpstan.org/user-guide/discovering-symbols',
-       'nodeLine' => 105,
+       'nodeLine' => 94,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'class.notFound',
+       'metadata' => 
+      array (
+      ),
+       'fixedErrorDiff' => NULL,
+    )),
+    1 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Class Laravel\\Horizon\\Contracts\\MasterSupervisorRepository not found.',
+       'file' => '/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php',
+       'line' => 94,
+       'canBeIgnored' => true,
+       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more at https://phpstan.org/user-guide/discovering-symbols',
+       'nodeLine' => 94,
        'nodeType' => 'PhpParser\\Node\\Expr\\ClassConstFetch',
        'identifier' => 'class.notFound',
        'metadata' => 
       array (
       ),
-    )),
-  ),
-  '/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php' => 
-  array (
-    0 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Called \'env\' outside of the config directory which returns null when the config is cached, use \'config\'.',
-       'file' => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php',
-       'line' => 26,
-       'canBeIgnored' => true,
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 26,
-       'nodeType' => 'PhpParser\\Node\\Expr\\FuncCall',
-       'identifier' => 'larastan.noEnvCallsOutsideOfConfig',
-       'metadata' => 
-      array (
-      ),
-    )),
-    1 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Called \'env\' outside of the config directory which returns null when the config is cached, use \'config\'.',
-       'file' => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php',
-       'line' => 32,
-       'canBeIgnored' => true,
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 32,
-       'nodeType' => 'PhpParser\\Node\\Expr\\FuncCall',
-       'identifier' => 'larastan.noEnvCallsOutsideOfConfig',
-       'metadata' => 
-      array (
-      ),
+       'fixedErrorDiff' => NULL,
     )),
   ),
 ); },
@@ -2475,1130 +2317,761 @@ return [
 	'collectedDataCallback' => static function (): array { return array (
   '/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\PossiblyPureStaticCallCollector' => 
+    array (
+      0 => 
       array (
-        0 => 'Illuminate\\Support\\Facades\\Cache',
+        0 => 'Illuminate\\Cache\\Repository',
         1 => 'put',
-        2 => 82,
+        2 => 88,
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\PossiblyPureStaticCallCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/InertiaCollector.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\InertiaCollector',
         1 => 'key',
         2 => 'NckRtl\\Toolbar\\Collectors\\InertiaCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/InertiaCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\InertiaCollector',
         1 => 'configClass',
         2 => 'NckRtl\\Toolbar\\Collectors\\InertiaCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/InertiaCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/LaravelCollector.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
+      array (
+        0 => 'NckRtl\\Toolbar\\Collectors\\LaravelCollector',
+        1 => 'key',
+        2 => 'NckRtl\\Toolbar\\Collectors\\LaravelCollector',
+      ),
+      1 => 
+      array (
+        0 => 'NckRtl\\Toolbar\\Collectors\\LaravelCollector',
+        1 => 'configClass',
+        2 => 'NckRtl\\Toolbar\\Collectors\\LaravelCollector',
+      ),
+    ),
+    'PHPStan\\Rules\\Traits\\TraitUseCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Traits\\ResolvesConfigSource',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/LaravelCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitUseCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'Illuminate\\Foundation\\Concerns\\ResolvesDumpSource',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/LaravelCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitUseCollector',
-    )),
-    2 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      2 => 
       array (
         0 => 'Illuminate\\Foundation\\Concerns\\ResolvesDumpSource',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/LaravelCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitUseCollector',
-    )),
-    3 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Collectors\\LaravelCollector',
-        1 => 'key',
-        2 => 'NckRtl\\Toolbar\\Collectors\\LaravelCollector',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/LaravelCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    4 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Collectors\\LaravelCollector',
-        1 => 'configClass',
-        2 => 'NckRtl\\Toolbar\\Collectors\\LaravelCollector',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/LaravelCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\ModelsCollector',
         1 => 'key',
         2 => 'NckRtl\\Toolbar\\Collectors\\ModelsCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\ModelsCollector',
         1 => 'configClass',
         2 => 'NckRtl\\Toolbar\\Collectors\\ModelsCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/PhpCollector.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\PhpCollector',
         1 => 'key',
         2 => 'NckRtl\\Toolbar\\Collectors\\PhpCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/PhpCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\PhpCollector',
         1 => 'configClass',
         2 => 'NckRtl\\Toolbar\\Collectors\\PhpCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/PhpCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\ProfilerCollector',
         1 => 'key',
         2 => 'NckRtl\\Toolbar\\Collectors\\ProfilerCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\ProfilerCollector',
         1 => 'configClass',
         2 => 'NckRtl\\Toolbar\\Collectors\\ProfilerCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    2 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Collectors\\ProfilerCollector',
-        1 => 'findStageForSubstage',
-        2 => 'NckRtl\\Toolbar\\Collectors\\ProfilerCollector',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\QueriesCollector',
         1 => 'key',
         2 => 'NckRtl\\Toolbar\\Collectors\\QueriesCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\QueriesCollector',
         1 => 'configClass',
         2 => 'NckRtl\\Toolbar\\Collectors\\QueriesCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/RequestCollector.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\RequestCollector',
         1 => 'key',
         2 => 'NckRtl\\Toolbar\\Collectors\\RequestCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/RequestCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\RequestCollector',
         1 => 'configClass',
         2 => 'NckRtl\\Toolbar\\Collectors\\RequestCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/RequestCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ResponseCollector.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\ResponseCollector',
         1 => 'key',
         2 => 'NckRtl\\Toolbar\\Collectors\\ResponseCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ResponseCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\ResponseCollector',
         1 => 'configClass',
         2 => 'NckRtl\\Toolbar\\Collectors\\ResponseCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ResponseCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/TailwindCollector.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\TailwindCollector',
         1 => 'key',
         2 => 'NckRtl\\Toolbar\\Collectors\\TailwindCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/TailwindCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\TailwindCollector',
         1 => 'configClass',
         2 => 'NckRtl\\Toolbar\\Collectors\\TailwindCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/TailwindCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/VueCollector.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'Illuminate\\Foundation\\Concerns\\ResolvesDumpSource',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/VueCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitUseCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\VueCollector',
         1 => 'key',
         2 => 'NckRtl\\Toolbar\\Collectors\\VueCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/VueCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    2 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'NckRtl\\Toolbar\\Collectors\\VueCollector',
         1 => 'configClass',
         2 => 'NckRtl\\Toolbar\\Collectors\\VueCollector',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/VueCollector.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
+    'PHPStan\\Rules\\Traits\\TraitUseCollector' => 
+    array (
+      0 => 
+      array (
+        0 => 'Illuminate\\Foundation\\Concerns\\ResolvesDumpSource',
+      ),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\PossiblyPureStaticCallCollector' => 
+    array (
+      0 => 
       array (
         0 => 'Illuminate\\Support\\ServiceProvider',
         1 => 'addProviderToBootstrapFile',
         2 => 57,
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\PossiblyPureStaticCallCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Controllers/AssetController.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\PossiblyPureFuncCallCollector' => 
+    array (
+      0 => 
       array (
         0 => 'abort',
         1 => 18,
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Controllers/AssetController.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\PossiblyPureFuncCallCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\PossiblyPureFuncCallCollector' => 
+    array (
+      0 => 
       array (
         0 => 'shell_exec',
-        1 => 89,
+        1 => 78,
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\PossiblyPureFuncCallCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/BootProfileData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\BootProfileData',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/BootProfileData.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\BootProfileData',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/InertiaConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Configurations\\InertiaConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/InertiaConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Data\\Configurations\\InertiaConfig',
-        1 => 'isEnabled',
-        2 => 'NckRtl\\Toolbar\\Data\\Configurations\\InertiaConfig',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/InertiaConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Configurations\\InertiaConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/LaravelConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Configurations\\LaravelConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/LaravelConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Data\\Configurations\\LaravelConfig',
-        1 => 'isEnabled',
-        2 => 'NckRtl\\Toolbar\\Data\\Configurations\\LaravelConfig',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/LaravelConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Configurations\\LaravelConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/MiddlewareConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Configurations\\MiddlewareConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/MiddlewareConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Data\\Configurations\\MiddlewareConfig',
-        1 => 'isEnabled',
-        2 => 'NckRtl\\Toolbar\\Data\\Configurations\\MiddlewareConfig',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/MiddlewareConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Configurations\\MiddlewareConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ModelsConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Configurations\\ModelsConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ModelsConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Data\\Configurations\\ModelsConfig',
-        1 => 'isEnabled',
-        2 => 'NckRtl\\Toolbar\\Data\\Configurations\\ModelsConfig',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ModelsConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Configurations\\ModelsConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/PhpConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Configurations\\PhpConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/PhpConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Data\\Configurations\\PhpConfig',
-        1 => 'isEnabled',
-        2 => 'NckRtl\\Toolbar\\Data\\Configurations\\PhpConfig',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/PhpConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Configurations\\PhpConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ProfilerConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Configurations\\ProfilerConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ProfilerConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Data\\Configurations\\ProfilerConfig',
-        1 => 'isEnabled',
-        2 => 'NckRtl\\Toolbar\\Data\\Configurations\\ProfilerConfig',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ProfilerConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Configurations\\ProfilerConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/QueriesConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Configurations\\QueriesConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/QueriesConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Data\\Configurations\\QueriesConfig',
-        1 => 'isEnabled',
-        2 => 'NckRtl\\Toolbar\\Data\\Configurations\\QueriesConfig',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/QueriesConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Configurations\\QueriesConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/RequestConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Configurations\\RequestConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/RequestConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Data\\Configurations\\RequestConfig',
-        1 => 'isEnabled',
-        2 => 'NckRtl\\Toolbar\\Data\\Configurations\\RequestConfig',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/RequestConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Configurations\\RequestConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ResponseConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Configurations\\ResponseConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ResponseConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Data\\Configurations\\ResponseConfig',
-        1 => 'isEnabled',
-        2 => 'NckRtl\\Toolbar\\Data\\Configurations\\ResponseConfig',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ResponseConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Configurations\\ResponseConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/TailwindConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Configurations\\TailwindConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/TailwindConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Data\\Configurations\\TailwindConfig',
-        1 => 'isEnabled',
-        2 => 'NckRtl\\Toolbar\\Data\\Configurations\\TailwindConfig',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/TailwindConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Configurations\\TailwindConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/VueConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Configurations\\VueConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/VueConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Data\\Configurations\\VueConfig',
-        1 => 'isEnabled',
-        2 => 'NckRtl\\Toolbar\\Data\\Configurations\\VueConfig',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/VueConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Configurations\\VueConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/InertiaData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\InertiaData',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/InertiaData.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\InertiaData',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/LaravelData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\LaravelData',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/LaravelData.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-  ),
-  '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/GroupConfig.php' => 
-  array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Layout\\GroupConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/GroupConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\LaravelData',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/LayoutConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Layout\\LayoutConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/LayoutConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Layout\\LayoutConfig',
+    ),
+    'PHPStan\\Rules\\DeadCode\\PossiblyPureFuncCallCollector' => 
+    array (
+      0 => 
       array (
         0 => 'usort',
-        1 => 42,
+        1 => 41,
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/LayoutConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\PossiblyPureFuncCallCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/ToolConfig.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Layout\\ToolConfig',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/ToolConfig.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Layout\\ToolConfig',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/ModelData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\ModelData',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/ModelData.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\ModelData',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/PhpData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\PhpData',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/PhpData.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\PhpData',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/ProfilerData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\ProfilerData',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/ProfilerData.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\ProfilerData',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/QueriesData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\QueriesData',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/QueriesData.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\QueriesData',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/QueryData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\Traits\\TraitUseCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Traits\\ControllerActionEditorUrl',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/QueryData.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitUseCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'Illuminate\\Foundation\\Concerns\\ResolvesDumpSource',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/QueryData.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitUseCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/RequestData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\Traits\\TraitUseCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Traits\\ControllerActionEditorUrl',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/RequestData.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitUseCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+      1 => 
       array (
         0 => 'Illuminate\\Foundation\\Concerns\\ResolvesDumpSource',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/RequestData.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitUseCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/ResponseData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\ResponseData',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/ResponseData.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\ResponseData',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/TailwindData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\TailwindData',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/TailwindData.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\TailwindData',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/TimingData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\TimingData',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/TimingData.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\TimingData',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/BreakpointIndicatorTool.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Tools\\BreakpointIndicatorTool',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/BreakpointIndicatorTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Tools\\BreakpointIndicatorTool',
+    ),
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Data\\Tools\\BreakpointIndicatorTool',
         1 => 'component',
         2 => 'NckRtl\\Toolbar\\Data\\Tools\\BreakpointIndicatorTool',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/BreakpointIndicatorTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/DatabaseTool.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Tools\\DatabaseTool',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/DatabaseTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Tools\\DatabaseTool',
+    ),
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Data\\Tools\\DatabaseTool',
         1 => 'component',
         2 => 'NckRtl\\Toolbar\\Data\\Tools\\DatabaseTool',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/DatabaseTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/LaravelTool.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Tools\\LaravelTool',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/LaravelTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Tools\\LaravelTool',
+    ),
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Data\\Tools\\LaravelTool',
         1 => 'component',
         2 => 'NckRtl\\Toolbar\\Data\\Tools\\LaravelTool',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/LaravelTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/MemoryUsageTool.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Tools\\MemoryUsageTool',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/MemoryUsageTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Tools\\MemoryUsageTool',
+    ),
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Data\\Tools\\MemoryUsageTool',
         1 => 'component',
         2 => 'NckRtl\\Toolbar\\Data\\Tools\\MemoryUsageTool',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/MemoryUsageTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/ModelsTool.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Tools\\ModelsTool',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/ModelsTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Tools\\ModelsTool',
+    ),
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Data\\Tools\\ModelsTool',
         1 => 'component',
         2 => 'NckRtl\\Toolbar\\Data\\Tools\\ModelsTool',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/ModelsTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/RequestTool.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Tools\\RequestTool',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/RequestTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Tools\\RequestTool',
+    ),
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Data\\Tools\\RequestTool',
         1 => 'component',
         2 => 'NckRtl\\Toolbar\\Data\\Tools\\RequestTool',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/RequestTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/TechStackTool.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Tools\\TechStackTool',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/TechStackTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Tools\\TechStackTool',
+    ),
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Data\\Tools\\TechStackTool',
         1 => 'component',
         2 => 'NckRtl\\Toolbar\\Data\\Tools\\TechStackTool',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/TechStackTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/TimingsTool.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Tools\\TimingsTool',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/TimingsTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Tools\\TimingsTool',
+    ),
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Data\\Tools\\TimingsTool',
         1 => 'component',
         2 => 'NckRtl\\Toolbar\\Data\\Tools\\TimingsTool',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/TimingsTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/VueDevtoolsTool.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Data\\Tools\\VueDevtoolsTool',
         1 => 'component',
         2 => 'NckRtl\\Toolbar\\Data\\Tools\\VueDevtoolsTool',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/VueDevtoolsTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/VueInspectorTool.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Data\\Tools\\VueInspectorTool',
         1 => 'component',
         2 => 'NckRtl\\Toolbar\\Data\\Tools\\VueInspectorTool',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/VueInspectorTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/VueTool.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\Tools\\VueTool',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/VueTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\Tools\\VueTool',
+    ),
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Data\\Tools\\VueTool',
         1 => 'component',
         2 => 'NckRtl\\Toolbar\\Data\\Tools\\VueTool',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/VueTool.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/VueData.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Data\\VueData',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Data/VueData.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Data\\VueData',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Enums/DataSizeUnit.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Enums\\DataSizeUnit',
         1 => 'abbreviations',
         2 => 'NckRtl\\Toolbar\\Enums\\DataSizeUnit',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Enums/DataSizeUnit.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Enums/TimeUnit.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Enums\\TimeUnit',
         1 => 'abbreviations',
         2 => 'NckRtl\\Toolbar\\Enums\\TimeUnit',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Enums/TimeUnit.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Events/ProfilerEvent.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector' => 
+    array (
+      0 => 'NckRtl\\Toolbar\\Events\\ProfilerEvent',
+    ),
+    'PHPStan\\Rules\\Traits\\TraitUseCollector' => 
+    array (
+      0 => 
       array (
         0 => 'Illuminate\\Foundation\\Events\\Dispatchable',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Events/ProfilerEvent.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitUseCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 'NckRtl\\Toolbar\\Events\\ProfilerEvent',
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Events/ProfilerEvent.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\ConstructorWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Facades/Toolbar.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Facades\\Toolbar',
         1 => 'getFacadeAccessor',
         2 => 'NckRtl\\Toolbar\\Facades\\Toolbar',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Facades/Toolbar.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Observers/FetchesStackTrace.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\Traits\\TraitDeclarationCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Observers\\FetchesStackTrace',
         1 => 7,
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Observers/FetchesStackTrace.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitDeclarationCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Observers\\FetchesStackTrace',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitUseCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Observers\\QueryObserver',
         1 => 'ignoredVendorPath',
         2 => 'NckRtl\\Toolbar\\Observers\\QueryObserver',
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    2 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    ),
+    'PHPStan\\Rules\\DeadCode\\PossiblyPureFuncCallCollector' => 
+    array (
+      0 => 
       array (
         0 => 'throw_if',
-        1 => 179,
+        1 => 188,
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\PossiblyPureFuncCallCollector',
-    )),
+    ),
+    'PHPStan\\Rules\\Traits\\TraitUseCollector' => 
+    array (
+      0 => 
+      array (
+        0 => 'NckRtl\\Toolbar\\Observers\\FetchesStackTrace',
+      ),
+    ),
   ),
-  '/home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService/Profiler.php' => 
+  '/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\DeadCode\\PossiblyPureMethodCallCollector' => 
+    array (
+      0 => 
       array (
-        0 => 'NckRtl\\Toolbar\\Services\\ProfilerService\\Profiler',
-        1 => 'getProfileMarkers',
-        2 => 'NckRtl\\Toolbar\\Services\\ProfilerService\\Profiler',
+        0 => 
+        array (
+          0 => 'NckRtl\\Toolbar\\CollectorManager',
+        ),
+        1 => 'collectData',
+        2 => 42,
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService/Profiler.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
-    1 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
-      array (
-        0 => 'NckRtl\\Toolbar\\Services\\ProfilerService\\Profiler',
-        1 => 'getCurrentMemoryUsage',
-        2 => 'NckRtl\\Toolbar\\Services\\ProfilerService\\Profiler',
-      ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService/Profiler.php',
-       'collectorType' => 'PHPStan\\Rules\\DeadCode\\MethodWithoutImpurePointsCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Traits/ControllerActionEditorUrl.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\Traits\\TraitDeclarationCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Traits\\ControllerActionEditorUrl',
         1 => 9,
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Traits/ControllerActionEditorUrl.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitDeclarationCollector',
-    )),
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Traits/ResolvesConfigSource.php' => 
   array (
-    0 => 
-    \PHPStan\Collectors\CollectedData::__set_state(array(
-       'data' => 
+    'PHPStan\\Rules\\Traits\\TraitDeclarationCollector' => 
+    array (
+      0 => 
       array (
         0 => 'NckRtl\\Toolbar\\Traits\\ResolvesConfigSource',
         1 => 7,
       ),
-       'filePath' => '/home/nckrtl/projects/laravel-toolbar/src/Traits/ResolvesConfigSource.php',
-       'collectorType' => 'PHPStan\\Rules\\Traits\\TraitDeclarationCollector',
-    )),
+    ),
   ),
 ); },
 	'dependencies' => array (
   '/home/nckrtl/projects/laravel-toolbar/database/factories/ModelFactory.php' => 
   array (
-    'fileHash' => '6e2ffb5b9a350b90655a6b805a94b0827c8270c1',
+    'fileHash' => 'd6ee51c2f105fedf73bf5bf5adc5584ad0c516bc4b83efe3521907832a24f494',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php' => 
   array (
-    'fileHash' => '3f06aa15026dcf8414ab55ba8f6aa99fe52f0dac',
+    'fileHash' => '0a844383677c3450d0635626f3ac4556e60d53eb0be7bf65f6c625efd91717b8',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/CollectorInterface.php',
@@ -3617,7 +3090,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/Collector.php' => 
   array (
-    'fileHash' => '7dcb54f2ec0622adbba76ac7504957d709d4e581',
+    'fileHash' => '7d2454c3044c5ddb1f8a4327488a99d1af3ecb2ab0ee828a4b61cf430a6b5d6c',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/InertiaCollector.php',
@@ -3635,7 +3108,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/CollectorInterface.php' => 
   array (
-    'fileHash' => '42680985a0aac4ae027a35d7af72291d49f39c35',
+    'fileHash' => 'e94182b79aa1bb23d7f4a6f0119cb77dd33b37712415ac972f264e01c51885b3',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/InertiaCollector.php',
@@ -3653,7 +3126,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/InertiaCollector.php' => 
   array (
-    'fileHash' => 'bbafad52bd3d24b0dd036f809681a7b39bc229a6',
+    'fileHash' => 'b5f4ffb19305676c62ac73418ca0f21c146445629b8f964aae50be538f409bac',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -3661,7 +3134,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/LaravelCollector.php' => 
   array (
-    'fileHash' => '34675fe51861ddadcb190cd4a702f9e007fb327b',
+    'fileHash' => '1f25ef06d8ccc234978a8195890adc1ce691b6697a010135afe5726ca881e9d7',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -3669,7 +3142,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php' => 
   array (
-    'fileHash' => 'e0e251bd1e21f3553234fa455b6695cb59a16258',
+    'fileHash' => '14cf904f2286def032b09abe2b2b89f5ab9f6b1373493299237044de46c636b6',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -3677,7 +3150,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/PhpCollector.php' => 
   array (
-    'fileHash' => '2c1b716bb68593121182b1d39d6dbe3f94e93438',
+    'fileHash' => '955e6fd3af1f40362b81fbf114a809b32ebb1eef5ba1b508020e4f57ece3246e',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -3685,7 +3158,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php' => 
   array (
-    'fileHash' => '11286caf11f5448ca06333d76064f3ee692a0562',
+    'fileHash' => '6d19bc78d971a3be24f0bdd672220f91ea2258713d24a88e7c123ce2a3233c55',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -3693,7 +3166,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php' => 
   array (
-    'fileHash' => 'e67220d6ba2407325c227ec929ae98ac39c66f3e',
+    'fileHash' => 'b72f7acb11a73859821ca4efadc207238bd12d43df5d66b566b3742eed9fc601',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -3701,7 +3174,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/RequestCollector.php' => 
   array (
-    'fileHash' => 'da2e716e69569814ad9f2b83bdfb009b5f1bdc5d',
+    'fileHash' => '5ff168932adde4824d87a9c5de40dcc72b85c5fef6818c1789b3ff085478226a',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -3709,7 +3182,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ResponseCollector.php' => 
   array (
-    'fileHash' => '53eea2ef79479bfdeb73763a57264b865ae2d3c2',
+    'fileHash' => '44b22e0150c216926fa3d6fee482dd8156341dcb4a050e406531d2d839f2d587',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -3717,7 +3190,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/TailwindCollector.php' => 
   array (
-    'fileHash' => '67c87f025bdda8749cb2907c81b09a4a39eb3470',
+    'fileHash' => 'e2915d4e81df2e8c07eac6f5d0415449e8d55b4f8e80f872ab77b124e3c209e1',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -3725,7 +3198,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Collectors/VueCollector.php' => 
   array (
-    'fileHash' => 'f6aad5fc077d3b4dd446c1a9c42cd377aa031450',
+    'fileHash' => '47f0dce935b160542fa2525455d1aa6bc93f42f6a8df659f86bff47790ec7ea4',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -3733,7 +3206,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Console/CustomizeToolbarCommand.php' => 
   array (
-    'fileHash' => 'dc113075e4f1c3456230869245242fe58d813b1b',
+    'fileHash' => '6fec27520db6d408ebc3c8527f5820f6800ae09e50b6a4074bd33e56c9b137fe',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php',
@@ -3741,7 +3214,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Console/StartMcpServerCommand.php' => 
   array (
-    'fileHash' => 'c64cd5d945f2501e48b58c115a0f8c0fca955ad6',
+    'fileHash' => '81c9846aa9443c3f8c8c17d627dc5573091d2abc73c4b02fe312131253c3272d',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php',
@@ -3749,35 +3222,35 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Controllers/AssetController.php' => 
   array (
-    'fileHash' => '7883d49988f8636973d425283779fe0230d37367',
+    'fileHash' => '9990d016f2533ead8c4786cf039b8f2f547cd67a97cee2983f65dc51f8ff8aef',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Controllers/HorizonController.php' => 
   array (
-    'fileHash' => 'd708568bbedca66e91916515a941dc0af665fd84',
+    'fileHash' => 'e5766b349fd158fb1137a64eeb7c04858fff1019ac248190fc99f31d65644ac5',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/BootProfileData.php' => 
   array (
-    'fileHash' => 'b893dc0ff818e1bcea5239b9b13eb070ca29f627',
+    'fileHash' => 'bac94ad6634f9be418049e0529d1090d29156a2aa7414ec3b25650c279402410',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/CollectorConfigurations/RequestConfurationData.php' => 
   array (
-    'fileHash' => 'fad177470de742d15d03b17eb759854e14b0dac3',
+    'fileHash' => '6b42291a1d1229af0e26232b45ec7b299ab534d1fc445829a4436ee52b2d6e40',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/CollectorConfig.php' => 
   array (
-    'fileHash' => '6289c72acd3a7a0a6845375647b4dfba7812baa0',
+    'fileHash' => 'a45821a71862b3baf403b187438cdb4087af6b89f36d2568e8ee4b8f394ec2af',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/Collector.php',
@@ -3806,7 +3279,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/InertiaConfig.php' => 
   array (
-    'fileHash' => '5bc2db74661a6828919665d4ea86df8452d2f5fc',
+    'fileHash' => '7c3ca16ff6a4dbc856eeb330a6ff42a881bbb76f62a969451a3e8412c290ca1d',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/InertiaCollector.php',
@@ -3814,7 +3287,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/LaravelConfig.php' => 
   array (
-    'fileHash' => '8120d2051ff319f42dd9f68bbc3f84322f4b2226',
+    'fileHash' => '58435d02b5b140705b51a019cca016fbeb82ef6f633b25de1a21333f9930066f',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/LaravelCollector.php',
@@ -3823,7 +3296,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/MiddlewareConfig.php' => 
   array (
-    'fileHash' => 'b557cdffcd4844fda390a8aac59c87fa2c633e71',
+    'fileHash' => '5005d820fd877fd2651e6592ee2bea789305fe6fe07da9a2bfc9f77b1dc4ccb8',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -3831,7 +3304,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ModelsConfig.php' => 
   array (
-    'fileHash' => '06c6eb97c884de01381f78c6fa604b4c33e46e10',
+    'fileHash' => 'c016ba3abbfe196ddd90df954260d47661b1e52b8d2b9174a6e976ac2141d3ea',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php',
@@ -3839,7 +3312,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/PhpConfig.php' => 
   array (
-    'fileHash' => '68393a8bb496d66d3715c7749f8e10bc989108ef',
+    'fileHash' => 'a3ac4ccdc728c23865b1637d0041e9080291385d4a2fefc75ffc66d4d983dfeb',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/PhpCollector.php',
@@ -3847,7 +3320,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ProfilerConfig.php' => 
   array (
-    'fileHash' => 'f2a060ff3f60d7b75169e412ffc78faae30ddfdc',
+    'fileHash' => '97489036b981d3c14b1e76c92b999ebb4587d346bb2c8852869febf7c630928a',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
@@ -3855,7 +3328,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/QueriesConfig.php' => 
   array (
-    'fileHash' => '1ef856e694388b50791977e6936dc2bf61f37e2d',
+    'fileHash' => '08ab936d432d9181a961529f9c260d16581d4daa81473990364e9f8aa00c2503',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php',
@@ -3863,7 +3336,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/RequestConfig.php' => 
   array (
-    'fileHash' => '0a2bc0b5fada85e5feb056a387c111902671f4b7',
+    'fileHash' => 'cd87ad94fa535d8d4020b7eda2648eb415ea597b47bde1392827a4b934eaf853',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/RequestCollector.php',
@@ -3872,7 +3345,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/ResponseConfig.php' => 
   array (
-    'fileHash' => '0d97cc6f3f2ea243aa8f9707fc869420eecaf64e',
+    'fileHash' => '742b8bf860b3de3f21451cfcf3d3af5da443e1afdf81191a5341e3d7b8bc34e7',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ResponseCollector.php',
@@ -3880,7 +3353,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/TailwindConfig.php' => 
   array (
-    'fileHash' => '6e00aacef36e9435326e6f4bd33ac3103d6e830d',
+    'fileHash' => 'f780de7c7042ed3e721c87cd159d54d9a8af18511eaa6957b0cd34bb125038b8',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/TailwindCollector.php',
@@ -3888,7 +3361,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Configurations/VueConfig.php' => 
   array (
-    'fileHash' => '16c2a4add55aa247f144c5ae72f125012cb431f3',
+    'fileHash' => 'c51a7a2f734bd874ec86ef45d87e00836a92880bacccf9e725cad0ef2e5bab62',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/VueCollector.php',
@@ -3896,7 +3369,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/DatabaseData.php' => 
   array (
-    'fileHash' => '71ffb2d2cea8f9490aa8568d2307e25bf67c6830',
+    'fileHash' => '9b1ea9004de4be904b331e508cbf5ee9ab5fcb327e9c0b7b45b4eea0b7f796cc',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php',
@@ -3904,7 +3377,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/InertiaData.php' => 
   array (
-    'fileHash' => '0f1a76a5d7c683aef655f21a45f29d9d8e48ad9d',
+    'fileHash' => 'ab312cb8c0960125c4492912cf5ad291dc3088a02d3d4ba8ed962b8aa76d0e25',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/InertiaCollector.php',
@@ -3912,7 +3385,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/LaravelData.php' => 
   array (
-    'fileHash' => '63d0bf45adcf00a5eff609a96c966bb58f3c47a8',
+    'fileHash' => '14738210a07d8f6021e049a0002abba7f29b9298ca0cf39c086d58a63e48167a',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/LaravelCollector.php',
@@ -3920,7 +3393,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/GroupConfig.php' => 
   array (
-    'fileHash' => 'f7b5f6ebb6a71ccf4b16d5835a9917222ac09870',
+    'fileHash' => '86d02d3162e159199b0a5c21bf9430d0575c34dca69127b492d8cac9b785c314',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/LayoutConfig.php',
@@ -3929,7 +3402,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/LayoutConfig.php' => 
   array (
-    'fileHash' => 'b5649904a44a308425fbfcc088036782378ea593',
+    'fileHash' => 'a83fa6a9e0f165f71d4325bdd5d0f2d37722e51cb46afb66e320794f8723f126',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php',
@@ -3938,14 +3411,14 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/ToolConfig.php' => 
   array (
-    'fileHash' => '12ee7772c2173d13da71d8b239a89e013d68dc69',
+    'fileHash' => '4ff50b0e126f5eb3f0d3caf179c277c2c7a654ddb776f50fb54ad5216da813a0',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/ModelData.php' => 
   array (
-    'fileHash' => 'db84a438632458fad0ea8bf7efeb3fcd9b1f9e1b',
+    'fileHash' => '75a6a5ebb4700d407d47d1802eb44b59334a9498cc5bc48d496f9500bd898c18',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php',
@@ -3953,7 +3426,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/PhpData.php' => 
   array (
-    'fileHash' => 'fe55b0012c615fdb07110b1801b785f000a60aa0',
+    'fileHash' => '46a4a76548f82eb389829a8b6d2ebe88901340ef5e29ddf57d4946109d27bbde',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/PhpCollector.php',
@@ -3961,7 +3434,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/ProfileMarkerData.php' => 
   array (
-    'fileHash' => 'be1b3ba1ba976d56700a10b4d917bf95161f262f',
+    'fileHash' => '59a4f2d268c44506acdd1252a9a8286a4681ce0c78aca12419152c628d183365',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
@@ -3971,7 +3444,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/ProfilerData.php' => 
   array (
-    'fileHash' => '1c0e09df430516900a758dfa5823f8cbb825d5b6',
+    'fileHash' => '91879a78b24136f8caef67aa177454f1683ab50ba59398ff03d30d96724abdac',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
@@ -3979,7 +3452,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/QueriesData.php' => 
   array (
-    'fileHash' => '2128f2163a76915ee07b6fe57562fe7433b0c0c0',
+    'fileHash' => '33e089e7efbc5eb1922d74a9091cadc5bca2f46307601470f17cc6bbd2abb9b7',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php',
@@ -3987,7 +3460,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/QueryData.php' => 
   array (
-    'fileHash' => '9bae7937db60b7cb070c179d2e49796f1882c276',
+    'fileHash' => 'be2917a0aa77f6a75fc4691a1405bce3bf35248d63bfc0163244a4a4fe5715df',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php',
@@ -3995,7 +3468,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/RequestCheckpointData.php' => 
   array (
-    'fileHash' => '0647b5092861c5b7b4abc87f412d7cd0f2b2418e',
+    'fileHash' => 'e857f109f4c01eeb495ce65285711f79bbb5ac1ee4a8a2d2168a2042f7fdbe51',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
@@ -4007,7 +3480,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/RequestData.php' => 
   array (
-    'fileHash' => '6612c9b967f7ee78eabae36973df5d37beab33e6',
+    'fileHash' => '43af5d9ba3df0e72261c4eca8ec299a0e6fb0c4fc5c5e823cd9010d34a20210d',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/RequestCollector.php',
@@ -4015,7 +3488,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/RequestStageData.php' => 
   array (
-    'fileHash' => '3d4d0e21464b00afdd99b66a71f958f1ccf8cd39',
+    'fileHash' => '411c27cf38e488dca8015ec06c6efd1b3cd9f7201e8bccfd1dc802fe758f029e',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
@@ -4024,7 +3497,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/RequestStagePropertyData.php' => 
   array (
-    'fileHash' => '5102235bfa913c55f6f6223a932c25c0b44b7854',
+    'fileHash' => 'a6f7f9b6ad4e5136c2502708c69411603a89b42b0640b07fc60227b2ae985e2a',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
@@ -4034,7 +3507,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/ResponseData.php' => 
   array (
-    'fileHash' => 'dd76c089c62e81a8a6430b52b68dd0fd3dcc2cc1',
+    'fileHash' => 'c4647c84bc71a41083c509c6cf983c83ed68dfd65d75000b0c5d2838ee0943a3',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ResponseCollector.php',
@@ -4042,7 +3515,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/SubstageData.php' => 
   array (
-    'fileHash' => 'a09cd384c52a6f58d808341155be573ee4b5e208',
+    'fileHash' => '3da411d1b1cecca360fba2097fe2b3fdc2c641b8b745044b62f81fcb2a5756e9',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
@@ -4051,7 +3524,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/TailwindData.php' => 
   array (
-    'fileHash' => 'b8074bf93f003e71ac280c40fd811a5d9e0b9049',
+    'fileHash' => '64b5581f9aecfb6dbc0b380ad8e9c7b0ddb1a2d6f60932cd22d4fa24b0df6a2f',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/TailwindCollector.php',
@@ -4059,27 +3532,28 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/TimingData.php' => 
   array (
-    'fileHash' => 'fd61d7a8a6a8996962e62e372bfa712e7b0fbba4',
+    'fileHash' => '5490afea66966389074652fad40b70393ef71385a8e3c17b193208ec2782f82b',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php' => 
   array (
-    'fileHash' => 'd60b655e37f87e33cbd5bf625aa283be5cf4a46a',
+    'fileHash' => '656a08547eee030c273b0d9e0a6cca10ceb6bb1cc6a6af9c0d57e64efc92ca4d',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php',
       1 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php',
       2 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php',
-      3 => '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php',
-      4 => '/home/nckrtl/projects/laravel-toolbar/src/Toolbar.php',
-      5 => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php',
+      3 => '/home/nckrtl/projects/laravel-toolbar/src/Observers/RequestObserver.php',
+      4 => '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php',
+      5 => '/home/nckrtl/projects/laravel-toolbar/src/Toolbar.php',
+      6 => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php',
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/BreakpointIndicatorTool.php' => 
   array (
-    'fileHash' => 'f4fca7a3a5dcb6034a0bbbf4d4fd486e385c81d8',
+    'fileHash' => '572bb35a74a9959e478ccaf823bfe7fef79d7bd5286bb6471f92ea4e511385d4',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -4087,7 +3561,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/DatabaseTool.php' => 
   array (
-    'fileHash' => '7d66712f4029752cba0337bad15e9661df688c29',
+    'fileHash' => 'b714aaf19b09b309bce1d11c871aad935299d0497b49abdc21a5cc0e77e2a978',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -4095,14 +3569,14 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/LaravelTool.php' => 
   array (
-    'fileHash' => 'f5750c0acd4700213e095c11bfe20ed979d5e955',
+    'fileHash' => '554532fee6f816d5fa955956a8acb5b81497213b2228050f9808b342182f2be8',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/MemoryUsageTool.php' => 
   array (
-    'fileHash' => 'fd5636a70213be1b457cbcbf8572bd6e4b7b5db9',
+    'fileHash' => 'cec108e251f451c9805332767061cfa35f5345c0ed7ba8ebea1341a6f5f89018',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -4110,7 +3584,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/ModelsTool.php' => 
   array (
-    'fileHash' => '9e7d803f2937df17f31ba01d8c2f58e1741cf674',
+    'fileHash' => 'ce860ebe8edfe568f691bbf4cec39198723e9f31750a1e3228d433325f135af2',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -4118,7 +3592,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/RequestTool.php' => 
   array (
-    'fileHash' => 'e01cf74df7f652300e4f32285a0335b63ab7ea6e',
+    'fileHash' => 'defded9aebea62d66be1a2f4e14aa5b08810bfa9474225a6a89ccf04f91a96e3',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -4126,7 +3600,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/TechStackTool.php' => 
   array (
-    'fileHash' => 'e35f46fcad206f7560f45671ea186c682e079e95',
+    'fileHash' => 'a47cd8ea85fecb6169aa0e6d1fe4fac55789b7e87673b63740677e3d78c3ca24',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -4134,7 +3608,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/TimingsTool.php' => 
   array (
-    'fileHash' => 'b4dd5bf3989a496b26f4315d96954c19bb4ba83b',
+    'fileHash' => '14ac7832347c8fb4f799548cc0fa2aafd82ff79ca294ec646932787578ef2bd5',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -4142,7 +3616,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/ToolInterface.php' => 
   array (
-    'fileHash' => '62c810f63948174eef3fdee5122714a5a47b9d39',
+    'fileHash' => 'f52a6d4674d6d4c3c8ac557c543bfc6788b606ac5ab2b9f8e797ee707e128cec',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/GroupConfig.php',
@@ -4162,28 +3636,28 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/VueDevtoolsTool.php' => 
   array (
-    'fileHash' => '78431209dd8d0f7b3c82c92ca492edaa06efd777',
+    'fileHash' => 'd059da19ea1f709f0e5501392c0603ff5d33d4f7b7aa42952072bfd503b91ed7',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/VueInspectorTool.php' => 
   array (
-    'fileHash' => '4e2d44c64cd17f239e76e4b777c511108d5f6929',
+    'fileHash' => 'f1fc323d8195ec65b00a3a998c58772bc9449c69fce4a4cfc6cc3d1f05d8f9eb',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/Tools/VueTool.php' => 
   array (
-    'fileHash' => '59a60b6cf1d3581e1aececdf47fce2b9f8d78841',
+    'fileHash' => '75be0a27eb6ef3da7343b6635d1035324d721c719608ab542db5d98659d2ccd6',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Data/VueData.php' => 
   array (
-    'fileHash' => '9932f9cfa5f86872deb21ccb1cae55378d8fe2d2',
+    'fileHash' => '38a3170ccebaa058a708cf168bd6182be7046cf9a926b53de4d9b41a0345673c',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/VueCollector.php',
@@ -4191,7 +3665,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Enums/DataProvider.php' => 
   array (
-    'fileHash' => '38e42e5228e8f1c6b40680b201877f0a69dbd351',
+    'fileHash' => '8a1834b5a988d0d99097cfcb76bca8a2e20d29559eed286d848525e0d7819c0c',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/CollectorConfigurations/RequestConfurationData.php',
@@ -4200,7 +3674,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Enums/DataSizeUnit.php' => 
   array (
-    'fileHash' => '50714df9a881812265adaea01cb375a39794a6ae',
+    'fileHash' => '2d7e25da97f3330e37d1c5451ac7e9ab6fb011816922729b1b91532011b5b635',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
@@ -4215,7 +3689,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Enums/Layout/Section.php' => 
   array (
-    'fileHash' => '558e0412332f5b890dd1e29497dcaac37fde9511',
+    'fileHash' => '2bc97278e2a3d949930de82b3b9c9672d1d1a9bebf8a6101381242c67d2312be',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/Layout/GroupConfig.php',
@@ -4225,7 +3699,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Enums/QueryType.php' => 
   array (
-    'fileHash' => '7b0d1a4444883b9458f90c60e57056f413275ca0',
+    'fileHash' => '05b8d00d9949d7f988ba8229e9d7b83ea557856a29ab6cbbbccd5c76c02675f2',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/QueryData.php',
@@ -4233,7 +3707,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Enums/RequestCheckpointId.php' => 
   array (
-    'fileHash' => '512de654741190e4dccdf8f816bedcdb2e897ed5',
+    'fileHash' => '22e62afb9485cfda763b4b16a65d00328365b59c2ca07420baacfef9d27e50f8',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Events/ProfilerEvent.php',
@@ -4246,7 +3720,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Enums/TimeUnit.php' => 
   array (
-    'fileHash' => '66087f6c81588c115989e3220e568f5f29a95938',
+    'fileHash' => '0f78e4ee4813632bba0abdba8be323f07f1d145b56287992b50076c111133275',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php',
@@ -4260,7 +3734,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Enums/Unit.php' => 
   array (
-    'fileHash' => 'c75d2185fe1c442cbf7be692e3070a8f56941613',
+    'fileHash' => '128af53e9a9468acc68cc70cbac81d088c9f47238c5bd42372c1031c4ff3fcb7',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php',
@@ -4281,21 +3755,21 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Events/ProfilerEvent.php' => 
   array (
-    'fileHash' => '18a2b4993418f8436e38fe932bc5a82fc45a66b3',
+    'fileHash' => '6a0d88cef900e90c68c82e69ab9d36b4be613132c05be8174ebf27018db1d532',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Facades/Toolbar.php' => 
   array (
-    'fileHash' => 'a1ff7d39a98a130153b45e90e5e2ee47d994dc2a',
+    'fileHash' => '473ddffdff2b0efff465492fba02d14c10b5ac7664bc4502be579f6937b42975',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Http/Middleware/MiddlewareEnd.php' => 
   array (
-    'fileHash' => '69530f5fef6f8fc684d65627a94b427806f8e1db',
+    'fileHash' => '55312f66963f7cde0fbd3406f07b6a259cbca0d4061a94b2d604c134dbd2240a',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -4303,7 +3777,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Http/Middleware/MiddlewareStart.php' => 
   array (
-    'fileHash' => 'c214fb1d862a97fed894fba3b3db27df6a89a385',
+    'fileHash' => '04148a853f63c702427e84f09e48b4ee16f1ceb7caef90a0f9353325e521c7c7',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -4311,7 +3785,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Mcp/Resources/ToolbarDataResource.php' => 
   array (
-    'fileHash' => '81a74d822067e65206e404b5ca3379014062501c',
+    'fileHash' => '2915a9150dcf7019872a28f164167f79b1757aa34c0b253b0a9f9ba40de6ae91',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Mcp/Servers/DataServer.php',
@@ -4319,14 +3793,14 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Mcp/Servers/DataServer.php' => 
   array (
-    'fileHash' => 'c542a60d528859392b30e551d868df7b379d73a1',
+    'fileHash' => '9c48019d04e675de2768dfa753e64934f1de47b2c904f2470e16906c513ca1c7',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Mcp/Tools/GetRequestDataTool.php' => 
   array (
-    'fileHash' => 'a958bba389e0124389e1245d72b8141db0873539',
+    'fileHash' => '318933795db08b08c04db16951fecaeb81f6223f2d8ca964598df75a73de8612',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Mcp/Servers/DataServer.php',
@@ -4334,7 +3808,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Measurement.php' => 
   array (
-    'fileHash' => '70410a87334e582ab16af28dc45f1737908dd16c',
+    'fileHash' => '90eee7006bcafae65cade67945cdcf525968be2e25c29b0d9fef5d3e5af94d3f',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php',
@@ -4356,17 +3830,21 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Observers/FetchesStackTrace.php' => 
   array (
-    'fileHash' => '9d2bb7b912295e5bf8b746384d386cd66bd0be73',
+    'fileHash' => 'ba2d0a4218a91771e5bd797744aca7cb1c499fb2fc6fb77d90ac1595a31316ba',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php',
       1 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
       2 => '/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php',
     ),
+    'usedTraitDependentFiles' => 
+    array (
+      0 => '/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php' => 
   array (
-    'fileHash' => 'c208791d3e55b9b39abd8e5544fabf330318b4d3',
+    'fileHash' => '42ec832cdf11828c0ae62b3568264c2458f27fc07bab5e0fd08f87280e785a8e',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ModelsCollector.php',
@@ -4375,7 +3853,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php' => 
   array (
-    'fileHash' => '51872f4c668fe12e3dd4352b224984d796155138',
+    'fileHash' => 'ec0e78c36d50168755f146a8e163232f54090810e20945342f19fe3d59a8a944',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php',
@@ -4384,7 +3862,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Observers/RequestObserver.php' => 
   array (
-    'fileHash' => '7b6f398ff6883e13d28ac12ffb44c8ee13c6651b',
+    'fileHash' => 'b887e5c096cee78add51f15782110fdde2542734a349b872631cb0e8230a3c99',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -4392,7 +3870,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Observers/RoutingObserver.php' => 
   array (
-    'fileHash' => 'd0632df9019f5630ed597d92f9ee8b26fdc0e188',
+    'fileHash' => '65e4618b0293f5cb9ced27e5168935872c34210a4d7fde3673ba6585df905613',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
@@ -4400,14 +3878,14 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php' => 
   array (
-    'fileHash' => 'b51c4f706db6058e746bde6d7244e9d2a244141c',
+    'fileHash' => '6611148bc4b0da3de631e9f34d94e0b886f98b283c1d442b76ff7890d8a77626',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Services/ProfilerService/Profiler.php' => 
   array (
-    'fileHash' => '0ccc6e87bfcd464ebd120f9d4c7beaeab293202d',
+    'fileHash' => '61a85737c6e9563ddd01b0daf82bc8af26620ef6e499594985571b0d301b8a62',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/ProfilerCollector.php',
@@ -4423,7 +3901,7 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Toolbar.php' => 
   array (
-    'fileHash' => '78836a5d0bc8baa28e19e0bf7279fcd48c550c4e',
+    'fileHash' => 'd3147126d78b17806b5564d648cba8f49ba4ba0c2178295689c9d1807e245659',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/CollectorManager.php',
@@ -4431,14 +3909,16 @@ return [
       2 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/QueriesCollector.php',
       3 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
       4 => '/home/nckrtl/projects/laravel-toolbar/src/Facades/Toolbar.php',
-      5 => '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php',
-      6 => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php',
-      7 => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php',
+      5 => '/home/nckrtl/projects/laravel-toolbar/src/Http/Middleware/MiddlewareStart.php',
+      6 => '/home/nckrtl/projects/laravel-toolbar/src/Observers/RequestObserver.php',
+      7 => '/home/nckrtl/projects/laravel-toolbar/src/Providers/ToolbarProvider.php',
+      8 => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php',
+      9 => '/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php',
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/ToolbarInjector.php' => 
   array (
-    'fileHash' => '31b94693ec326e7805396bcd0c1c3f15d2ab665c',
+    'fileHash' => '2c876ab2aa0f99340b1f4f1c80d6eaaf3035b36eab087cc1c55e943de5292c96',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Observers/RequestObserver.php',
@@ -4446,14 +3926,14 @@ return [
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/ToolbarServiceProvider.php' => 
   array (
-    'fileHash' => '15f438bf04a5cff9c53d066fdcca9d715fb70ed5',
+    'fileHash' => 'a86860609c9dd318f3fe92dff45792d6a85cb0003a65f86c8be68f7a336482db',
     'dependentFiles' => 
     array (
     ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Traits/ControllerActionEditorUrl.php' => 
   array (
-    'fileHash' => '22529106e60d9bb10368a01af95c236453ab89d9',
+    'fileHash' => '56b25ee1e75a44f15a54de71d92b52ea6c2bf3b0163a19b089545c21f55273b5',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/RequestCollector.php',
@@ -4461,19 +3941,28 @@ return [
       2 => '/home/nckrtl/projects/laravel-toolbar/src/Data/RequestData.php',
       3 => '/home/nckrtl/projects/laravel-toolbar/src/Observers/QueryObserver.php',
     ),
+    'usedTraitDependentFiles' => 
+    array (
+      0 => '/home/nckrtl/projects/laravel-toolbar/src/Data/QueryData.php',
+      1 => '/home/nckrtl/projects/laravel-toolbar/src/Data/RequestData.php',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Traits/ResolvesConfigSource.php' => 
   array (
-    'fileHash' => '826efa0377a8def913cfc53805c93accec04c4a4',
+    'fileHash' => 'eed0cf16c2f4308f5587852c7d10588bc5c03e6c7f61ef38601526203562bd70',
     'dependentFiles' => 
     array (
       0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/LaravelCollector.php',
       1 => '/home/nckrtl/projects/laravel-toolbar/src/Data/ToolbarConfig.php',
     ),
+    'usedTraitDependentFiles' => 
+    array (
+      0 => '/home/nckrtl/projects/laravel-toolbar/src/Collectors/LaravelCollector.php',
+    ),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/helpers.php' => 
   array (
-    'fileHash' => '56327c0299696b960b13edbf91ae2e72bf576766',
+    'fileHash' => '9efcaaba54f10cbd59730330fdf0a9b222f57c4b5d18740b2d7fee823382c3b2',
     'dependentFiles' => 
     array (
     ),
@@ -4512,7 +4001,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -4528,7 +4026,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -4544,7 +4051,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -4560,7 +4076,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -5061,7 +4586,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -5382,7 +4916,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -5398,7 +4941,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -5414,7 +4966,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -5430,7 +4991,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -5446,7 +5016,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -5462,7 +5041,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -7375,7 +6963,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -7706,7 +7303,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -7722,7 +7328,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -7738,7 +7353,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -7925,7 +7549,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -8543,7 +8176,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -8559,7 +8201,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -8840,7 +8491,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -8856,7 +8516,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -8872,7 +8541,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9031,7 +8709,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9047,7 +8734,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9063,7 +8759,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9079,7 +8784,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9109,7 +8823,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9329,7 +9052,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9345,7 +9077,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9562,7 +9303,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9578,7 +9328,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9868,7 +9627,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9884,7 +9652,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9900,7 +9677,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9916,7 +9702,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9932,7 +9727,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -9948,7 +9752,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12271,7 +12084,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12287,7 +12109,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12303,7 +12134,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12378,7 +12218,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12409,7 +12258,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12440,7 +12298,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12473,7 +12340,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12506,7 +12382,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12539,7 +12424,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12633,7 +12527,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12788,7 +12691,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -12929,7 +12841,128 @@ return [
   array (
     0 => 
     \PHPStan\Dependency\ExportedNode\ExportedTraitNode::__set_state(array(
-       'traitName' => 'NckRtl\\Toolbar\\Observers\\FetchesStackTrace',
+       'name' => 'NckRtl\\Toolbar\\Observers\\FetchesStackTrace',
+       'phpDoc' => NULL,
+       'usedTraits' => 
+      array (
+      ),
+       'traitUseAdaptations' => 
+      array (
+      ),
+       'statements' => 
+      array (
+        0 => 
+        \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
+           'name' => 'getCallerFromStackTrace',
+           'phpDoc' => 
+          \PHPStan\Dependency\ExportedNode\ExportedPhpDocNode::__set_state(array(
+             'phpDocString' => '/**
+     * Find the first frame in the stack trace outside of Telescope/Laravel.
+     *
+     * @param  int|string|array  $forgetLines
+     */',
+             'namespace' => 'NckRtl\\Toolbar\\Observers',
+             'uses' => 
+            array (
+              'str' => 'Illuminate\\Support\\Str',
+            ),
+             'constUses' => 
+            array (
+            ),
+          )),
+           'byRef' => false,
+           'public' => false,
+           'private' => false,
+           'abstract' => false,
+           'final' => false,
+           'static' => false,
+           'returnType' => '?array',
+           'parameters' => 
+          array (
+            0 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'forgetLines',
+               'type' => NULL,
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => true,
+               'attributes' => 
+              array (
+              ),
+            )),
+          ),
+           'attributes' => 
+          array (
+          ),
+        )),
+        1 => 
+        \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
+           'name' => 'ignoredPaths',
+           'phpDoc' => 
+          \PHPStan\Dependency\ExportedNode\ExportedPhpDocNode::__set_state(array(
+             'phpDocString' => '/**
+     * Get the file paths that should not be used by backtraces.
+     */',
+             'namespace' => 'NckRtl\\Toolbar\\Observers',
+             'uses' => 
+            array (
+              'str' => 'Illuminate\\Support\\Str',
+            ),
+             'constUses' => 
+            array (
+            ),
+          )),
+           'byRef' => false,
+           'public' => false,
+           'private' => false,
+           'abstract' => false,
+           'final' => false,
+           'static' => false,
+           'returnType' => 'array',
+           'parameters' => 
+          array (
+          ),
+           'attributes' => 
+          array (
+          ),
+        )),
+        2 => 
+        \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
+           'name' => 'ignoredVendorPath',
+           'phpDoc' => 
+          \PHPStan\Dependency\ExportedNode\ExportedPhpDocNode::__set_state(array(
+             'phpDocString' => '/**
+     * Choose the frame outside of either Telescope / Laravel or all packages.
+     *
+     * Returns empty string to ignore all vendor packages, or \'laravel\' to only ignore Laravel packages.
+     */',
+             'namespace' => 'NckRtl\\Toolbar\\Observers',
+             'uses' => 
+            array (
+              'str' => 'Illuminate\\Support\\Str',
+            ),
+             'constUses' => 
+            array (
+            ),
+          )),
+           'byRef' => false,
+           'public' => false,
+           'private' => false,
+           'abstract' => false,
+           'final' => false,
+           'static' => false,
+           'returnType' => 'string',
+           'parameters' => 
+          array (
+          ),
+           'attributes' => 
+          array (
+          ),
+        )),
+      ),
+       'attributes' => 
+      array (
+      ),
     )),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Observers/ModelObserver.php' => 
@@ -12964,7 +12997,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -13220,7 +13262,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -13236,7 +13287,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -13252,7 +13312,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -13268,7 +13337,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -13284,7 +13362,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -13300,7 +13387,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -13847,7 +13943,16 @@ return [
            'private' => false,
            'static' => true,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -13863,7 +13968,16 @@ return [
            'private' => false,
            'static' => true,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -13879,7 +13993,16 @@ return [
            'private' => false,
            'static' => true,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -14026,6 +14149,24 @@ return [
         )),
         9 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
+           'name' => 'resetState',
+           'phpDoc' => NULL,
+           'byRef' => false,
+           'public' => true,
+           'private' => false,
+           'abstract' => false,
+           'final' => false,
+           'static' => true,
+           'returnType' => 'void',
+           'parameters' => 
+          array (
+          ),
+           'attributes' => 
+          array (
+          ),
+        )),
+        10 => 
+        \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'getCheckpoint',
            'phpDoc' => NULL,
            'byRef' => false,
@@ -14053,7 +14194,7 @@ return [
           array (
           ),
         )),
-        10 => 
+        11 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'getFirstViewRender',
            'phpDoc' => NULL,
@@ -14071,7 +14212,7 @@ return [
           array (
           ),
         )),
-        11 => 
+        12 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'getLastViewRender',
            'phpDoc' => NULL,
@@ -14089,7 +14230,7 @@ return [
           array (
           ),
         )),
-        12 => 
+        13 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'getCurrentMemoryUsage',
            'phpDoc' => NULL,
@@ -14145,7 +14286,16 @@ return [
            'private' => false,
            'static' => true,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -14161,7 +14311,16 @@ return [
            'private' => false,
            'static' => true,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -14249,7 +14408,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -14265,7 +14433,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -14281,7 +14458,16 @@ return [
            'private' => false,
            'static' => false,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -14397,7 +14583,16 @@ return [
            'private' => false,
            'static' => true,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -14433,7 +14628,16 @@ return [
            'private' => false,
            'static' => true,
            'readonly' => false,
+           'abstract' => false,
+           'final' => false,
+           'publicSet' => false,
+           'protectedSet' => false,
+           'privateSet' => false,
+           'virtual' => false,
            'attributes' => 
+          array (
+          ),
+           'hooks' => 
           array (
           ),
         )),
@@ -15177,14 +15381,42 @@ return [
   array (
     0 => 
     \PHPStan\Dependency\ExportedNode\ExportedTraitNode::__set_state(array(
-       'traitName' => 'NckRtl\\Toolbar\\Traits\\ControllerActionEditorUrl',
+       'name' => 'NckRtl\\Toolbar\\Traits\\ControllerActionEditorUrl',
+       'phpDoc' => NULL,
+       'usedTraits' => 
+      array (
+        0 => 'Illuminate\\Foundation\\Concerns\\ResolvesDumpSource',
+      ),
+       'traitUseAdaptations' => 
+      array (
+      ),
+       'statements' => 
+      array (
+      ),
+       'attributes' => 
+      array (
+      ),
     )),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/Traits/ResolvesConfigSource.php' => 
   array (
     0 => 
     \PHPStan\Dependency\ExportedNode\ExportedTraitNode::__set_state(array(
-       'traitName' => 'NckRtl\\Toolbar\\Traits\\ResolvesConfigSource',
+       'name' => 'NckRtl\\Toolbar\\Traits\\ResolvesConfigSource',
+       'phpDoc' => NULL,
+       'usedTraits' => 
+      array (
+        0 => 'Illuminate\\Foundation\\Concerns\\ResolvesDumpSource',
+      ),
+       'traitUseAdaptations' => 
+      array (
+      ),
+       'statements' => 
+      array (
+      ),
+       'attributes' => 
+      array (
+      ),
     )),
   ),
   '/home/nckrtl/projects/laravel-toolbar/src/helpers.php' => 

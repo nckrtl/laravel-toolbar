@@ -19,6 +19,16 @@ const props = defineProps({
 
 const { data } = useToolbar();
 const isOpen = ref(false);
+let closeTimeout = null;
+const open = () => {
+    clearTimeout(closeTimeout);
+    isOpen.value = true;
+};
+const close = () => {
+    closeTimeout = setTimeout(() => {
+        isOpen.value = false;
+    }, 100);
+};
 const searchPhrase = ref('');
 const filter = ref('none');
 
@@ -71,8 +81,8 @@ watch(queriesTable, (newVal) => {
     <div>
         <Panel
             v-if="isOpen"
-            @mouseenter="isOpen = true"
-            @mouseleave="isOpen = false"
+            @mouseenter="open"
+            @mouseleave="close"
             size="full"
             minHeight="h-[385px]"
         >
@@ -354,8 +364,8 @@ watch(queriesTable, (newVal) => {
         </Panel>
 
         <ToolbarItem
-            @mouseenter="isOpen = true"
-            @mouseleave="isOpen = false"
+            @mouseenter="open"
+            @mouseleave="close"
             :isActive="isOpen"
             :class="itemClasses"
         >

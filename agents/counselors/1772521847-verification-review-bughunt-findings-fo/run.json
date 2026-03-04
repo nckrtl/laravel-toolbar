@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-03-03T07:13:25.583Z",
+  "slug": "1772521851-1772521847-verification-review-bughunt-f",
+  "prompt": "file:prompt.md",
+  "promptSource": "file",
+  "readOnlyPolicy": "bestEffort",
+  "tools": [
+    {
+      "toolId": "amp-smart",
+      "status": "success",
+      "exitCode": 0,
+      "durationMs": 152634,
+      "wordCount": 889,
+      "outputFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772521847-verification-review-bughunt-findings-fo/amp-smart.md",
+      "stderrFile": "/home/nckrtl/projects/laravel-toolbar/agents/counselors/1772521847-verification-review-bughunt-findings-fo/amp-smart.stderr",
+      "cost": {
+        "cost_usd": 0.72,
+        "free_used_usd": 0.01,
+        "credits_used_usd": 0.71,
+        "source": "credits",
+        "free_remaining_usd": 9.99,
+        "free_total_usd": 10,
+        "credits_remaining_usd": 19.91
+      }
+    }
+  ]
+}
