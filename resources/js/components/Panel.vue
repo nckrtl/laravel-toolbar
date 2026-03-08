@@ -31,7 +31,6 @@ const props = defineProps({
             $attrs.class,
         ]"
     >
-
         <div
             class="text-xxs rounded-2xl border border-white/10 bg-[#111111]/95 p-2 text-white backdrop-blur-xl"
             :class="[minHeight]"

@@ -4,7 +4,7 @@ import ToolbarItem from '@/components/ToolbarItem.vue';
 import { useToolbar } from '@/composables/useToolbar';
 import Panel from '@/components/Panel.vue';
 import EmptyListIcon from '@/icons/EmptyListIcon.vue';
-import { FunnelIcon } from '@heroicons/vue/16/solid';
+import { ChevronRightIcon } from '@heroicons/vue/16/solid';
 
 const props = defineProps({
     config: {
@@ -20,9 +20,18 @@ const props = defineProps({
 const { data } = useToolbar();
 
 const isOpen = ref(false);
+const expandedModels = ref({});
 
 const onlyUnique = (value, index, array) => {
     return array.indexOf(value) === index;
+};
+
+const toggleModel = (modelClass) => {
+    expandedModels.value[modelClass] = !expandedModels.value[modelClass];
+};
+
+const hasSources = (model) => {
+    return model.sources && Object.keys(model.sources).length > 0;
 };
 </script>
 
@@ -77,21 +86,7 @@ const onlyUnique = (value, index, array) => {
                         </span>
                     </div>
                 </div>
-                <div class="relative min-w-64">
-                    <!-- <input
-                        placeholder="Search"
-                        class="min-w-64 rounded-md border border-white/10 bg-white/3 px-3 py-2 text-white placeholder-white/40 focus:border-white/70 focus:ring-2 focus:ring-white/20 focus:outline-none"
-                        type="text"
-                        v-model="searchPhrase"
-                    />
-
-                    <div class="absolute top-2.5 right-2">
-                        <div
-                            class="absolute -top-[5px] -right-[3px] size-2 rounded-full border-1 border-black/80 bg-red-500"
-                        ></div>
-                        <FunnelIcon class="size-4 text-white/50" />
-                    </div> -->
-                </div>
+                <div class="relative min-w-64"></div>
             </div>
             <div class="h-2 w-full"></div>
             <div class="relative">
@@ -117,13 +112,13 @@ const onlyUnique = (value, index, array) => {
                                 </div>
                             </th>
                             <th
-                                class="shadow-3xl sticky top-0 z-10 my-0.5 w-[20%] text-[#A3A3A3] uppercase shadow-black"
+                                class="shadow-3xl sticky top-0 z-10 my-0.5 w-[30%] text-[#A3A3A3] uppercase shadow-black"
                             >
                                 <div class="pb-0.5">
                                     <div
                                         class="rounded-r-md border-y border-r border-white/7.5 bg-white/3 px-3 py-2"
                                     >
-                                        File
+                                        Source
                                     </div>
                                 </div>
                             </th>
@@ -141,56 +136,133 @@ const onlyUnique = (value, index, array) => {
                         <tbody>
                             <template v-if="Object.values(data.models ?? []).length === 0">
                                 <tr>
-                                    <td colspan="4" class="text-center text-white/50">
+                                    <td colspan="3" class="text-center text-white/50">
                                         <div
                                             class="flex flex-col items-center justify-center gap-4 py-16"
                                         >
                                             <EmptyListIcon class="w-24" />
-                                            <span class="text-white/75"
-                                                >No {{ filter }} queries found</span
-                                            >
+                                            <span class="text-white/75">No models hydrated</span>
                                         </div>
                                     </td>
                                 </tr>
                             </template>
-                            <tr
+                            <template
                                 v-else
-                                v-for="(model, index) in data.models"
-                                :key="index"
-                                class="group relative"
+                                v-for="(model, modelClass) in data.models"
+                                :key="modelClass"
                             >
-                                <td class="w-[60%]">
-                                    <div class="py-0.5">
-                                        <div
-                                            class="overflow-hidden rounded-l-md border-y border-l border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
-                                        >
-                                            <span class="whitespace-nowrap">
-                                                {{ index }}
-                                            </span>
+                                <tr
+                                    class="group relative"
+                                    :class="{ 'cursor-pointer': hasSources(model) }"
+                                    @click="hasSources(model) && toggleModel(modelClass)"
+                                >
+                                    <td class="w-[60%]">
+                                        <div class="py-0.5">
+                                            <div
+                                                class="overflow-hidden rounded-l-md border-y border-l border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
+                                            >
+                                                <span
+                                                    class="flex items-center gap-1.5 whitespace-nowrap"
+                                                >
+                                                    <ChevronRightIcon
+                                                        v-if="hasSources(model)"
+                                                        class="size-3.5 shrink-0 text-white/40 transition-transform duration-150"
+                                                        :class="{
+                                                            'rotate-90': expandedModels[modelClass],
+                                                        }"
+                                                    />
+                                                    {{ modelClass }}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="w-[10%] text-right">
-                                    <div class="py-0.5">
-                                        <div
-                                            class="overflow-hidden border-y border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
-                                        >
-                                            <span class="whitespace-nowrap">
-                                                {{ model.count }}
-                                            </span>
+                                    </td>
+                                    <td class="w-[10%] text-right">
+                                        <div class="py-0.5">
+                                            <div
+                                                class="overflow-hidden border-y border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
+                                            >
+                                                <span class="whitespace-nowrap">
+                                                    {{ model.count }}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="w-[20%] text-right">
-                                    <div class="py-0.5">
-                                        <div
-                                            class="overflow-hidden rounded-r-md border-y border-r border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
-                                        >
-                                            <span class="whitespace-nowrap"> - </span>
+                                    </td>
+                                    <td class="w-[30%]">
+                                        <div class="py-0.5">
+                                            <div
+                                                class="overflow-hidden rounded-r-md border-y border-r border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
+                                            >
+                                                <span class="whitespace-nowrap text-white/40">
+                                                    {{
+                                                        hasSources(model)
+                                                            ? Object.keys(model.sources).length +
+                                                              (Object.keys(model.sources).length ===
+                                                              1
+                                                                  ? ' source'
+                                                                  : ' sources')
+                                                            : '-'
+                                                    }}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                                <template v-if="expandedModels[modelClass] && hasSources(model)">
+                                    <tr
+                                        v-for="(source, sourceKey) in model.sources"
+                                        :key="sourceKey"
+                                        class="group relative"
+                                    >
+                                        <td class="w-[60%]">
+                                            <div class="py-0.5">
+                                                <div
+                                                    class="overflow-hidden rounded-l-md border-y border-l border-white/5 bg-white/1.5 px-3 py-1.5 pl-8 text-ellipsis group-hover:bg-white/3"
+                                                >
+                                                    <span class="whitespace-nowrap text-white/60">
+                                                        <a
+                                                            v-if="
+                                                                source.controller_action_editor_url
+                                                            "
+                                                            class="cursor-pointer hover:text-white hover:underline"
+                                                            :href="
+                                                                source.controller_action_editor_url
+                                                            "
+                                                            target="_blank"
+                                                            @click.stop
+                                                            >{{ source.file.split('/').pop() }}:{{
+                                                                source.line
+                                                            }}</a
+                                                        >
+                                                        <span v-else
+                                                            >{{ source.file.split('/').pop() }}:{{
+                                                                source.line
+                                                            }}</span
+                                                        >
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="w-[10%] text-right">
+                                            <div class="py-0.5">
+                                                <div
+                                                    class="overflow-hidden border-y border-white/5 bg-white/1.5 px-3 py-1.5 text-ellipsis text-white/60 group-hover:bg-white/3"
+                                                >
+                                                    <span class="whitespace-nowrap">
+                                                        {{ source.count }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="w-[30%]">
+                                            <div class="py-0.5">
+                                                <div
+                                                    class="overflow-hidden rounded-r-md border-y border-r border-white/5 bg-white/1.5 px-3 py-1.5 text-ellipsis group-hover:bg-white/3"
+                                                ></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </template>
                         </tbody>
                     </table>
                 </div>

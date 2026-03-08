@@ -363,12 +363,7 @@ watch(queriesTable, (newVal) => {
             </div>
         </Panel>
 
-        <ToolbarItem
-            @mouseenter="open"
-            @mouseleave="close"
-            :isActive="isOpen"
-            :class="itemClasses"
-        >
+        <ToolbarItem @mouseenter="open" @mouseleave="close" :isActive="isOpen" :class="itemClasses">
             <div class="flex items-center gap-1 py-0.5">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

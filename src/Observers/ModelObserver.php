@@ -7,18 +7,25 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use NckRtl\Toolbar\Data\ModelData;
+use NckRtl\Toolbar\Data\ModelSourceData;
 use NckRtl\Toolbar\Enums\DataSizeUnit;
 use NckRtl\Toolbar\Measurement;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 
 class ModelObserver
 {
+    use FetchesStackTrace;
+
     private int $currentMemory = 0;
 
     public array $hydrationEntries = [];
 
+    private bool $lookUpCallerFromStackTrace;
+
     public function __construct(array $options = [])
     {
+        $this->lookUpCallerFromStackTrace = ! app()->isProduction();
+
         $events = $options['events'] ?? 'eloquent.*';
         app('events')->listen($events, [$this, 'recordAction']);
     }
@@ -51,7 +58,9 @@ class ModelObserver
         $memoryBefore = $this->currentMemory;
         $memoryAfter = memory_get_usage();
 
-        $this->recordHydrations($data, $memoryBefore, $memoryAfter);
+        $caller = $this->lookUpCallerFromStackTrace ? $this->getCallerFromStackTrace() : null;
+
+        $this->recordHydrations($data, $memoryBefore, $memoryAfter, $caller);
     }
 
     /**
@@ -60,7 +69,7 @@ class ModelObserver
      * @param  array  $data
      * @return void
      */
-    public function recordHydrations($data, $memoryBefore, $memoryAfter)
+    public function recordHydrations($data, $memoryBefore, $memoryAfter, ?array $caller = null)
     {
         $modelClass = get_class($data['model'] ?? $data[0]);
 
@@ -78,7 +87,36 @@ class ModelObserver
             $model->count++;
         }
 
+        $this->recordSource($modelClass, $caller);
+
         $this->currentMemory = $memoryAfter;
+    }
+
+    private function recordSource(string $modelClass, ?array $caller): void
+    {
+        if (! $caller) {
+            return;
+        }
+
+        $file = $caller['file'] ?? null;
+        $line = $caller['line'] ?? null;
+
+        if (! $file || ! $line) {
+            return;
+        }
+
+        $sourceKey = $file.':'.$line;
+        $modelData = $this->hydrationEntries[$modelClass];
+
+        if (! isset($modelData->sources[$sourceKey])) {
+            $modelData->sources[$sourceKey] = new ModelSourceData(
+                file: $file,
+                line: $line,
+                count: 1,
+            );
+        } else {
+            $modelData->sources[$sourceKey]->count++;
+        }
     }
 
     public function given($model)

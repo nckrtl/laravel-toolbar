@@ -12,7 +12,7 @@ yarn-error.log
 # Caches
 .phpunit.cache
 .phpunit.result.cache
-# /build - Keep build folder committed for package distribution
+/build
 
 # IDE Helper
 _ide_helper.php
