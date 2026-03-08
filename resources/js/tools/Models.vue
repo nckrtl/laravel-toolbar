@@ -1,8 +1,9 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import ToolbarItem from '@/components/ToolbarItem.vue';
 import { useToolbar } from '@/composables/useToolbar';
 import Panel from '@/components/Panel.vue';
+import Pill from '@/components/Pill.vue';
 import EmptyListIcon from '@/icons/EmptyListIcon.vue';
 import { ChevronRightIcon } from '@heroicons/vue/16/solid';
 
@@ -30,9 +31,71 @@ const toggleModel = (modelClass) => {
     expandedModels.value[modelClass] = !expandedModels.value[modelClass];
 };
 
-const hasSources = (model) => {
-    return model.sources && Object.keys(model.sources).length > 0;
+const getSources = (model) => {
+    return Object.values(model?.sources ?? {});
 };
+
+const getSourceCount = (model) => {
+    return getSources(model).length;
+};
+
+const hasMultipleSources = (model) => {
+    return getSourceCount(model) > 1;
+};
+
+const getSingleSource = (model) => {
+    return getSources(model)[0] ?? null;
+};
+
+const getSourceLabel = (source) => {
+    return `${source.file.split('/').pop()}:${source.line}`;
+};
+
+const getActionPillColor = (action) => {
+    const normalizedAction = action?.toLowerCase();
+
+    if (normalizedAction === 'retrieved') {
+        return 'blue';
+    }
+
+    if (normalizedAction === 'created') {
+        return 'green';
+    }
+
+    if (normalizedAction === 'deleted') {
+        return 'red';
+    }
+
+    if (normalizedAction === 'updated') {
+        return 'yellow';
+    }
+
+    return 'slate';
+};
+
+const visibleRowCount = computed(() => {
+    return Object.entries(data.value?.models ?? {}).reduce((count, [modelClass, model]) => {
+        const sourceCount = getSourceCount(model);
+        const expandedSourceCount =
+            expandedModels.value[modelClass] && sourceCount > 1 ? sourceCount : 0;
+
+        return count + 1 + expandedSourceCount;
+    }, 0);
+});
+
+const shouldUseFixedPanelHeight = computed(() => {
+    return visibleRowCount.value > 8;
+});
+
+const panelMinHeight = computed(() => {
+    return shouldUseFixedPanelHeight.value ? 'h-[385px]' : '';
+});
+
+const tableBodyClasses = computed(() => {
+    return shouldUseFixedPanelHeight.value
+        ? 'relative max-h-[190px] overflow-y-auto rounded-b-lg pb-3'
+        : 'relative overflow-visible rounded-b-lg pb-0';
+});
 </script>
 
 <template>
@@ -42,7 +105,7 @@ const hasSources = (model) => {
             @mouseenter="isOpen = true"
             @mouseleave="isOpen = false"
             size="full"
-            minHeight="h-[385px]"
+            :minHeight="panelMinHeight"
         >
             <div class="flex items-center justify-between">
                 <div class="flex min-w-64 items-center gap-3 p-1.5">
@@ -111,6 +174,13 @@ const hasSources = (model) => {
                                     </div>
                                 </div>
                             </th>
+                            <th class="sticky top-0 z-10 my-0.5 w-[10%] text-[#A3A3A3] uppercase">
+                                <div class="pb-0.5">
+                                    <div class="border-y border-white/7.5 bg-white/3 px-3 py-2">
+                                        Action
+                                    </div>
+                                </div>
+                            </th>
                             <th
                                 class="shadow-3xl sticky top-0 z-10 my-0.5 w-[30%] text-[#A3A3A3] uppercase shadow-black"
                             >
@@ -125,10 +195,7 @@ const hasSources = (model) => {
                         </tr>
                     </thead>
                 </table>
-                <div
-                    ref="queriesTable"
-                    class="relative max-h-[190px] overflow-y-auto rounded-b-lg pb-3"
-                >
+                <div ref="queriesTable" :class="tableBodyClasses">
                     <table
                         ref="queriesTableInner"
                         class="relative mt-0 w-full table-fixed text-left"
@@ -153,8 +220,8 @@ const hasSources = (model) => {
                             >
                                 <tr
                                     class="group relative"
-                                    :class="{ 'cursor-pointer': hasSources(model) }"
-                                    @click="hasSources(model) && toggleModel(modelClass)"
+                                    :class="{ 'cursor-pointer': hasMultipleSources(model) }"
+                                    @click="hasMultipleSources(model) && toggleModel(modelClass)"
                                 >
                                     <td class="w-[60%]">
                                         <div class="py-0.5">
@@ -165,7 +232,7 @@ const hasSources = (model) => {
                                                     class="flex items-center gap-1.5 whitespace-nowrap"
                                                 >
                                                     <ChevronRightIcon
-                                                        v-if="hasSources(model)"
+                                                        v-if="hasMultipleSources(model)"
                                                         class="size-3.5 shrink-0 text-white/40 transition-transform duration-150"
                                                         :class="{
                                                             'rotate-90': expandedModels[modelClass],
@@ -187,27 +254,62 @@ const hasSources = (model) => {
                                             </div>
                                         </div>
                                     </td>
+                                    <td class="w-[10%]">
+                                        <div class="py-0.5">
+                                            <div
+                                                class="overflow-hidden border-y border-white/7.5 bg-white/3 px-3 py-[7px] text-ellipsis group-hover:bg-white/5"
+                                            >
+                                                <Pill :color="getActionPillColor(model.action)">
+                                                    {{ model.action }}
+                                                </Pill>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td class="w-[30%]">
                                         <div class="py-0.5">
                                             <div
                                                 class="overflow-hidden rounded-r-md border-y border-r border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
                                             >
-                                                <span class="whitespace-nowrap text-white/40">
-                                                    {{
-                                                        hasSources(model)
-                                                            ? Object.keys(model.sources).length +
-                                                              (Object.keys(model.sources).length ===
-                                                              1
-                                                                  ? ' source'
-                                                                  : ' sources')
-                                                            : '-'
-                                                    }}
-                                                </span>
+                                                <template v-if="hasMultipleSources(model)">
+                                                    <span class="whitespace-nowrap text-white/40">
+                                                        {{ getSourceCount(model) }} sources
+                                                    </span>
+                                                </template>
+                                                <template v-else-if="getSingleSource(model)">
+                                                    <a
+                                                        v-if="
+                                                            getSingleSource(model)
+                                                                .controller_action_editor_url
+                                                        "
+                                                        class="cursor-pointer whitespace-nowrap text-white/40 hover:text-white hover:underline"
+                                                        :href="
+                                                            getSingleSource(model)
+                                                                .controller_action_editor_url
+                                                        "
+                                                        target="_blank"
+                                                        @click.stop
+                                                        >{{
+                                                            getSourceLabel(getSingleSource(model))
+                                                        }}</a
+                                                    >
+                                                    <span
+                                                        v-else
+                                                        class="whitespace-nowrap text-white/40"
+                                                        >{{
+                                                            getSourceLabel(getSingleSource(model))
+                                                        }}</span
+                                                    >
+                                                </template>
+                                                <span v-else class="whitespace-nowrap text-white/40"
+                                                    >-</span
+                                                >
                                             </div>
                                         </div>
                                     </td>
                                 </tr>
-                                <template v-if="expandedModels[modelClass] && hasSources(model)">
+                                <template
+                                    v-if="expandedModels[modelClass] && hasMultipleSources(model)"
+                                >
                                     <tr
                                         v-for="(source, sourceKey) in model.sources"
                                         :key="sourceKey"
@@ -229,15 +331,11 @@ const hasSources = (model) => {
                                                             "
                                                             target="_blank"
                                                             @click.stop
-                                                            >{{ source.file.split('/').pop() }}:{{
-                                                                source.line
-                                                            }}</a
+                                                            >{{ getSourceLabel(source) }}</a
                                                         >
-                                                        <span v-else
-                                                            >{{ source.file.split('/').pop() }}:{{
-                                                                source.line
-                                                            }}</span
-                                                        >
+                                                        <span v-else>{{
+                                                            getSourceLabel(source)
+                                                        }}</span>
                                                     </span>
                                                 </div>
                                             </div>

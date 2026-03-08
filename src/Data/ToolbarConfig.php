@@ -88,15 +88,16 @@ class ToolbarConfig extends Data
                         new DatabaseTool,
                         new ModelsTool
                     )->section(Section::CENTER)
-                )->addGroup(
-                    (new GroupConfig(priority: 20))->setTools(
-                        new TechStackTool,
-                    )->section(Section::CENTER)
-                )->addGroup(
-                    (new GroupConfig(priority: 30))->setTools(
-                        new BreakpointIndicatorTool(show_pixels: true),
-                    )->section(Section::CENTER)
                 )
+                // )->addGroup(
+                //     (new GroupConfig(priority: 20))->setTools(
+                //         new TechStackTool,
+                //     )->section(Section::CENTER)
+                // )->addGroup(
+                //     (new GroupConfig(priority: 30))->setTools(
+                //         new BreakpointIndicatorTool(show_pixels: true),
+                //     )->section(Section::CENTER)
+                // )
             );
     }
 

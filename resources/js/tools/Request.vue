@@ -117,7 +117,7 @@ const openRouteEditor = (url) => {
 </script>
 
 <template>
-    <div class="">
+    <div>
         <Panel v-if="isOpen" @mouseenter="isOpen = true" @mouseleave="isOpen = false">
             <SectionHeader>
                 <template #icon>
@@ -259,12 +259,7 @@ const openRouteEditor = (url) => {
             :class="itemClasses"
             innerPadding="pl-0.5"
         >
-            <Pill color="green">{{ data.response?.status_code }}</Pill>
-            <!-- <span>{{ data.request?.method }}</span>
-            <span>
-                <span>{{ data.request?.uri.slice(0, 32) }}</span
-                ><span v-if="data.request?.uri.length > 32">...</span>
-            </span> -->
+            <Pill class="px-1.5 py-[5px]" color="green">{{ data.response?.status_code }}</Pill>
         </ToolbarItem>
     </div>
 </template>

@@ -60,11 +60,11 @@ class QueriesCollector extends Collector implements CollectorInterface
 
         $this->queries = $queryObserver->queries;
 
-        $this->connections = $queryObserver->connections;
+        $this->connections = array_values(array_unique($queryObserver->connections, SORT_REGULAR));
 
-        $this->drivers = $queryObserver->drivers;
+        $this->drivers = array_values(array_unique($queryObserver->drivers, SORT_REGULAR));
 
-        $this->databases = $queryObserver->databases;
+        $this->databases = array_values(array_unique($queryObserver->databases, SORT_REGULAR));
 
         $offset = 0;
 

@@ -1,9 +1,6 @@
 <script setup>
-import { onMounted, computed } from 'vue';
-
 import Group from '@/components/Group.vue';
 import { useToolbar } from '@/composables/useToolbar';
-// import CommandPallete from '@/CommandPallete.vue';
 
 const { data } = useToolbar();
 </script>

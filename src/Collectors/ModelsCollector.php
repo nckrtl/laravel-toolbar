@@ -39,5 +39,6 @@ class ModelsCollector extends Collector implements CollectorInterface
         }
 
         $this->models = $modelObserver->hydrationEntries;
+
     }
 }

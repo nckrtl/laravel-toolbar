@@ -19,16 +19,6 @@ const props = defineProps({
 
 const { data } = useToolbar();
 const isOpen = ref(false);
-let closeTimeout = null;
-const open = () => {
-    clearTimeout(closeTimeout);
-    isOpen.value = true;
-};
-const close = () => {
-    closeTimeout = setTimeout(() => {
-        isOpen.value = false;
-    }, 100);
-};
 const searchPhrase = ref('');
 const filter = ref('none');
 
@@ -51,8 +41,23 @@ const filteredQueries = computed(() => {
     return queries;
 });
 
+const shouldUseFixedPanelHeight = computed(() => {
+    return filteredQueries.value.length > 8;
+});
+
+const panelMinHeight = computed(() => {
+    return shouldUseFixedPanelHeight.value ? 'h-[385px]' : '';
+});
+
+const tableBodyClasses = computed(() => {
+    return shouldUseFixedPanelHeight.value
+        ? 'relative max-h-[290px] overflow-y-auto rounded-b-lg pb-3'
+        : 'relative overflow-visible rounded-b-lg pb-0';
+});
+
 const queriesTable = ref(null);
 const queriesTableInner = ref(null);
+const fadeClasses = ['fade-to-bottom', 'fade-to-top', 'fade-to-top-and-bottom'];
 
 watch(queriesTable, (newVal) => {
     if (newVal) {
@@ -63,17 +68,32 @@ watch(queriesTable, (newVal) => {
                 scrollTop + queriesTable.value.clientHeight ==
                 queriesTableInner.value.clientHeight + 12
             ) {
-                queriesTable.value.classList.remove('fade-to-top-and-bottom');
+                queriesTable.value.classList.remove(...fadeClasses);
                 queriesTable.value.classList.add('fade-to-top');
             } else if (scrollTop > 1) {
-                queriesTable.value.classList.remove('fade-to-bottom', 'fade-to-top');
+                queriesTable.value.classList.remove(...fadeClasses);
                 queriesTable.value.classList.add('fade-to-top-and-bottom');
             } else {
-                queriesTable.value.classList.remove('fade-to-bottom-and-top');
+                queriesTable.value.classList.remove(...fadeClasses);
                 queriesTable.value.classList.add('fade-to-bottom');
             }
         });
     }
+});
+
+watch(shouldUseFixedPanelHeight, (useFixedPanelHeight) => {
+    if (!queriesTable.value) {
+        return;
+    }
+
+    if (!useFixedPanelHeight) {
+        queriesTable.value.classList.remove(...fadeClasses);
+        queriesTable.value.scrollTop = 0;
+    }
+});
+
+watch(data, (newVal) => {
+    console.log(newVal);
 });
 </script>
 
@@ -81,10 +101,10 @@ watch(queriesTable, (newVal) => {
     <div>
         <Panel
             v-if="isOpen"
-            @mouseenter="open"
-            @mouseleave="close"
+            @mouseenter="isOpen = true"
+            @mouseleave="isOpen = false"
             size="full"
-            minHeight="h-[385px]"
+            :minHeight="panelMinHeight"
         >
             <div class="flex items-center justify-between">
                 <div class="flex min-w-64 items-center gap-3 p-1.5">
@@ -121,26 +141,7 @@ watch(queriesTable, (newVal) => {
                     <div class="flex items-center gap-2">
                         <span class="text-xxs font-medium text-white/50 uppercase"> Duration </span>
                         <span>
-                            <!-- <span v-if="data.queries?.totalTimeFilteredQueries"
-                                >{{
-                                    Math.round(data.queries?.totalTimeFilteredQueries * 100) / 100
-                                }}ms of
-                            </span> -->
-                            <span>{{ Math.round(data.queries?.totalTime) }}ms</span>
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xxs font-medium text-white/50 uppercase">
-                            Connection
-                        </span>
-                        <span>
-                            {{ data.queries?.connections.join(', ') }}
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xxs font-medium text-white/50 uppercase"> Driver </span>
-                        <span>
-                            {{ data.queries?.drivers.join(', ') }}
+                            <span>{{ data.queries?.totalTime }}ms</span>
                         </span>
                     </div>
                     <div class="flex items-center gap-2">
@@ -223,10 +224,7 @@ watch(queriesTable, (newVal) => {
                         </tr>
                     </thead>
                 </table>
-                <div
-                    ref="queriesTable"
-                    class="relative max-h-[290px] overflow-y-auto rounded-b-lg pb-3"
-                >
+                <div ref="queriesTable" :class="tableBodyClasses">
                     <table
                         ref="queriesTableInner"
                         class="relative mt-0 w-full table-fixed text-left"
@@ -363,7 +361,12 @@ watch(queriesTable, (newVal) => {
             </div>
         </Panel>
 
-        <ToolbarItem @mouseenter="open" @mouseleave="close" :isActive="isOpen" :class="itemClasses">
+        <ToolbarItem
+            @mouseenter="isOpen = true"
+            @mouseleave="isOpen = false"
+            :isActive="isOpen"
+            :class="itemClasses"
+        >
             <div class="flex items-center gap-1 py-0.5">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

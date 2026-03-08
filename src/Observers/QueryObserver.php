@@ -132,10 +132,18 @@ class QueryObserver
         }
 
         $this->databases[$database] = new DatabaseData(
-            name: $database,
+            name: $this->getDatabaseName($database, $event),
             connection: $event->connectionName,
             driver: $event->connection->getDriverName(),
         );
+    }
+
+    private function getDatabaseName($database, $event)
+    {
+        return match ($event->connectionName) {
+            'sqlite' => last(explode('/', $database)) ?? $database,
+            default => $database,
+        };
     }
 
     protected function formatBindings($event)
