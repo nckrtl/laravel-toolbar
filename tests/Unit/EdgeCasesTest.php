@@ -347,19 +347,27 @@ it('TailwindCollector checks both vite plugin and main package', function () {
 
 // ToolbarInjector Manifest Edge Cases
 
-it('ToolbarInjector handles missing manifest gracefully', function () {
+it('ToolbarInjector does not emit broken asset urls when production assets are unavailable', function () {
     $injector = new class extends ToolbarInjector
     {
-        public function testGetAssets(): array
+        protected function getPackageViteUrl(): ?string
         {
-            return $this->getProductionManifestAssets();
+            return null;
+        }
+
+        protected function getProductionManifestAssets(): ?array
+        {
+            return null;
         }
     };
 
-    $assets = $injector->testGetAssets();
+    $request = \Illuminate\Http\Request::create('/', 'GET');
+    $response = \NckRtl\Toolbar\Tests\Helpers\MockResponse::make('<html><body></body></html>');
 
-    // Even with missing manifest, should return array structure
-    expect($assets)->toBeArray();
-    expect($assets)->toHaveKey('js');
-    expect($assets)->toHaveKey('css');
+    $injector->inject($request, $response);
+
+    expect($response->getContent())
+        ->toContain('Laravel Toolbar assets are missing from the package distribution')
+        ->not->toContain('src="http://localhost/_toolbar"')
+        ->not->toContain('src="https://localhost/_toolbar"');
 });

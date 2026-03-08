@@ -224,6 +224,10 @@ class ToolbarInjector
     {
         $assets = $this->getProductionManifestAssets();
 
+        if (! $assets) {
+            return '<!-- Laravel Toolbar assets are missing from the package distribution -->';
+        }
+
         $jsUrl = url('/_toolbar/'.$assets['js']);
         $cssUrl = url('/_toolbar/'.$assets['css']);
 
@@ -310,19 +314,19 @@ class ToolbarInjector
     /**
      * Get the built asset filenames from Vite's manifest
      */
-    protected function getProductionManifestAssets(): array
+    protected function getProductionManifestAssets(): ?array
     {
         $manifestPath = __DIR__.'/../build/manifest.json';
 
         if (! file_exists($manifestPath)) {
-            return ['js' => '', 'css' => ''];
+            return null;
         }
 
         $manifest = json_decode(file_get_contents($manifestPath), true);
         $entry = $manifest['resources/js/toolbar.prod.ts'] ?? null;
 
         if (! $entry) {
-            return ['js' => '', 'css' => ''];
+            return null;
         }
 
         $cssFile = '';
@@ -330,9 +334,19 @@ class ToolbarInjector
             $cssFile = basename($entry['css'][0]);
         }
 
-        return [
-            'js' => basename($entry['file'] ?? ''),
-            'css' => $cssFile,
-        ];
+        $jsFile = basename($entry['file'] ?? '');
+
+        if ($jsFile === '' || $cssFile === '') {
+            return null;
+        }
+
+        if (
+            ! file_exists(__DIR__.'/../build/assets/'.$jsFile)
+            || ! file_exists(__DIR__.'/../build/assets/'.$cssFile)
+        ) {
+            return null;
+        }
+
+        return ['js' => $jsFile, 'css' => $cssFile];
     }
 }
