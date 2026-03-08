@@ -13,6 +13,7 @@ use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 #[IsReadOnly]
 class GetRequestDataTool extends Tool
@@ -55,15 +56,14 @@ class GetRequestDataTool extends Tool
         $mcpRequestId = Str::uuid();
 
         try {
-            $response = Http::send(
-                $method ?? 'GET',
-                config('app.url').'/'.ltrim($route->uri, '/'),
-                [
-                    'headers' => [
-                        'X-MCP-ID' => (string) $mcpRequestId,
-                    ],
-                ]
-            );
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'X-MCP-ID' => (string) $mcpRequestId,
+                ])
+                ->send(
+                    $method ?? 'GET',
+                    config('app.url').'/'.ltrim($route->uri, '/'),
+                );
         } catch (\Exception $e) {
             return Response::error('Failed to make request to route: '.$route->uri.', method: '.$method.', error: '.$e->getMessage());
         }
@@ -107,27 +107,24 @@ class GetRequestDataTool extends Tool
     {
         $routes = RouteFacade::getRoutes();
 
-        if ($type === 'route_name') {
-            return $routes->getByName($route);
-        }
+        $appUrl = config('app.url');
 
-        if ($type === 'url') {
-            $appUrl = config('app.url');
-            $uri = $route;
-
-            // Extract the URI path from the full URL if it contains the app URL
-            if ($appUrl && str_contains($route, $appUrl)) {
-                $uri = substr($route, strlen($appUrl));
+        try {
+            if ($type === 'route_name') {
+                return $routes->getByName($route);
             }
 
-            // Ensure URI starts with /
-            $uri = '/'.ltrim($uri, '/');
+            if ($type === 'url') {
+                return $routes->match(HttpRequest::create($route, $method ?? 'GET'));
+            }
 
-            return $routes->match(HttpRequest::create($uri, $method ?? 'GET'));
-        }
+            if ($type === 'uri') {
+                $fullUrl = rtrim($appUrl, '/').'/'.ltrim($route, '/');
 
-        if ($type === 'uri') {
-            return $routes->match(HttpRequest::create($route, $method ?? 'GET'));
+                return $routes->match(HttpRequest::create($fullUrl, $method ?? 'GET'));
+            }
+        } catch (NotFoundHttpException) {
+            return null;
         }
 
         return null;
