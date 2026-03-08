@@ -344,7 +344,7 @@ watch(data, (newVal) => {
                                             <span class="whitespace-nowrap">
                                                 <a
                                                     class="cursor-pointer hover:underline"
-                                                    :href="query.controller_action_editor_url"
+                                                    :href="query.editor_url"
                                                     target="_blank"
                                                     >{{ query.file.split('/').pop() }}:{{
                                                         query.line

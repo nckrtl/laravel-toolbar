@@ -194,12 +194,12 @@ const openRouteEditor = (url) => {
                     <template #value>
                         <span
                             :class="
-                                data.request?.controller_action_editor_url
+                                data.request?.editor_url
                                     ? 'cursor-pointer hover:underline'
                                     : ''
                             "
-                            @click="openRouteEditor(data.request?.controller_action_editor_url)"
-                            :title="data.request?.controller_action_editor_url"
+                            @click="openRouteEditor(data.request?.editor_url)"
+                            :title="data.request?.editor_url"
                             >{{
                                 data.request?.controller_action.split('\\')[
                                     data.request?.controller_action.split('\\').length - 1

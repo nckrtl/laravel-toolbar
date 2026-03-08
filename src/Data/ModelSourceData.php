@@ -9,7 +9,7 @@ class ModelSourceData extends Data
 {
     use ControllerActionEditorUrl;
 
-    public ?string $controller_action_editor_url = null;
+    public ?string $editor_url = null;
 
     public function __construct(
         public ?string $file,

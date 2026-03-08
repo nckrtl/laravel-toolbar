@@ -35,7 +35,7 @@ declare namespace NckRtl.Toolbar.Data {
         memory_used: any | null;
     };
     export type ModelSourceData = {
-        controller_action_editor_url: string | null;
+        editor_url: string | null;
         file: string | null;
         line: number | null;
         count: number;
@@ -65,7 +65,7 @@ declare namespace NckRtl.Toolbar.Data {
         queries: Array<any>;
     };
     export type QueryData = {
-        controller_action_editor_url: string | null;
+        editor_url: string | null;
         type: any | null;
         hash: string;
         sql: string;
@@ -88,7 +88,7 @@ declare namespace NckRtl.Toolbar.Data {
     };
     export type RequestData = {
         route_name: string;
-        controller_action_editor_url: string | null;
+        editor_url: string | null;
         route_editor_url: string | null;
         method: string;
         uri: string;

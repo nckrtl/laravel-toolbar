@@ -29,6 +29,6 @@ trait ControllerActionEditorUrl
             return;
         }
 
-        $this->controller_action_editor_url = $this->resolveSourceHref($file, (int) $line);
+        $this->editor_url = $this->resolveSourceHref($file, (int) $line);
     }
 }

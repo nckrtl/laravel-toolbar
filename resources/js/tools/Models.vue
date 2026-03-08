@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch, nextTick } from 'vue';
 import ToolbarItem from '@/components/ToolbarItem.vue';
 import { useToolbar } from '@/composables/useToolbar';
 import Panel from '@/components/Panel.vue';
@@ -22,6 +22,8 @@ const { data } = useToolbar();
 
 const isOpen = ref(false);
 const expandedModels = ref({});
+const queriesTable = ref(null);
+const queriesTableInner = ref(null);
 
 const onlyUnique = (value, index, array) => {
     return array.indexOf(value) === index;
@@ -73,18 +75,25 @@ const getActionPillColor = (action) => {
     return 'slate';
 };
 
+const isExpanded = (modelClass) => {
+    return expandedModels.value[modelClass];
+};
+
 const visibleRowCount = computed(() => {
     return Object.entries(data.value?.models ?? {}).reduce((count, [modelClass, model]) => {
-        const sourceCount = getSourceCount(model);
-        const expandedSourceCount =
-            expandedModels.value[modelClass] && sourceCount > 1 ? sourceCount : 0;
-
-        return count + 1 + expandedSourceCount;
+        const expanded = isExpanded(modelClass) && hasMultipleSources(model);
+        return count + 1 + (expanded ? 1 : 0);
     }, 0);
 });
 
+const hasAnyExpanded = computed(() => {
+    return Object.entries(data.value?.models ?? {}).some(
+        ([modelClass, model]) => isExpanded(modelClass) && hasMultipleSources(model),
+    );
+});
+
 const shouldUseFixedPanelHeight = computed(() => {
-    return visibleRowCount.value > 8;
+    return visibleRowCount.value > 8 || hasAnyExpanded.value;
 });
 
 const panelMinHeight = computed(() => {
@@ -93,9 +102,52 @@ const panelMinHeight = computed(() => {
 
 const tableBodyClasses = computed(() => {
     return shouldUseFixedPanelHeight.value
-        ? 'relative max-h-[190px] overflow-y-auto rounded-b-lg pb-3'
+        ? 'relative min-h-0 flex-1 overflow-y-auto -mb-2'
         : 'relative overflow-visible rounded-b-lg pb-0';
 });
+
+// Scroll fade effect
+const fadeClasses = ['fade-to-bottom', 'fade-to-top', 'fade-to-top-and-bottom'];
+
+watch(queriesTable, (newVal) => {
+    if (newVal) {
+        newVal.addEventListener('scroll', () => {
+            const scrollTop = newVal.scrollTop;
+
+            if (
+                scrollTop + queriesTable.value.clientHeight ==
+                queriesTableInner.value.clientHeight + 12
+            ) {
+                queriesTable.value.classList.remove(...fadeClasses);
+                queriesTable.value.classList.add('fade-to-top');
+            } else if (scrollTop > 1) {
+                queriesTable.value.classList.remove(...fadeClasses);
+                queriesTable.value.classList.add('fade-to-top-and-bottom');
+            } else {
+                queriesTable.value.classList.remove(...fadeClasses);
+                queriesTable.value.classList.add('fade-to-bottom');
+            }
+        });
+    }
+});
+
+watch(shouldUseFixedPanelHeight, (useFixedPanelHeight) => {
+    if (!queriesTable.value) {
+        return;
+    }
+
+    if (useFixedPanelHeight) {
+        nextTick(() => {
+            if (queriesTable.value.scrollHeight > queriesTable.value.clientHeight) {
+                queriesTable.value.classList.add('fade-to-bottom');
+            }
+        });
+    } else {
+        queriesTable.value.classList.remove(...fadeClasses);
+        queriesTable.value.scrollTop = 0;
+    }
+});
+
 </script>
 
 <template>
@@ -107,7 +159,8 @@ const tableBodyClasses = computed(() => {
             size="full"
             :minHeight="panelMinHeight"
         >
-            <div class="flex items-center justify-between">
+            <div class="flex h-full flex-col">
+            <div class="flex shrink-0 items-center justify-between">
                 <div class="flex min-w-64 items-center gap-3 p-1.5">
                     <div
                         class="relative flex h-7 w-7 items-center justify-center rounded-md border border-white/8 bg-white/6"
@@ -151,8 +204,8 @@ const tableBodyClasses = computed(() => {
                 </div>
                 <div class="relative min-w-64"></div>
             </div>
-            <div class="h-2 w-full"></div>
-            <div class="relative">
+            <div class="h-2 w-full shrink-0"></div>
+            <div class="relative flex min-h-0 flex-1 flex-col">
                 <table class="relative mt-0 w-full table-fixed text-left">
                     <thead v-if="Object.values(data.models ?? []).length > 0">
                         <tr>
@@ -224,9 +277,21 @@ const tableBodyClasses = computed(() => {
                                     @click="hasMultipleSources(model) && toggleModel(modelClass)"
                                 >
                                     <td class="w-[60%]">
-                                        <div class="py-0.5">
+                                        <div
+                                            :class="
+                                                isExpanded(modelClass) && hasMultipleSources(model)
+                                                    ? 'pt-0.5 pb-0'
+                                                    : 'py-0.5'
+                                            "
+                                        >
                                             <div
-                                                class="overflow-hidden rounded-l-md border-y border-l border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
+                                                class="overflow-hidden border-y border-l border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
+                                                :class="
+                                                    isExpanded(modelClass) &&
+                                                    hasMultipleSources(model)
+                                                        ? 'rounded-tl-md border-b-0'
+                                                        : 'rounded-l-md'
+                                                "
                                             >
                                                 <span
                                                     class="flex items-center gap-1.5 whitespace-nowrap"
@@ -244,9 +309,20 @@ const tableBodyClasses = computed(() => {
                                         </div>
                                     </td>
                                     <td class="w-[10%] text-right">
-                                        <div class="py-0.5">
+                                        <div
+                                            :class="
+                                                isExpanded(modelClass) && hasMultipleSources(model)
+                                                    ? 'pt-0.5 pb-0'
+                                                    : 'py-0.5'
+                                            "
+                                        >
                                             <div
                                                 class="overflow-hidden border-y border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
+                                                :class="{
+                                                    'border-b-0':
+                                                        isExpanded(modelClass) &&
+                                                        hasMultipleSources(model),
+                                                }"
                                             >
                                                 <span class="whitespace-nowrap">
                                                     {{ model.count }}
@@ -255,9 +331,20 @@ const tableBodyClasses = computed(() => {
                                         </div>
                                     </td>
                                     <td class="w-[10%]">
-                                        <div class="py-0.5">
+                                        <div
+                                            :class="
+                                                isExpanded(modelClass) && hasMultipleSources(model)
+                                                    ? 'pt-0.5 pb-0'
+                                                    : 'py-0.5'
+                                            "
+                                        >
                                             <div
                                                 class="overflow-hidden border-y border-white/7.5 bg-white/3 px-3 py-[7px] text-ellipsis group-hover:bg-white/5"
+                                                :class="{
+                                                    'border-b-0':
+                                                        isExpanded(modelClass) &&
+                                                        hasMultipleSources(model),
+                                                }"
                                             >
                                                 <Pill :color="getActionPillColor(model.action)">
                                                     {{ model.action }}
@@ -266,9 +353,21 @@ const tableBodyClasses = computed(() => {
                                         </div>
                                     </td>
                                     <td class="w-[30%]">
-                                        <div class="py-0.5">
+                                        <div
+                                            :class="
+                                                isExpanded(modelClass) && hasMultipleSources(model)
+                                                    ? 'pt-0.5 pb-0'
+                                                    : 'py-0.5'
+                                            "
+                                        >
                                             <div
-                                                class="overflow-hidden rounded-r-md border-y border-r border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
+                                                class="overflow-hidden border-y border-r border-white/7.5 bg-white/3 px-3 py-2 text-ellipsis group-hover:bg-white/5"
+                                                :class="
+                                                    isExpanded(modelClass) &&
+                                                    hasMultipleSources(model)
+                                                        ? 'rounded-tr-md border-b-0'
+                                                        : 'rounded-r-md'
+                                                "
                                             >
                                                 <template v-if="hasMultipleSources(model)">
                                                     <span class="whitespace-nowrap text-white/40">
@@ -276,29 +375,22 @@ const tableBodyClasses = computed(() => {
                                                     </span>
                                                 </template>
                                                 <template v-else-if="getSingleSource(model)">
-                                                    <a
-                                                        v-if="
-                                                            getSingleSource(model)
-                                                                .controller_action_editor_url
-                                                        "
-                                                        class="cursor-pointer whitespace-nowrap text-white/40 hover:text-white hover:underline"
-                                                        :href="
-                                                            getSingleSource(model)
-                                                                .controller_action_editor_url
-                                                        "
-                                                        target="_blank"
-                                                        @click.stop
-                                                        >{{
-                                                            getSourceLabel(getSingleSource(model))
-                                                        }}</a
-                                                    >
-                                                    <span
-                                                        v-else
-                                                        class="whitespace-nowrap text-white/40"
-                                                        >{{
-                                                            getSourceLabel(getSingleSource(model))
-                                                        }}</span
-                                                    >
+                                                    <span class="whitespace-nowrap">
+                                                        <a
+                                                            class="cursor-pointer text-white/40 hover:underline"
+                                                            :href="
+                                                                getSingleSource(model)
+                                                                    .editor_url
+                                                            "
+                                                            target="_blank"
+                                                            @click.stop
+                                                            >{{
+                                                                getSourceLabel(
+                                                                    getSingleSource(model),
+                                                                )
+                                                            }}</a
+                                                        >
+                                                    </span>
                                                 </template>
                                                 <span v-else class="whitespace-nowrap text-white/40"
                                                     >-</span
@@ -307,63 +399,68 @@ const tableBodyClasses = computed(() => {
                                         </div>
                                     </td>
                                 </tr>
-                                <template
-                                    v-if="expandedModels[modelClass] && hasMultipleSources(model)"
+                                <tr
+                                    v-if="isExpanded(modelClass) && hasMultipleSources(model)"
                                 >
-                                    <tr
-                                        v-for="(source, sourceKey) in model.sources"
-                                        :key="sourceKey"
-                                        class="group relative"
-                                    >
-                                        <td class="w-[60%]">
-                                            <div class="py-0.5">
-                                                <div
-                                                    class="overflow-hidden rounded-l-md border-y border-l border-white/5 bg-white/1.5 px-3 py-1.5 pl-8 text-ellipsis group-hover:bg-white/3"
-                                                >
-                                                    <span class="whitespace-nowrap text-white/60">
-                                                        <a
-                                                            v-if="
-                                                                source.controller_action_editor_url
-                                                            "
-                                                            class="cursor-pointer hover:text-white hover:underline"
-                                                            :href="
-                                                                source.controller_action_editor_url
-                                                            "
-                                                            target="_blank"
-                                                            @click.stop
-                                                            >{{ getSourceLabel(source) }}</a
+                                    <td colspan="4" class="p-0">
+                                        <div class="pb-0.5">
+                                            <div
+                                                class="overflow-hidden rounded-b-md border-x border-b border-white/7.5 bg-white/3"
+                                            >
+                                                <table class="w-full text-left" style="table-layout: fixed">
+                                                    <colgroup>
+                                                        <col style="width: 60%" />
+                                                        <col style="width: 10%" />
+                                                        <col style="width: 10%" />
+                                                        <col style="width: 30%" />
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr
+                                                            v-for="(
+                                                                source, sourceKey
+                                                            ) in model.sources"
+                                                            :key="sourceKey"
+                                                            class="group/source border-t border-white/5"
                                                         >
-                                                        <span v-else>{{
-                                                            getSourceLabel(source)
-                                                        }}</span>
-                                                    </span>
-                                                </div>
+                                                            <td
+                                                                class="px-3 py-2 group-hover/source:bg-white/3"
+                                                            ></td>
+                                                            <td
+                                                                class="px-3 py-2 text-right text-white/60 group-hover/source:bg-white/3"
+                                                            >
+                                                                {{ source.count }}
+                                                            </td>
+                                                            <td
+                                                                class="group-hover/source:bg-white/3"
+                                                            ></td>
+                                                            <td
+                                                                class="px-3 py-2 text-white/60 group-hover/source:bg-white/3"
+                                                            >
+                                                                <span class="whitespace-nowrap">
+                                                                    <a
+                                                                        class="cursor-pointer hover:underline"
+                                                                        :href="
+                                                                            source.editor_url
+                                                                        "
+                                                                        target="_blank"
+                                                                        >{{
+                                                                            getSourceLabel(source)
+                                                                        }}</a
+                                                                    >
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
-                                        </td>
-                                        <td class="w-[10%] text-right">
-                                            <div class="py-0.5">
-                                                <div
-                                                    class="overflow-hidden border-y border-white/5 bg-white/1.5 px-3 py-1.5 text-ellipsis text-white/60 group-hover:bg-white/3"
-                                                >
-                                                    <span class="whitespace-nowrap">
-                                                        {{ source.count }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="w-[30%]">
-                                            <div class="py-0.5">
-                                                <div
-                                                    class="overflow-hidden rounded-r-md border-y border-r border-white/5 bg-white/1.5 px-3 py-1.5 text-ellipsis group-hover:bg-white/3"
-                                                ></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </template>
+                                        </div>
+                                    </td>
+                                </tr>
                             </template>
                         </tbody>
                     </table>
                 </div>
+            </div>
             </div>
         </Panel>
         <ToolbarItem

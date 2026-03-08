@@ -56,7 +56,7 @@ class QueriesCollector extends Collector implements CollectorInterface
             return;
         }
 
-        $this->totalTime = $queryObserver->totalTime;
+        $this->totalTime = round($queryObserver->totalTime, 2);
 
         $this->queries = $queryObserver->queries;
 
