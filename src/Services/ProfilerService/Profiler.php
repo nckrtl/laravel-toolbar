@@ -2,7 +2,6 @@
 
 namespace NckRtl\Toolbar\Services\ProfilerService;
 
-use Illuminate\View\Engines\CompilerEngine;
 use NckRtl\Toolbar\Data\ProfileMarkerData;
 use NckRtl\Toolbar\Data\RequestCheckpointData;
 use NckRtl\Toolbar\Data\RequestStageData;
@@ -95,28 +94,13 @@ class Profiler
         }
 
         $resolver = app('view.engine.resolver');
+        $bladeEngine = $resolver->resolve('blade');
 
-        // Wrap the blade engine
-        $resolver->register('blade', function () {
-            $compiler = app('blade.compiler');
-            $files = app('files');
+        if ($bladeEngine instanceof ProfiledViewEngine) {
+            return;
+        }
 
-            return new class($compiler, $files) extends CompilerEngine
-            {
-                public function get($path, array $data = [])
-                {
-                    if (empty(Profiler::$viewRenders)) {
-                        Profiler::record(RequestCheckpointId::BEFORE_VIEW_RENDERING);
-                    }
-
-                    $result = parent::get($path, $data);
-
-                    Profiler::$viewRenders[$path] = new RequestCheckpointData;
-
-                    return $result;
-                }
-            };
-        });
+        $resolver->register('blade', fn () => new ProfiledViewEngine($bladeEngine));
     }
 
     public static function getRequestStages(): array

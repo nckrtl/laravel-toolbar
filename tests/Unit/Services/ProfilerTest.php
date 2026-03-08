@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\View\Engine;
 use NckRtl\Toolbar\Data\RequestCheckpointData;
 use NckRtl\Toolbar\Enums\DataSizeUnit;
 use NckRtl\Toolbar\Enums\RequestCheckpointId;
@@ -131,6 +132,50 @@ it('gets last view render', function () {
     $lastView = Profiler::getLastViewRender();
 
     expect($lastView)->toBeInstanceOf(RequestCheckpointData::class);
+});
+
+it('profiles the existing blade engine without replacing its rendering context', function () {
+    $viewPath = tempnam(sys_get_temp_dir(), 'toolbar-view-');
+    file_put_contents($viewPath, '<?= $this->value ?>');
+
+    $context = new class
+    {
+        public string $value = 'profiled';
+    };
+
+    $contextAwareEngine = new class($context) implements Engine
+    {
+        public function __construct(
+            private readonly object $context
+        ) {}
+
+        public function get($path, array $data = [])
+        {
+            return \Closure::bind(function () use ($path, $data) {
+                extract($data, EXTR_SKIP);
+
+                ob_start();
+                include $path;
+
+                return ltrim(ob_get_clean());
+            }, $this->context, $this->context)();
+        }
+    };
+
+    app('view.engine.resolver')->register('blade', fn () => $contextAwareEngine);
+
+    $setupViewProfiling = new \ReflectionMethod(Profiler::class, 'setupViewProfiling');
+    $setupViewProfiling->setAccessible(true);
+    $setupViewProfiling->invoke(null);
+
+    $profiledEngine = app('view.engine.resolver')->resolve('blade');
+    $output = $profiledEngine->get($viewPath);
+
+    expect($output)->toBe('profiled');
+    expect(Profiler::$viewRenders)->toHaveKey($viewPath);
+    expect(Profiler::getCheckpoint(RequestCheckpointId::BEFORE_VIEW_RENDERING))->not->toBeNull();
+
+    unlink($viewPath);
 });
 
 it('gets current memory usage from latest checkpoint with memory', function () {
