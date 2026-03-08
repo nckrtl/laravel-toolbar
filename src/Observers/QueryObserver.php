@@ -190,13 +190,34 @@ class QueryObserver
      */
     protected function quoteStringBinding($event, $binding)
     {
+        $pdo = $this->resolvePdoForEvent($event);
+
+        if (! $pdo instanceof \PDO) {
+            return $this->fallbackQuoteStringBinding($binding);
+        }
+
         try {
-            return $event->connection->getPdo()->quote($binding);
+            return $pdo->quote($binding);
         } catch (\PDOException $e) {
             throw_if($e->getCode() !== 'IM001', $e);
         }
 
-        // Fallback when PDO::quote function is missing...
+        return $this->fallbackQuoteStringBinding($binding);
+    }
+
+    protected function resolvePdoForEvent($event): ?\PDO
+    {
+        $pdo = match ($event->readWriteType ?? null) {
+            'read' => $event->connection->getReadPdo(),
+            'write' => $event->connection->getPdo(),
+            default => $event->connection->getReadPdo() ?: $event->connection->getPdo(),
+        };
+
+        return $pdo instanceof \PDO ? $pdo : null;
+    }
+
+    protected function fallbackQuoteStringBinding(string $binding): string
+    {
         $binding = \strtr($binding, [
             chr(26) => '\\Z',
             chr(8) => '\\b',

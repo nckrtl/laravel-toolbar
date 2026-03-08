@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use NckRtl\Toolbar\Observers\QueryObserver;
@@ -118,6 +120,27 @@ it('handles numeric bindings', function () {
     $query = $observer->queries[0];
 
     expect($query->sql)->toContain('42');
+});
+
+it('quotes string bindings from the read pdo when the write pdo is null', function () {
+    $observer = new QueryObserver;
+
+    /** @var Connection $baseConnection */
+    $baseConnection = DB::connection();
+    $readPdo = $baseConnection->getReadPdo();
+
+    $connection = new SQLiteConnection(null, $baseConnection->getDatabaseName(), '', []);
+    $connection->setReadPdo($readPdo);
+
+    $event = new QueryExecuted(
+        'select * from "test_users" where "name" = ?',
+        ['John'],
+        1.0,
+        $connection,
+        'read',
+    );
+
+    expect($observer->replaceBindings($event))->toContain("'John'");
 });
 
 it('tracks connections', function () {
