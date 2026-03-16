@@ -34,7 +34,7 @@
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
-        "spatie/laravel-typescript-transformer": "^2.5"
+        "spatie/laravel-typescript-transformer": "^3.0"
     },
     "autoload": {
         "psr-4": {
