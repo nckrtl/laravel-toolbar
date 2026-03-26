@@ -6,10 +6,10 @@ const props = defineProps({
     },
 });
 
-const modules = import.meta.glob('../tools/*.vue', { eager: true });
+const modules = import.meta.glob("../tools/*.vue", { eager: true });
 
 const getComponent = (component) => {
-    return modules[`../tools/${component}.vue`].default;
+    return modules[`../tools/${component}.vue`]?.default;
 };
 </script>
 

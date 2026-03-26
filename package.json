@@ -4,14 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && node fix-font-urls.js",
-    "preview": "vite preview",
-    "build-watch": "vite build --watch",
-    "format": "prettier --write resources/",
-    "format:check": "prettier --check resources/",
-    "oxlint": "bunx oxlint@latest --fix --fix-suggestions",
-    "typecheck": "vue-tsc --noEmit",
+    "dev": "vp dev",
+    "build": "vp build && node fix-font-urls.js",
+    "preview": "vp preview",
+    "build-watch": "vp build --watch",
+    "prepare": "vp config",
     "generate-types": "php vendor/bin/testbench typescript:transform"
   },
   "dependencies": {
@@ -27,12 +24,14 @@
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "postcss": "^8.5.6",
-    "prettier": "^3.6.2",
-    "prettier-plugin-tailwindcss": "^0.7.1",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
-    "vite": "^7.1.7",
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vite-plus": "latest",
     "vite-plugin-run": "^0.6.1",
     "vue-tsc": "^3.1.5"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest"
   }
 }

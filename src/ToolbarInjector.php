@@ -269,7 +269,7 @@ class ToolbarInjector
 
         {$additionalLightDomHtml}
 
-        <div id="laravel-toolbar-shadow-host"></div>
+        <div id="laravel-toolbar-shadow-host" data-feedback-toolbar="true"></div>
         <script{$nonceAttribute}>
             window.__LARAVEL_TOOLBAR_DATA__ = {$data};
             window.__LARAVEL_TOOLBAR_CSS_URL__ = "{$cssUrl}";
