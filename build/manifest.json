@@ -8,12 +8,12 @@
     "src": "resources/fonts/JetBrainsMono[wght].ttf"
   },
   "resources/js/toolbar.prod.ts": {
-    "file": "assets/toolbar.prod-BzefBbLJ.js",
+    "file": "assets/toolbar.prod-CgFfPfm8.js",
     "name": "toolbar.prod",
     "src": "resources/js/toolbar.prod.ts",
     "isEntry": true,
     "css": [
-      "assets/toolbar-BnKelpRN.css"
+      "assets/toolbar-DO2xxTp8.css"
     ],
     "assets": [
       "assets/JetBrainsMono_wght_-Ho3HWDri.ttf",
