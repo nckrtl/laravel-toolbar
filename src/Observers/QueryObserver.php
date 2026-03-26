@@ -184,7 +184,7 @@ class QueryObserver
     /**
      * Add quotes to string bindings.
      *
-     * @param  \Illuminate\Database\Events\QueryExecuted  $event
+     * @param  QueryExecuted  $event
      * @param  string  $binding
      * @return string
      */

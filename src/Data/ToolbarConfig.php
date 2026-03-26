@@ -2,6 +2,8 @@
 
 namespace NckRtl\Toolbar\Data;
 
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Routing\Router;
 use NckRtl\Toolbar\Collectors\CollectorInterface;
 use NckRtl\Toolbar\Collectors\InertiaCollector;
 use NckRtl\Toolbar\Collectors\LaravelCollector;
@@ -121,8 +123,8 @@ class ToolbarConfig extends Data
         }
 
         app()->booted(function () use ($middlewareConfig) {
-            $kernel = app()->make(\Illuminate\Contracts\Http\Kernel::class);
-            $router = app()->make(\Illuminate\Routing\Router::class);
+            $kernel = app()->make(Kernel::class);
+            $router = app()->make(Router::class);
 
             foreach ($middlewareConfig->prepend as $middleware) {
                 $kernel->prependMiddleware($middleware);

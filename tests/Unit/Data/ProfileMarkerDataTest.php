@@ -4,6 +4,7 @@ use NckRtl\Toolbar\Data\ProfileMarkerData;
 use NckRtl\Toolbar\Enums\DataSizeUnit;
 use NckRtl\Toolbar\Enums\TimeUnit;
 use NckRtl\Toolbar\Measurement;
+use Spatie\LaravelData\Data;
 
 it('creates profile marker with label', function () {
     $marker = new ProfileMarkerData('Fetching articles');
@@ -52,5 +53,5 @@ it('accepts custom memory', function () {
 it('extends Spatie Data class', function () {
     $marker = new ProfileMarkerData('Test marker');
 
-    expect($marker)->toBeInstanceOf(\Spatie\LaravelData\Data::class);
+    expect($marker)->toBeInstanceOf(Data::class);
 });

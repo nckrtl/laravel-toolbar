@@ -3,6 +3,16 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use NckRtl\Toolbar\CollectorManager;
+use NckRtl\Toolbar\Collectors\QueriesCollector;
+use NckRtl\Toolbar\Collectors\ResponseCollector;
+use NckRtl\Toolbar\Collectors\TailwindCollector;
+use NckRtl\Toolbar\Data\QueriesData;
+use NckRtl\Toolbar\Data\RequestCheckpointData;
+use NckRtl\Toolbar\Data\TailwindData;
+use NckRtl\Toolbar\Enums\RequestCheckpointId;
+use NckRtl\Toolbar\Enums\TimeUnit;
+use NckRtl\Toolbar\Measurement;
+use NckRtl\Toolbar\Observers\QueryObserver;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
 use NckRtl\Toolbar\Tests\Helpers\MockResponse;
 use NckRtl\Toolbar\Toolbar;
@@ -273,7 +283,7 @@ it('Profiler handles getting stages with no checkpoints', function () {
 it('ResponseCollector handles null response gracefully', function () {
     $toolbar = app(Toolbar::class);
     $toolbar->config->collectors([
-        new \NckRtl\Toolbar\Collectors\ResponseCollector,
+        new ResponseCollector,
     ]);
 
     $manager = new CollectorManager(response: null);
@@ -289,11 +299,11 @@ it('ResponseCollector handles null response gracefully', function () {
 it('QueriesCollector handles zero queries without division by zero', function () {
     $toolbar = app(Toolbar::class);
     $toolbar->config->collectors([
-        new \NckRtl\Toolbar\Collectors\QueriesCollector,
+        new QueriesCollector,
     ]);
 
     // Ensure no queries have been recorded
-    $queryObserver = $toolbar->config->getObserver(\NckRtl\Toolbar\Observers\QueryObserver::class);
+    $queryObserver = $toolbar->config->getObserver(QueryObserver::class);
     $queryObserver->reset();
 
     $manager = new CollectorManager;
@@ -301,7 +311,7 @@ it('QueriesCollector handles zero queries without division by zero', function ()
 
     // Should not throw division by zero error
     expect($data)->toBeArray();
-    expect($data['queries'])->toBeInstanceOf(\NckRtl\Toolbar\Data\QueriesData::class);
+    expect($data['queries'])->toBeInstanceOf(QueriesData::class);
     expect($data['queries']->queries)->toBeEmpty();
     expect($data['queries']->totalTimeFilteredQueries)->toBe(0.0);
 });
@@ -321,9 +331,9 @@ it('Profiler getCurrentMemoryUsage returns null when no checkpoints have measure
 
     // Record a checkpoint that doesn't measure memory
     Profiler::record(
-        id: \NckRtl\Toolbar\Enums\RequestCheckpointId::LARAVEL_START,
-        data: new \NckRtl\Toolbar\Data\RequestCheckpointData(
-            time: new \NckRtl\Toolbar\Measurement(microtime(true), \NckRtl\Toolbar\Enums\TimeUnit::SECONDS),
+        id: RequestCheckpointId::LARAVEL_START,
+        data: new RequestCheckpointData(
+            time: new Measurement(microtime(true), TimeUnit::SECONDS),
             measureMemory: false,
         )
     );
@@ -336,13 +346,13 @@ it('Profiler getCurrentMemoryUsage returns null when no checkpoints have measure
 // TailwindCollector Edge Cases
 
 it('TailwindCollector checks both vite plugin and main package', function () {
-    $collector = new \NckRtl\Toolbar\Collectors\TailwindCollector;
+    $collector = new TailwindCollector;
 
     // This test verifies the collector doesn't crash
     // Actual version detection depends on node_modules being present
     $data = $collector->collectData(new CollectorManager);
 
-    expect($data)->toBeInstanceOf(\NckRtl\Toolbar\Data\TailwindData::class);
+    expect($data)->toBeInstanceOf(TailwindData::class);
 });
 
 // ToolbarInjector Manifest Edge Cases
@@ -361,8 +371,8 @@ it('ToolbarInjector does not emit broken asset urls when production assets are u
         }
     };
 
-    $request = \Illuminate\Http\Request::create('/', 'GET');
-    $response = \NckRtl\Toolbar\Tests\Helpers\MockResponse::make('<html><body></body></html>');
+    $request = Request::create('/', 'GET');
+    $response = MockResponse::make('<html><body></body></html>');
 
     $injector->inject($request, $response);
 
