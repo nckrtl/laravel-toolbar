@@ -4,6 +4,8 @@ import { log, logData } from '@/core/utils/logger';
 
 let isToolbarMounted = false;
 let shadowRootRef: ShadowRoot | null = null;
+let shadowHostRef: HTMLElement | null = null;
+let appRef: App<Element> | null = null;
 
 export interface ShadowDOMSetupResult {
     shadowRoot: ShadowRoot;
@@ -26,6 +28,8 @@ export function setupShadowDOM(): ShadowDOMSetupResult {
     if (!shadowHost) {
         throw new Error('Shadow host not found - toolbar HTML not injected?');
     }
+
+    shadowHostRef = shadowHost;
 
     // Check if shadow was already created (from cache or template)
     let shadowRoot = shadowHost.shadowRoot;
@@ -71,9 +75,23 @@ export function mountVueApp(appContainer: HTMLElement): App<Element> {
     };
 
     app.mount(appContainer);
+    appRef = app;
     log('✅ Vue app mounted in Shadow DOM');
 
     return app;
+}
+
+function resetMountState(): void {
+    try {
+        appRef?.unmount();
+    } catch (error) {
+        log('⚠️ Failed to unmount existing toolbar app:', error);
+    }
+
+    appRef = null;
+    shadowRootRef = null;
+    shadowHostRef = null;
+    isToolbarMounted = false;
 }
 
 export function cleanupFailedMount(): void {
@@ -85,10 +103,19 @@ export function cleanupFailedMount(): void {
         log('Removed shadow host from DOM');
     }
 
-    isToolbarMounted = false;
+    resetMountState();
 }
 
 export function guardMount(): boolean {
+    if (isToolbarMounted) {
+        const currentShadowHost = document.getElementById('laravel-toolbar-shadow-host');
+
+        if (!shadowHostRef?.isConnected || !currentShadowHost || currentShadowHost !== shadowHostRef) {
+            log('🔁 Detected a new toolbar host, resetting mount state');
+            resetMountState();
+        }
+    }
+
     if (isToolbarMounted) {
         log('⚠️ Toolbar already mounted, skipping');
         return false;

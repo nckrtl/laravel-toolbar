@@ -231,7 +231,7 @@ class ToolbarInjector
         $jsUrl = url('/_toolbar/'.$assets['js']);
         $cssUrl = url('/_toolbar/'.$assets['css']);
 
-        $script = "<script src=\"{$jsUrl}\"{$nonceAttribute}></script>";
+        $script = "<script src=\"{$jsUrl}\" data-navigate-once{$nonceAttribute}></script>";
 
         return $this->toolbarHtml(
             data: $data,
@@ -245,7 +245,7 @@ class ToolbarInjector
     protected function toolbarHtmlWithViteAssets(string $data, string $viteUrl, string $nonceAttribute): string
     {
         $cssUrl = "{$viteUrl}/resources/css/toolbar.css?inline";
-        $script = "<script type=\"module\" src=\"{$viteUrl}/resources/js/toolbar.dev.js\"{$nonceAttribute}></script>";
+        $script = "<script type=\"module\" src=\"{$viteUrl}/resources/js/toolbar.dev.js\" data-navigate-once{$nonceAttribute}></script>";
 
         return $this->toolbarHtml(
             data: $data,
@@ -298,6 +298,8 @@ class ToolbarInjector
                     }
                 }
             })();
+
+            window.dispatchEvent(new CustomEvent('laravel-toolbar:html-updated'));
         </script>
         {$script}
         <!-- End Laravel Toolbar -->
