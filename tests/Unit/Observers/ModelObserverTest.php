@@ -2,6 +2,7 @@
 
 use NckRtl\Toolbar\Data\ModelData;
 use NckRtl\Toolbar\Enums\DataSizeUnit;
+use NckRtl\Toolbar\Enums\RequestCheckpointId;
 use NckRtl\Toolbar\Measurement;
 use NckRtl\Toolbar\Observers\ModelObserver;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
@@ -126,7 +127,7 @@ it('processes retrieved events', function () {
     $modelClass = get_class($mockModel);
 
     // Ensure profiler has a memory checkpoint
-    Profiler::record(\NckRtl\Toolbar\Enums\RequestCheckpointId::BEFORE_MIDDLEWARE);
+    Profiler::record(RequestCheckpointId::BEFORE_MIDDLEWARE);
 
     // Directly call recordAction with a retrieved event
     $observer->recordAction('eloquent.retrieved: '.$modelClass, ['model' => $mockModel]);

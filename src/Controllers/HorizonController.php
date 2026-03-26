@@ -5,7 +5,9 @@
 namespace NckRtl\Toolbar\Controllers;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 use Laravel\Horizon\Contracts\MasterSupervisorRepository;
+use Laravel\Horizon\Horizon;
 
 class HorizonController
 {
@@ -86,10 +88,10 @@ class HorizonController
 
     private function isAvailable(): bool
     {
-        return class_exists(\Laravel\Horizon\Horizon::class);
+        return class_exists(Horizon::class);
     }
 
-    private function getSupervisors(): \Illuminate\Support\Collection
+    private function getSupervisors(): Collection
     {
         return collect(app(MasterSupervisorRepository::class)->all());
     }

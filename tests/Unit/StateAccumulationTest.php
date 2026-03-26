@@ -11,6 +11,8 @@
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use NckRtl\Toolbar\Data\RequestCheckpointData;
+use NckRtl\Toolbar\Enums\RequestCheckpointId;
 use NckRtl\Toolbar\Observers\ModelObserver;
 use NckRtl\Toolbar\Observers\QueryObserver;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
@@ -144,7 +146,7 @@ describe('Profiler state accumulation', function () {
     });
 
     it('clears checkpoints via resetState', function () {
-        Profiler::record(\NckRtl\Toolbar\Enums\RequestCheckpointId::BEFORE_MIDDLEWARE);
+        Profiler::record(RequestCheckpointId::BEFORE_MIDDLEWARE);
 
         expect(Profiler::$requestCheckpoints)->not->toBeEmpty();
 
@@ -164,7 +166,7 @@ describe('Profiler state accumulation', function () {
     });
 
     it('clears viewRenders via resetState', function () {
-        Profiler::$viewRenders['/path/to/view.blade.php'] = new \NckRtl\Toolbar\Data\RequestCheckpointData;
+        Profiler::$viewRenders['/path/to/view.blade.php'] = new RequestCheckpointData;
 
         expect(Profiler::$viewRenders)->toHaveCount(1);
 
@@ -175,8 +177,8 @@ describe('Profiler state accumulation', function () {
 
     it('initialize method resets all prior state', function () {
         // Add state from a "previous request"
-        Profiler::record(\NckRtl\Toolbar\Enums\RequestCheckpointId::BEFORE_MIDDLEWARE);
-        Profiler::$viewRenders['/path/to/view.blade.php'] = new \NckRtl\Toolbar\Data\RequestCheckpointData;
+        Profiler::record(RequestCheckpointId::BEFORE_MIDDLEWARE);
+        Profiler::$viewRenders['/path/to/view.blade.php'] = new RequestCheckpointData;
         Profiler::profile('Test');
 
         // Before initialize, we have state

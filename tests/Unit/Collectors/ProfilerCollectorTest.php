@@ -1,5 +1,7 @@
 <?php
 
+use NckRtl\Toolbar\Collectors\Collector;
+use NckRtl\Toolbar\Collectors\CollectorInterface;
 use NckRtl\Toolbar\Collectors\ProfilerCollector;
 use NckRtl\Toolbar\Data\Configurations\ProfilerConfig;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
@@ -33,13 +35,13 @@ it('has correct config class', function () {
 it('implements collector interface', function () {
     $collector = new ProfilerCollector;
 
-    expect($collector)->toBeInstanceOf(\NckRtl\Toolbar\Collectors\CollectorInterface::class);
+    expect($collector)->toBeInstanceOf(CollectorInterface::class);
 });
 
 it('extends base collector', function () {
     $collector = new ProfilerCollector;
 
-    expect($collector)->toBeInstanceOf(\NckRtl\Toolbar\Collectors\Collector::class);
+    expect($collector)->toBeInstanceOf(Collector::class);
 });
 
 it('has default config', function () {

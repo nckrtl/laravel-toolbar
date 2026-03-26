@@ -151,7 +151,7 @@ it('profiles the existing blade engine without replacing its rendering context',
 
         public function get($path, array $data = [])
         {
-            return \Closure::bind(function () use ($path, $data) {
+            return Closure::bind(function () use ($path, $data) {
                 extract($data, EXTR_SKIP);
 
                 ob_start();
@@ -164,7 +164,7 @@ it('profiles the existing blade engine without replacing its rendering context',
 
     app('view.engine.resolver')->register('blade', fn () => $contextAwareEngine);
 
-    $setupViewProfiling = new \ReflectionMethod(Profiler::class, 'setupViewProfiling');
+    $setupViewProfiling = new ReflectionMethod(Profiler::class, 'setupViewProfiling');
     $setupViewProfiling->setAccessible(true);
     $setupViewProfiling->invoke(null);
 

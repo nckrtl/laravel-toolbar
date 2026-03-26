@@ -3,6 +3,9 @@
 use NckRtl\Toolbar\Collectors\CollectorInterface;
 use NckRtl\Toolbar\Collectors\LaravelCollector;
 use NckRtl\Toolbar\Collectors\PhpCollector;
+use NckRtl\Toolbar\Data\Configurations\LaravelConfig;
+use NckRtl\Toolbar\Data\Configurations\PhpConfig;
+use NckRtl\Toolbar\Data\Layout\LayoutConfig;
 use NckRtl\Toolbar\Data\ToolbarConfig;
 use NckRtl\Toolbar\Observers\QueryObserver;
 use NckRtl\Toolbar\Observers\RequestObserver;
@@ -219,7 +222,7 @@ it('updates collector config', function () {
     $collector = new PhpCollector;
     $config->collectors([$collector]);
 
-    $newCollectorConfig = new \NckRtl\Toolbar\Data\Configurations\PhpConfig;
+    $newCollectorConfig = new PhpConfig;
     $newCollectorConfig->enabled = false;
 
     $config->updateCollectorConfig(PhpCollector::class, $newCollectorConfig);
@@ -231,15 +234,15 @@ it('throws exception when updating non-existent collector config', function () {
     $config = new ToolbarConfig;
     $config->collectors([new PhpCollector]);
 
-    $newConfig = new \NckRtl\Toolbar\Data\Configurations\LaravelConfig;
+    $newConfig = new LaravelConfig;
 
-    expect(fn () => $config->updateCollectorConfig(LaravelCollector::class, $newConfig))->toThrow(\Exception::class);
+    expect(fn () => $config->updateCollectorConfig(LaravelCollector::class, $newConfig))->toThrow(Exception::class);
 });
 
 it('has layout configuration', function () {
     $config = new ToolbarConfig;
 
-    expect($config->layout)->toBeInstanceOf(\NckRtl\Toolbar\Data\Layout\LayoutConfig::class);
+    expect($config->layout)->toBeInstanceOf(LayoutConfig::class);
 });
 
 it('sets empty collectors when empty array passed', function () {
