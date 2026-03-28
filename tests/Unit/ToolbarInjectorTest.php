@@ -34,7 +34,7 @@ it('injects toolbar html before closing body tag', function () {
 
     expect($response->getContent())
         ->toContain('<!-- Laravel Toolbar')
-        ->toContain('<div id="laravel-toolbar-shadow-host"></div>')
+        ->toContain('<div id="laravel-toolbar-shadow-host" data-feedback-toolbar="true"></div>')
         ->toContain('</body>')
         ->toContain('window.__LARAVEL_TOOLBAR_DATA__');
 });

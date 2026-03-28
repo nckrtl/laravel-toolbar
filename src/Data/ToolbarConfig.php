@@ -24,6 +24,7 @@ use NckRtl\Toolbar\Data\Tools\DatabaseTool;
 use NckRtl\Toolbar\Data\Tools\MemoryUsageTool;
 use NckRtl\Toolbar\Data\Tools\ModelsTool;
 use NckRtl\Toolbar\Data\Tools\RequestTool;
+use NckRtl\Toolbar\Data\Tools\ProcessesTool;
 use NckRtl\Toolbar\Data\Tools\TechStackTool;
 use NckRtl\Toolbar\Data\Tools\TimingsTool;
 use NckRtl\Toolbar\Enums\Layout\Section;
@@ -90,6 +91,10 @@ class ToolbarConfig extends Data
                         new DatabaseTool,
                         new ModelsTool
                     )->section(Section::CENTER)
+                )->addGroup(
+                    (new GroupConfig(priority: 10))->setTools(
+                        new ProcessesTool,
+                    )->section(Section::RIGHT)
                 )
                 // )->addGroup(
                 //     (new GroupConfig(priority: 20))->setTools(
