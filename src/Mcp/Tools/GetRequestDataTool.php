@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NckRtl\Toolbar\Mcp\Tools;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
@@ -13,6 +15,7 @@ use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
+use NckRtl\Toolbar\Data\RequestProfileSummaryData;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 #[IsReadOnly]
@@ -20,7 +23,7 @@ class GetRequestDataTool extends Tool
 {
     public function shouldRegister(Request $request): bool
     {
-        return config('toolbar.enabled', false);
+        return config('toolbar.enabled', false) && $this->requestDataRoutesEnabled();
     }
 
     /**
@@ -33,10 +36,16 @@ class GetRequestDataTool extends Tool
      */
     public function handle(Request $request): Response
     {
+        if (! $this->requestDataRoutesEnabled()) {
+            return Response::error('Request data is not available in this environment.');
+        }
+
         $validated = $request->validate([
             'route' => 'required|string',
             'type' => 'required|string|in:route_name,url,uri',
             'method' => 'nullable|string|in:GET,POST,PUT,DELETE,PATCH,OPTIONS,HEAD',
+            'auth_mode' => 'nullable|string|in:guest,first-user,user',
+            'user' => 'nullable|string',
         ], [
             'route.required' => 'You must specify the route name, url or uri.',
             'type.required' => 'You must specify what route type to use. Valid types are: route_name, url, uri.',
@@ -53,13 +62,20 @@ class GetRequestDataTool extends Tool
             return Response::error('No route found for route: '.$route.', type: '.$type.', method: '.$method);
         }
 
-        $mcpRequestId = Str::uuid();
+        $requestId = (string) Str::uuid();
+        $authMode = $validated['auth_mode'] ?? 'guest';
+        $headers = [
+            'X-REQUEST-ID' => $requestId,
+            'X-TOOLBAR-AUTH' => $authMode,
+        ];
+
+        if (($validated['user'] ?? null) !== null) {
+            $headers['X-TOOLBAR-USER'] = $validated['user'];
+        }
 
         try {
             $response = Http::withoutVerifying()
-                ->withHeaders([
-                    'X-MCP-ID' => (string) $mcpRequestId,
-                ])
+                ->withHeaders($headers)
                 ->send(
                     $method ?? 'GET',
                     config('app.url').'/'.ltrim($route->uri, '/'),
@@ -72,13 +88,16 @@ class GetRequestDataTool extends Tool
             return Response::error('Failed to make request to route: '.$route->uri.', method: '.$method.', status: '.$response->status());
         }
 
-        $requestData = Cache::get('laravel-toolbar-request-data-'.$mcpRequestId);
+        $payload = Cache::get('laravel-toolbar-request-data-'.$requestId);
 
-        if (empty($requestData)) {
-            return Response::error('No request data found for request id: '.$mcpRequestId);
+        if (! is_array($payload) || $payload === []) {
+            return Response::error('No request data found for request id: '.$requestId);
         }
 
-        return Response::json($requestData);
+        return Response::json([
+            'summary' => RequestProfileSummaryData::fromPayload($payload),
+            'raw' => $payload,
+        ]);
     }
 
     /**
@@ -99,6 +118,13 @@ class GetRequestDataTool extends Tool
             'method' => $schema->string()
                 ->enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'])
                 ->description('The method of the route to get data for.')
+                ->nullable(),
+            'auth_mode' => $schema->string()
+                ->enum(['guest', 'first-user', 'user'])
+                ->description('Authentication mode for the profiled request.')
+                ->nullable(),
+            'user' => $schema->string()
+                ->description('User primary key to authenticate when auth_mode is user.')
                 ->nullable(),
         ];
     }
@@ -128,5 +154,10 @@ class GetRequestDataTool extends Tool
         }
 
         return null;
+    }
+
+    private function requestDataRoutesEnabled(): bool
+    {
+        return app()->environment(config('toolbar.request_data_allowed_environments', ['local', 'development']));
     }
 }
