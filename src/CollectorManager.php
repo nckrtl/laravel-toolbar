@@ -107,7 +107,7 @@ class CollectorManager
     }
 
     /**
-     * @return array{caddy_start_ms: float|null, php_start_ms: float, laravel_start_ms: float|null, profiler_end_ms: float|null}
+     * @return array{caddy_start_ms: float|null, php_start_ms: float, laravel_start_ms: float|null, profiler_end_ms: float|null, collected_at_ms: float}
      */
     private function timingAnchors(\Illuminate\Http\Request $request): array
     {
@@ -133,6 +133,7 @@ class CollectorManager
             'php_start_ms' => $phpStart * 1000,
             'laravel_start_ms' => $laravelStart !== null ? $laravelStart * 1000 : null,
             'profiler_end_ms' => $profilerEnd,
+            'collected_at_ms' => microtime(true) * 1000,
         ];
     }
 
