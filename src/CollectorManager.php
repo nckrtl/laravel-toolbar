@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NckRtl\Toolbar;
 
 use Illuminate\Http\JsonResponse;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Laravel\Telescope\Telescope;
 use NckRtl\Toolbar\Enums\TimeUnit;
+use NckRtl\Toolbar\Support\ProfileRequestContext;
 
 class CollectorManager
 {
@@ -23,7 +26,7 @@ class CollectorManager
 
     public function __construct(public Response|JsonResponse|RedirectResponse|null $response = null)
     {
-        $this->id = Str::uuid();
+        $this->id = (string) Str::uuid();
     }
 
     /**
@@ -32,6 +35,7 @@ class CollectorManager
     public function collectData(): array
     {
         $toolbar = app(Toolbar::class);
+        $requestContext = ProfileRequestContext::fromRequest(request());
 
         $startTime = microtime(true);
 
@@ -42,6 +46,9 @@ class CollectorManager
                 'metadata' => [
                     'id' => $this->id,
                     'timestamp' => $time,
+                    'request_id' => $requestContext->requestId,
+                    'auth_mode' => $requestContext->authMode,
+                    'auth_user_id' => $requestContext->authMode === 'user' ? $requestContext->userId : null,
                     'collectors' => 'No collectors enabled in the toolbar configuration (toolbar.php)',
                     'wall_time' => [
                         'total' => new Measurement($time - $startTime, TimeUnit::SECONDS)->formattedValue,
@@ -75,6 +82,9 @@ class CollectorManager
         $this->data['layout'] = $toolbar->config->layout->toArray();
 
         $this->data['metadata']['id'] = $this->id;
+        $this->data['metadata']['request_id'] = $requestContext->requestId;
+        $this->data['metadata']['auth_mode'] = $requestContext->authMode;
+        $this->data['metadata']['auth_user_id'] = $requestContext->authMode === 'user' ? $requestContext->userId : null;
 
         if (app(Toolbar::class)->config->debug) {
             $endTime = microtime(true);
@@ -84,8 +94,12 @@ class CollectorManager
             $this->data['metadata']['wall_time']['total'] = new Measurement($endTime - $startTime, TimeUnit::SECONDS)->formattedValue;
         }
 
-        $mcpRequestId = request()->header('X-MCP-ID');
-        Cache::put('laravel-toolbar-request-data-'.($mcpRequestId ?? $this->id), $this->data, 30);
+        $cacheKey = $requestContext->requestId ?? $this->id;
+        Cache::put(
+            'laravel-toolbar-request-data-'.$cacheKey,
+            $this->data,
+            config('toolbar.request_data_ttl', 30),
+        );
 
         return $this->data;
     }

@@ -1,17 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use NckRtl\Toolbar\Enums\RequestCheckpointId;
 use NckRtl\Toolbar\Http\Middleware\MiddlewareEnd;
 use NckRtl\Toolbar\Http\Middleware\MiddlewareStart;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+use NckRtl\Toolbar\Tests\Fixtures\TestUser;
 use NckRtl\Toolbar\Toolbar;
 
 beforeEach(function () {
     Toolbar::enable();
     Profiler::$requestCheckpoints = [];
     Profiler::$viewRenders = [];
+    Auth::logout();
+
+    Schema::dropIfExists('users');
+    Schema::create('users', function (Blueprint $table) {
+        $table->id();
+        $table->string('name')->nullable();
+    });
+
+    config()->set('login-link.allowed_environments', ['testing']);
+    config()->set('login-link.user_model', TestUser::class);
+    config()->set('auth.guards.web', [
+        'driver' => 'session',
+        'provider' => 'users',
+    ]);
+    config()->set('auth.providers.users', [
+        'driver' => 'eloquent',
+        'model' => TestUser::class,
+    ]);
 
     $toolbar = new Toolbar;
     $toolbar->config->enableInConsole();
@@ -91,6 +115,68 @@ it('MiddlewareStart returns response from next middleware', function () {
     });
 
     expect($response)->toBe($expectedResponse);
+});
+
+it('does not authenticate when only X-REQUEST-ID is present', function () {
+    TestUser::query()->create([
+        'id' => 1,
+        'name' => 'First User',
+    ]);
+
+    $middleware = new MiddlewareStart;
+    $request = Request::create('/test', 'GET');
+    $request->headers->set('X-REQUEST-ID', 'request-123');
+
+    $middleware->handle($request, function (Request $request) {
+        return new Response('OK');
+    });
+
+    expect(Auth::check())->toBeFalse();
+});
+
+it('authenticates the first user when X-TOOLBAR-AUTH is first-user', function () {
+    $firstUser = TestUser::query()->create([
+        'id' => 10,
+        'name' => 'First User',
+    ]);
+
+    TestUser::query()->create([
+        'id' => 20,
+        'name' => 'Second User',
+    ]);
+
+    $middleware = new MiddlewareStart;
+    $request = Request::create('/test', 'GET');
+    $request->headers->set('X-TOOLBAR-AUTH', 'first-user');
+
+    $middleware->handle($request, function (Request $request) {
+        return new Response('OK');
+    });
+
+    expect(Auth::id())->toBe($firstUser->getKey());
+});
+
+it('authenticates the requested user id when X-TOOLBAR-AUTH is user', function () {
+    TestUser::query()->create([
+        'id' => 10,
+        'name' => 'First User',
+    ]);
+
+    $requestedUser = TestUser::query()->create([
+        'id' => 20,
+        'name' => 'Requested User',
+    ]);
+
+    $middleware = new MiddlewareStart;
+    $request = Request::create('/test', 'GET');
+    $request->headers->set('X-TOOLBAR-AUTH', 'user');
+    $request->headers->set('X-TOOLBAR-USER', (string) $requestedUser->getKey());
+
+    $middleware->handle($request, function (Request $request) {
+        return new Response('OK');
+    });
+
+    expect(Auth::id())->toBe($requestedUser->getKey());
 });
 
 // MiddlewareEnd Tests

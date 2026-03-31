@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use NckRtl\Toolbar\CollectorManager;
 use NckRtl\Toolbar\Collectors\LaravelCollector;
@@ -14,6 +17,7 @@ beforeEach(function () {
     $toolbar->config->collectors([]);
     $toolbar->config->enableInConsole();
     app()->instance(Toolbar::class, $toolbar);
+    app()->instance('request', Request::create('/test', 'GET'));
 });
 
 it('generates unique request id', function () {
@@ -35,7 +39,13 @@ it('returns metadata when no collectors enabled', function () {
     expect($data['metadata'])->toHaveKey('id');
     expect($data['metadata'])->toHaveKey('timestamp');
     expect($data['metadata'])->toHaveKey('collectors');
+    expect($data['metadata'])->toHaveKey('request_id');
+    expect($data['metadata'])->toHaveKey('auth_mode');
+    expect($data['metadata'])->toHaveKey('auth_user_id');
     expect($data['metadata']['collectors'])->toContain('No collectors enabled');
+    expect($data['metadata']['request_id'])->toBeNull();
+    expect($data['metadata']['auth_mode'])->toBe('guest');
+    expect($data['metadata']['auth_user_id'])->toBeNull();
     expect($data['metadata'])->toHaveKey('wall_time');
 });
 
@@ -135,16 +145,21 @@ it('caches data for requests', function () {
     expect($cachedData)->not->toBeNull();
     expect($cachedData)->toHaveKey('php');
     expect($cachedData['metadata']['id'])->toBe($manager->id);
+    expect($cachedData['metadata']['request_id'])->toBeNull();
+    expect($cachedData['metadata']['auth_mode'])->toBe('guest');
+    expect($cachedData['metadata']['auth_user_id'])->toBeNull();
 });
 
-it('caches data with mcp request id when provided', function () {
+it('caches request data under X-REQUEST-ID', function () {
     Cache::flush();
 
-    $mcpId = 'test-mcp-id-123';
+    $requestId = 'test-request-id-123';
 
-    // Mock the request with X-MCP-ID header
-    $request = request();
-    $request->headers->set('X-MCP-ID', $mcpId);
+    $request = Request::create('/test', 'GET');
+    $request->headers->set('X-REQUEST-ID', $requestId);
+    $request->headers->set('X-TOOLBAR-AUTH', 'user');
+    $request->headers->set('X-TOOLBAR-USER', '42');
+    app()->instance('request', $request);
 
     $toolbar = app(Toolbar::class);
     $toolbar->config->collectors([
@@ -154,13 +169,34 @@ it('caches data with mcp request id when provided', function () {
     $manager = new CollectorManager;
     $data = $manager->collectData();
 
-    $cachedData = Cache::get('laravel-toolbar-request-data-'.$mcpId);
+    $cachedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
 
     expect($cachedData)->not->toBeNull();
     expect($cachedData)->toHaveKey('php');
+    expect($cachedData['metadata']['request_id'])->toBe($requestId);
+    expect($cachedData['metadata']['auth_mode'])->toBe('user');
+    expect($cachedData['metadata']['auth_user_id'])->toBe('42');
+    expect($data['metadata']['request_id'])->toBe($requestId);
+});
 
-    // Clean up
-    $request->headers->remove('X-MCP-ID');
+it('uses the configured request data ttl when caching', function () {
+    config()->set('toolbar.request_data_ttl', 45);
+
+    $toolbar = app(Toolbar::class);
+    $toolbar->config->collectors([
+        new PhpCollector,
+    ]);
+
+    Cache::shouldReceive('put')
+        ->once()
+        ->withArgs(function (string $key, array $data, int $ttl): bool {
+            return str_starts_with($key, 'laravel-toolbar-request-data-')
+                && array_key_exists('php', $data)
+                && $ttl === 45;
+        });
+
+    $manager = new CollectorManager;
+    $manager->collectData();
 });
 
 it('includes layout configuration in data', function () {

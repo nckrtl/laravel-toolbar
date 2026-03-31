@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NckRtl\Toolbar\Http\Middleware;
 
 use Closure;
@@ -8,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use NckRtl\Toolbar\Enums\RequestCheckpointId;
 use NckRtl\Toolbar\Observers\QueryObserver;
 use NckRtl\Toolbar\Services\ProfilerService\Profiler;
+use NckRtl\Toolbar\Support\ProfileRequestContext;
 use NckRtl\Toolbar\Toolbar;
 
 class MiddlewareStart
@@ -35,7 +38,9 @@ class MiddlewareStart
 
     private function authenticateMcpRequest(Request $request): void
     {
-        if (! $request->hasHeader('X-MCP-ID')) {
+        $context = ProfileRequestContext::fromRequest($request);
+
+        if (! in_array($context->authMode, ['first-user', 'user'], true)) {
             return;
         }
 
@@ -50,13 +55,19 @@ class MiddlewareStart
             return;
         }
 
-        $user = $userModel::query()->first();
+        $userId = match ($context->authMode) {
+            'first-user' => $userModel::query()->first()?->getKey(),
+            'user' => $context->userId,
+            default => null,
+        };
 
-        if (! $user) {
+        if ($userId === null) {
             return;
         }
 
-        Auth::onceUsingId($user->getKey());
+        if (! Auth::onceUsingId($userId)) {
+            return;
+        }
 
         $queryObserver = app(Toolbar::class)->config->getObserver(QueryObserver::class);
         $queryObserver?->reset();
