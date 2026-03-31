@@ -218,12 +218,24 @@ Monitors Eloquent model operations via Telescope integration. This collector wil
 ### ResponseCollector
 Inspects response data including headers and content.
 
+## Profile Request Headers
+
+When integrating with external profiling tools (like [Orbit](https://github.com/hardimpactdev/orbit)), these headers control request identity and authentication:
+
+| Header | Purpose |
+|--------|---------|
+| `X-REQUEST-ID` | Correlates the request for cached data retrieval via `/_toolbar/requests/{id}` |
+| `X-TOOLBAR-AUTH` | Auth mode: `guest` (default), `first-user`, or `user` |
+| `X-TOOLBAR-USER` | Primary key of the user to authenticate as (when auth mode is `user`) |
+
+The `/_toolbar/requests/{id}` endpoint returns a summary of the profiled request including route, memory, wall time, and query statistics. This endpoint is only available in environments listed in `toolbar.request_data_allowed_environments` (defaults to `local` and `development`).
+
 ## MCP Integration for AI Assistants
 
 Laravel Toolbar includes a Model Context Protocol (MCP) server that allows AI assistants like Claude to access your application's request data during development. This enables AI to help debug issues, optimize queries, and provide insights based on real application data.
 
 The MCP server is automatically registered and provides:
-- Request data access for AI tools
+- Request data access for AI tools (with the same `auth_mode` and `user` options as the headers above)
 - Collector information
 - Real-time debugging assistance
 
