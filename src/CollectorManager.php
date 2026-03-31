@@ -11,7 +11,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Laravel\Telescope\Telescope;
-use NckRtl\Toolbar\Enums\TimeUnit;
 use NckRtl\Toolbar\Support\ProfileRequestContext;
 
 class CollectorManager
@@ -53,7 +52,7 @@ class CollectorManager
                     'auth_user_id' => $resolvedAuth['auth_user_id'],
                     'collectors' => 'No collectors enabled in the toolbar configuration (toolbar.php)',
                     'wall_time' => [
-                        'total' => new Measurement($time - $startTime, TimeUnit::SECONDS)->formattedValue,
+                        'total' => number_format(($time - $startTime) * 1000, 2).'ms',
                     ],
                 ],
             ];
@@ -80,9 +79,8 @@ class CollectorManager
                 continue;
             }
 
-            $endCollector = microtime(true);
-
-            $this->data['metadata']['wall_time']['collectors'][$collector->key()]['duration'] = new Measurement($endCollector - $startCollector, TimeUnit::SECONDS)->formattedValue;
+            $elapsed = (microtime(true) - $startCollector) * 1_000_000;
+            $this->data['metadata']['wall_time']['collectors'][$collector->key()]['duration'] = number_format($elapsed, 2).'µs';
         }
 
         $this->data['layout'] = $toolbar->config->layout->toArray();
@@ -98,11 +96,12 @@ class CollectorManager
 
             $this->data['metadata']['debug'] = true;
             $this->data['metadata']['timestamp'] = $endTime;
-            $this->data['metadata']['wall_time']['total'] = new Measurement($endTime - $startTime, TimeUnit::SECONDS)->formattedValue;
+            $this->data['metadata']['wall_time']['total'] = number_format(($endTime - $startTime) * 1000, 2).'ms';
         }
 
         $this->cacheCollectedData($requestContext->requestId);
-        $this->updateCollectedAtAnchor($requestContext->requestId);
+
+        $this->data['metadata']['timing_anchors']['collected_at_ms'] = microtime(true) * 1000;
 
         return $this->data;
     }
@@ -138,26 +137,15 @@ class CollectorManager
         ];
     }
 
-    private function updateCollectedAtAnchor(?string $requestId): void
-    {
-        $cacheKey = 'laravel-toolbar-request-data-'.($requestId ?? $this->id);
-        $cached = Cache::get($cacheKey);
-
-        if (! is_array($cached)) {
-            return;
-        }
-
-        $cached['metadata']['timing_anchors']['collected_at_ms'] = microtime(true) * 1000;
-        Cache::put($cacheKey, $cached, config('toolbar.request_data_ttl', 30));
-    }
-
     private function cacheCollectedData(?string $requestId): void
     {
         $cacheKey = $requestId ?? $this->id;
+        $plain = json_decode((string) json_encode($this->data), true);
+        $plain['metadata']['timing_anchors']['collected_at_ms'] = microtime(true) * 1000;
 
         Cache::put(
             'laravel-toolbar-request-data-'.$cacheKey,
-            json_decode((string) json_encode($this->data), true),
+            $plain,
             config('toolbar.request_data_ttl', 30),
         );
     }

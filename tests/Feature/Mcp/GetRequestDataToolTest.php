@@ -67,6 +67,7 @@ it('MCP tool sends explicit auth headers from the new contract and returns summa
                 'slow_count' => 1,
                 'duplicate_count' => 1,
             ],
+            'timing_anchors' => null,
         ],
     ]);
 

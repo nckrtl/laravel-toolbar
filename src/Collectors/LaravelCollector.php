@@ -16,6 +16,10 @@ class LaravelCollector extends Collector implements CollectorInterface
     use ResolvesConfigSource;
     use ResolvesDumpSource;
 
+    private static ?string $cachedVersionEditorUrl = null;
+
+    private static bool $versionEditorUrlChecked = false;
+
     public function key(): string
     {
         return 'laravel';
@@ -50,6 +54,12 @@ class LaravelCollector extends Collector implements CollectorInterface
 
     private function getLaravelVersionEditorUrl(): ?string
     {
+        if (self::$versionEditorUrlChecked) {
+            return self::$cachedVersionEditorUrl;
+        }
+
+        self::$versionEditorUrlChecked = true;
+
         $composerPath = base_path('composer.json');
 
         if (! file_exists($composerPath)) {
@@ -60,7 +70,9 @@ class LaravelCollector extends Collector implements CollectorInterface
 
         foreach ($contents as $index => $line) {
             if (str_contains($line, '"laravel/framework"')) {
-                return $this->resolveSourceHref($composerPath, $index + 1);
+                self::$cachedVersionEditorUrl = $this->resolveSourceHref($composerPath, $index + 1);
+
+                return self::$cachedVersionEditorUrl;
             }
         }
 

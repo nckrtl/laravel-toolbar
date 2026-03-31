@@ -342,9 +342,6 @@ it('uses the configured request data ttl when caching', function () {
                 && $ttl === 45;
         });
 
-    Cache::shouldReceive('get')->once()->andReturn(['metadata' => ['timing_anchors' => []]]);
-    Cache::shouldReceive('put')->once();
-
     $manager = new CollectorManager;
     $manager->collectData();
 });

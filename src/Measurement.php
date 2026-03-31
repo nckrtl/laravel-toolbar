@@ -2,9 +2,10 @@
 
 namespace NckRtl\Toolbar;
 
+use Illuminate\Contracts\Support\Arrayable;
 use NckRtl\Toolbar\Enums\Unit;
 
-class Measurement
+class Measurement implements \JsonSerializable, Arrayable
 {
     public string $formattedValue;
 
@@ -13,6 +14,22 @@ class Measurement
         public Unit $unit
     ) {
         $this->formatValue();
+    }
+
+    /** @return array{formattedValue: string, value: int|float, unit: string} */
+    public function toArray(): array
+    {
+        return [
+            'formattedValue' => $this->formattedValue,
+            'value' => $this->value,
+            'unit' => $this->unit->abbreviation(),
+        ];
+    }
+
+    /** @return array{formattedValue: string, value: int|float, unit: string} */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 
     public function convertTo(Unit $unit): self
