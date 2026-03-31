@@ -111,7 +111,7 @@ class CollectorManager
 
         Cache::put(
             'laravel-toolbar-request-data-'.$cacheKey,
-            $this->data,
+            json_decode((string) json_encode($this->data), true),
             config('toolbar.request_data_ttl', 30),
         );
     }
