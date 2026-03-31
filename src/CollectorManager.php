@@ -102,6 +102,7 @@ class CollectorManager
         }
 
         $this->cacheCollectedData($requestContext->requestId);
+        $this->updateCollectedAtAnchor($requestContext->requestId);
 
         return $this->data;
     }
@@ -135,6 +136,19 @@ class CollectorManager
             'profiler_end_ms' => $profilerEnd,
             'collected_at_ms' => microtime(true) * 1000,
         ];
+    }
+
+    private function updateCollectedAtAnchor(?string $requestId): void
+    {
+        $cacheKey = 'laravel-toolbar-request-data-'.($requestId ?? $this->id);
+        $cached = Cache::get($cacheKey);
+
+        if (! is_array($cached)) {
+            return;
+        }
+
+        $cached['metadata']['timing_anchors']['collected_at_ms'] = microtime(true) * 1000;
+        Cache::put($cacheKey, $cached, config('toolbar.request_data_ttl', 30));
     }
 
     private function cacheCollectedData(?string $requestId): void
