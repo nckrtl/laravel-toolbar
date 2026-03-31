@@ -14,11 +14,13 @@ class RequestProfileSummaryData extends Data
         public array $request,
         public array $profiler,
         public array $queries,
+        public ?array $timing_anchors = null,
     ) {}
 
     public static function fromPayload(array $payload): self
     {
         $queries = collect(data_get($payload, 'queries.queries', []));
+        $anchors = data_get($payload, 'metadata.timing_anchors');
 
         return new self(
             auth_mode: (string) data_get($payload, 'metadata.auth_mode', 'guest'),
@@ -37,6 +39,7 @@ class RequestProfileSummaryData extends Data
                 'slow_count' => $queries->where('is_slow', true)->count(),
                 'duplicate_count' => $queries->where('is_duplicate', true)->count(),
             ],
+            timing_anchors: is_array($anchors) ? $anchors : null,
         );
     }
 

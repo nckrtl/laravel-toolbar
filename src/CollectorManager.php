@@ -91,6 +91,7 @@ class CollectorManager
         $this->data['metadata']['request_id'] = $requestContext->requestId;
         $this->data['metadata']['auth_mode'] = $resolvedAuth['auth_mode'];
         $this->data['metadata']['auth_user_id'] = $resolvedAuth['auth_user_id'];
+        $this->data['metadata']['timing_anchors'] = $this->timingAnchors($request);
 
         if (app(Toolbar::class)->config->debug) {
             $endTime = microtime(true);
@@ -103,6 +104,36 @@ class CollectorManager
         $this->cacheCollectedData($requestContext->requestId);
 
         return $this->data;
+    }
+
+    /**
+     * @return array{caddy_start_ms: float|null, php_start_ms: float, laravel_start_ms: float|null, profiler_end_ms: float|null}
+     */
+    private function timingAnchors(\Illuminate\Http\Request $request): array
+    {
+        $caddyStart = $request->header('X-Caddy-Start');
+        $phpStart = (float) $request->server('REQUEST_TIME_FLOAT', microtime(true));
+
+        $laravelStart = defined('LARAVEL_START') ? (float) LARAVEL_START : null;
+
+        $profilerEnd = null;
+        $stages = data_get($this->data, 'profiler.stages', []);
+
+        if (is_array($stages) && $stages !== []) {
+            $lastStage = end($stages);
+            $endValue = data_get($lastStage, 'end.time.value');
+
+            if (is_numeric($endValue)) {
+                $profilerEnd = (float) $endValue * 1000;
+            }
+        }
+
+        return [
+            'caddy_start_ms' => is_numeric($caddyStart) ? (float) $caddyStart : null,
+            'php_start_ms' => $phpStart * 1000,
+            'laravel_start_ms' => $laravelStart !== null ? $laravelStart * 1000 : null,
+            'profiler_end_ms' => $profilerEnd,
+        ];
     }
 
     private function cacheCollectedData(?string $requestId): void
