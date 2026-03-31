@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Vite;
-use NckRtl\Toolbar\Data\RequestProfileSummaryData;
 use NckRtl\Toolbar\Support\ProfileRequestContext;
+use NckRtl\Toolbar\Support\ProfileSummaryBuilder;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -40,9 +40,16 @@ class ToolbarInjector
             return;
         }
 
+        $context = ProfileRequestContext::fromRequest($request);
+
+        if ($context->requestId !== null) {
+            $this->handleProfiledRequest($request, $response, $context);
+
+            return;
+        }
+
         if (! Toolbar::$visible) {
-            $data = new CollectorManager(response: $response)->collectData();
-            $this->setProfileSummaryHeader($request, $response, $data);
+            new CollectorManager(response: $response)->collectData();
 
             return;
         }
@@ -54,6 +61,39 @@ class ToolbarInjector
         }
 
         $this->injectToolbarHtml($request, $response);
+    }
+
+    /**
+     * For profiled requests (X-REQUEST-ID present): build a lightweight summary
+     * from profiler checkpoints, set it as a response header, then defer the
+     * full collection + cache write to after the response is sent.
+     */
+    protected function handleProfiledRequest(Request $request, $response, ProfileRequestContext $context): void
+    {
+        $summary = ProfileSummaryBuilder::build($request);
+
+        if (isset($response->headers)) {
+            $response->headers->set(
+                'X-Toolbar-Summary',
+                base64_encode((string) json_encode($summary, JSON_THROW_ON_ERROR)),
+            );
+        }
+
+        app()->terminating(function () use ($request, $response) {
+            if (! Toolbar::$visible) {
+                new CollectorManager(response: $response)->collectData();
+
+                return;
+            }
+
+            if ($this->isInertiaRequest($request)) {
+                $this->injectToolbarData($response);
+
+                return;
+            }
+
+            $this->injectToolbarHtml($request, $response);
+        });
     }
 
     /**
@@ -133,8 +173,6 @@ class ToolbarInjector
 
         // Collect data
         $data = new CollectorManager(response: $response)->collectData();
-
-        $this->setProfileSummaryHeader($request, $response, $data);
 
         $content = $response->getContent();
 
@@ -309,27 +347,6 @@ class ToolbarInjector
         {$script}
         <!-- End Laravel Toolbar -->
         HTML;
-    }
-
-    protected function setProfileSummaryHeader(Request $request, $response, array $data): void
-    {
-        $context = ProfileRequestContext::fromRequest($request);
-
-        if ($context->requestId === null) {
-            return;
-        }
-
-        if (! isset($response->headers)) {
-            return;
-        }
-
-        $summary = RequestProfileSummaryData::fromCollectedData($data);
-        $summary->timing_anchors['collected_at_ms'] = microtime(true) * 1000;
-
-        $response->headers->set(
-            'X-Toolbar-Summary',
-            base64_encode((string) json_encode($summary->toArray(), JSON_THROW_ON_ERROR)),
-        );
     }
 
     private function getNonceAttribute(): string

@@ -46,36 +46,6 @@ class RequestProfileSummaryData extends Data
         );
     }
 
-    /**
-     * Build from live collected data (objects, not flattened arrays).
-     * Used to set the response header without a cache round-trip.
-     */
-    public static function fromCollectedData(array $data): self
-    {
-        $queries = collect(data_get($data, 'queries.queries', []));
-        $anchors = data_get($data, 'metadata.timing_anchors');
-
-        return new self(
-            auth_mode: (string) data_get($data, 'metadata.auth_mode', 'guest'),
-            request: [
-                'route_name' => (string) data_get($data, 'request.route_name', '-'),
-                'controller_action' => (string) data_get($data, 'request.controller_action', '-'),
-            ],
-            profiler: [
-                'total_wall_time' => (string) data_get($data, 'profiler.total_wall_time.formattedValue', '0ms'),
-                'total_real_memory' => (string) data_get($data, 'profiler.total_real_memory.formattedValue', '0B'),
-                'total_allocated_memory' => (string) data_get($data, 'profiler.total_allocated_memory.formattedValue', '0B'),
-                'stages' => self::summarizeStages(data_get($data, 'profiler.stages', [])),
-            ],
-            queries: [
-                'count' => $queries->count(),
-                'slow_count' => $queries->where('is_slow', true)->count(),
-                'duplicate_count' => $queries->where('is_duplicate', true)->count(),
-            ],
-            timing_anchors: is_array($anchors) ? $anchors : null,
-        );
-    }
-
     private static function summarizeStages(mixed $stages): array
     {
         return Collection::wrap($stages)
