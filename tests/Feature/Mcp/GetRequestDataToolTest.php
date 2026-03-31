@@ -75,6 +75,20 @@ it('MCP tool sends explicit auth headers from the new contract and returns summa
     expect($payload['raw']['metadata']['request_id'])->not->toBeEmpty();
 });
 
+it('MCP tool requires a user id when auth_mode is user', function () {
+    $tool = new GetRequestDataTool;
+
+    $response = $tool->handle(new Request([
+        'route' => '/mcp-request-target',
+        'type' => 'uri',
+        'method' => 'GET',
+        'auth_mode' => 'user',
+    ]));
+
+    expect($response->isError())->toBeTrue();
+    expect((string) $response->content())->toContain('user');
+});
+
 function mcpRequestPayload(string $requestId): array
 {
     return [

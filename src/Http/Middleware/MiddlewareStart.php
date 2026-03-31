@@ -20,6 +20,7 @@ class MiddlewareStart
         // Reset static state for Octane/long-running processes
         Toolbar::$enabled = config('toolbar.enabled', true);
         Toolbar::$visible = config('toolbar.visible', true);
+        ProfileRequestContext::setResolvedAuth($request, 'guest');
 
         $this->authenticateMcpRequest($request);
 
@@ -68,6 +69,8 @@ class MiddlewareStart
         if (! Auth::onceUsingId($userId)) {
             return;
         }
+
+        ProfileRequestContext::setResolvedAuth($request, $context->authMode, Auth::id());
 
         $queryObserver = app(Toolbar::class)->config->getObserver(QueryObserver::class);
         $queryObserver?->reset();

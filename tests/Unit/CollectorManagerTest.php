@@ -2,16 +2,40 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use NckRtl\Toolbar\CollectorManager;
 use NckRtl\Toolbar\Collectors\LaravelCollector;
 use NckRtl\Toolbar\Collectors\PhpCollector;
+use NckRtl\Toolbar\Http\Middleware\MiddlewareStart;
+use NckRtl\Toolbar\Tests\Fixtures\TestUser;
 use NckRtl\Toolbar\Tests\Helpers\MockResponse;
 use NckRtl\Toolbar\Toolbar;
 
 beforeEach(function () {
     Toolbar::enable();
+    Auth::logout();
+
+    Schema::dropIfExists('users');
+    Schema::create('users', function (Blueprint $table) {
+        $table->id();
+        $table->string('name')->nullable();
+    });
+
+    config()->set('login-link.allowed_environments', ['testing']);
+    config()->set('login-link.user_model', TestUser::class);
+    config()->set('auth.guards.web', [
+        'driver' => 'session',
+        'provider' => 'users',
+    ]);
+    config()->set('auth.providers.users', [
+        'driver' => 'eloquent',
+        'model' => TestUser::class,
+    ]);
 
     $toolbar = new Toolbar;
     $toolbar->config->collectors([]);
@@ -174,9 +198,132 @@ it('caches request data under X-REQUEST-ID', function () {
     expect($cachedData)->not->toBeNull();
     expect($cachedData)->toHaveKey('php');
     expect($cachedData['metadata']['request_id'])->toBe($requestId);
-    expect($cachedData['metadata']['auth_mode'])->toBe('user');
-    expect($cachedData['metadata']['auth_user_id'])->toBe('42');
+    expect($cachedData['metadata']['auth_mode'])->toBe('guest');
+    expect($cachedData['metadata']['auth_user_id'])->toBeNull();
     expect($data['metadata']['request_id'])->toBe($requestId);
+});
+
+it('stores first-user metadata with the actual authenticated user id', function () {
+    Cache::flush();
+
+    $firstUser = TestUser::query()->create([
+        'id' => 10,
+        'name' => 'First User',
+    ]);
+
+    TestUser::query()->create([
+        'id' => 20,
+        'name' => 'Second User',
+    ]);
+
+    $requestId = 'first-user-request';
+    $request = Request::create('/test', 'GET');
+    $request->headers->set('X-REQUEST-ID', $requestId);
+    $request->headers->set('X-TOOLBAR-AUTH', 'first-user');
+
+    $toolbar = app(Toolbar::class);
+    $toolbar->config->collectors([
+        new PhpCollector,
+    ]);
+
+    $middleware = new MiddlewareStart;
+
+    $middleware->handle($request, function (Request $request) {
+        app()->instance('request', $request);
+
+        (new CollectorManager)->collectData();
+
+        return new Response('OK');
+    });
+
+    $cachedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
+
+    expect($cachedData['metadata']['auth_mode'])->toBe('first-user');
+    expect($cachedData['metadata']['auth_user_id'])->toBe($firstUser->getKey());
+});
+
+it('stores guest metadata when explicit user id is invalid', function () {
+    Cache::flush();
+
+    TestUser::query()->create([
+        'id' => 10,
+        'name' => 'First User',
+    ]);
+
+    $requestId = 'invalid-user-request';
+    $request = Request::create('/test', 'GET');
+    $request->headers->set('X-REQUEST-ID', $requestId);
+    $request->headers->set('X-TOOLBAR-AUTH', 'user');
+    $request->headers->set('X-TOOLBAR-USER', '999');
+
+    $toolbar = app(Toolbar::class);
+    $toolbar->config->collectors([
+        new PhpCollector,
+    ]);
+
+    $middleware = new MiddlewareStart;
+
+    $middleware->handle($request, function (Request $request) {
+        app()->instance('request', $request);
+
+        (new CollectorManager)->collectData();
+
+        return new Response('OK');
+    });
+
+    $cachedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
+
+    expect(Auth::check())->toBeFalse();
+    expect($cachedData['metadata']['auth_mode'])->toBe('guest');
+    expect($cachedData['metadata']['auth_user_id'])->toBeNull();
+});
+
+it('stores guest metadata when auth mode user is missing a user id', function () {
+    Cache::flush();
+
+    TestUser::query()->create([
+        'id' => 10,
+        'name' => 'First User',
+    ]);
+
+    $requestId = 'missing-user-request';
+    $request = Request::create('/test', 'GET');
+    $request->headers->set('X-REQUEST-ID', $requestId);
+    $request->headers->set('X-TOOLBAR-AUTH', 'user');
+    app()->instance('request', $request);
+
+    $toolbar = app(Toolbar::class);
+    $toolbar->config->collectors([
+        new PhpCollector,
+    ]);
+
+    $manager = new CollectorManager;
+    $manager->collectData();
+
+    $cachedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
+
+    expect($cachedData['metadata']['auth_mode'])->toBe('guest');
+    expect($cachedData['metadata']['auth_user_id'])->toBeNull();
+});
+
+it('caches metadata-only payloads under X-REQUEST-ID when no collectors are enabled', function () {
+    Cache::flush();
+
+    $requestId = 'metadata-only-request';
+    $request = Request::create('/test', 'GET');
+    $request->headers->set('X-REQUEST-ID', $requestId);
+    app()->instance('request', $request);
+
+    $toolbar = app(Toolbar::class);
+    $toolbar->config->collectors([]);
+
+    $data = (new CollectorManager)->collectData();
+    $cachedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
+
+    expect($data['metadata']['collectors'])->toContain('No collectors enabled');
+    expect($cachedData)->not->toBeNull();
+    expect($cachedData['metadata']['request_id'])->toBe($requestId);
+    expect($cachedData['metadata']['auth_mode'])->toBe('guest');
 });
 
 it('uses the configured request data ttl when caching', function () {

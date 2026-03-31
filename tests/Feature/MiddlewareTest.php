@@ -179,6 +179,24 @@ it('authenticates the requested user id when X-TOOLBAR-AUTH is user', function (
     expect(Auth::id())->toBe($requestedUser->getKey());
 });
 
+it('does not authenticate when X-TOOLBAR-AUTH is user with an invalid user id', function () {
+    TestUser::query()->create([
+        'id' => 10,
+        'name' => 'First User',
+    ]);
+
+    $middleware = new MiddlewareStart;
+    $request = Request::create('/test', 'GET');
+    $request->headers->set('X-TOOLBAR-AUTH', 'user');
+    $request->headers->set('X-TOOLBAR-USER', '999');
+
+    $middleware->handle($request, function (Request $request) {
+        return new Response('OK');
+    });
+
+    expect(Auth::check())->toBeFalse();
+});
+
 // MiddlewareEnd Tests
 
 it('MiddlewareEnd records BEFORE_CONTROLLER checkpoint', function () {

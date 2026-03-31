@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
@@ -40,17 +41,22 @@ class GetRequestDataTool extends Tool
             return Response::error('Request data is not available in this environment.');
         }
 
-        $validated = $request->validate([
-            'route' => 'required|string',
-            'type' => 'required|string|in:route_name,url,uri',
-            'method' => 'nullable|string|in:GET,POST,PUT,DELETE,PATCH,OPTIONS,HEAD',
-            'auth_mode' => 'nullable|string|in:guest,first-user,user',
-            'user' => 'nullable|string',
-        ], [
-            'route.required' => 'You must specify the route name, url or uri.',
-            'type.required' => 'You must specify what route type to use. Valid types are: route_name, url, uri.',
-            'method.in' => 'You must specify a valid method. Valid methods are: GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD.',
-        ]);
+        try {
+            $validated = $request->validate([
+                'route' => 'required|string',
+                'type' => 'required|string|in:route_name,url,uri',
+                'method' => 'nullable|string|in:GET,POST,PUT,DELETE,PATCH,OPTIONS,HEAD',
+                'auth_mode' => 'nullable|string|in:guest,first-user,user',
+                'user' => 'nullable|string|required_if:auth_mode,user',
+            ], [
+                'route.required' => 'You must specify the route name, url or uri.',
+                'type.required' => 'You must specify what route type to use. Valid types are: route_name, url, uri.',
+                'method.in' => 'You must specify a valid method. Valid methods are: GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD.',
+                'user.required_if' => 'You must specify a user when auth_mode is user.',
+            ]);
+        } catch (ValidationException $e) {
+            return Response::error($e->validator->errors()->first());
+        }
 
         $route = $validated['route'];
         $type = $validated['type'];

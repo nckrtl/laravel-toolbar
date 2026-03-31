@@ -35,26 +35,32 @@ class CollectorManager
     public function collectData(): array
     {
         $toolbar = app(Toolbar::class);
-        $requestContext = ProfileRequestContext::fromRequest(request());
+        $request = request();
+        $requestContext = ProfileRequestContext::fromRequest($request);
+        $resolvedAuth = ProfileRequestContext::resolvedAuthFromRequest($request);
 
         $startTime = microtime(true);
 
         if (empty($collectors = $toolbar->config->enabledCollectors())) {
             $time = microtime(true);
 
-            return [
+            $this->data = [
                 'metadata' => [
                     'id' => $this->id,
                     'timestamp' => $time,
                     'request_id' => $requestContext->requestId,
-                    'auth_mode' => $requestContext->authMode,
-                    'auth_user_id' => $requestContext->authMode === 'user' ? $requestContext->userId : null,
+                    'auth_mode' => $resolvedAuth['auth_mode'],
+                    'auth_user_id' => $resolvedAuth['auth_user_id'],
                     'collectors' => 'No collectors enabled in the toolbar configuration (toolbar.php)',
                     'wall_time' => [
                         'total' => new Measurement($time - $startTime, TimeUnit::SECONDS)->formattedValue,
                     ],
                 ],
             ];
+
+            $this->cacheCollectedData($requestContext->requestId);
+
+            return $this->data;
         }
 
         if ($toolbar->telescopeIsInstalled()) {
@@ -83,8 +89,8 @@ class CollectorManager
 
         $this->data['metadata']['id'] = $this->id;
         $this->data['metadata']['request_id'] = $requestContext->requestId;
-        $this->data['metadata']['auth_mode'] = $requestContext->authMode;
-        $this->data['metadata']['auth_user_id'] = $requestContext->authMode === 'user' ? $requestContext->userId : null;
+        $this->data['metadata']['auth_mode'] = $resolvedAuth['auth_mode'];
+        $this->data['metadata']['auth_user_id'] = $resolvedAuth['auth_user_id'];
 
         if (app(Toolbar::class)->config->debug) {
             $endTime = microtime(true);
@@ -94,14 +100,20 @@ class CollectorManager
             $this->data['metadata']['wall_time']['total'] = new Measurement($endTime - $startTime, TimeUnit::SECONDS)->formattedValue;
         }
 
-        $cacheKey = $requestContext->requestId ?? $this->id;
+        $this->cacheCollectedData($requestContext->requestId);
+
+        return $this->data;
+    }
+
+    private function cacheCollectedData(?string $requestId): void
+    {
+        $cacheKey = $requestId ?? $this->id;
+
         Cache::put(
             'laravel-toolbar-request-data-'.$cacheKey,
             $this->data,
             config('toolbar.request_data_ttl', 30),
         );
-
-        return $this->data;
     }
 
     protected function setTelescopeEntries(): bool
