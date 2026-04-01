@@ -79,20 +79,12 @@ class ToolbarInjector
             );
         }
 
-        app()->terminating(function () use ($request, $response) {
-            if (! Toolbar::$visible) {
-                new CollectorManager(response: $response)->collectData();
-
-                return;
+        app()->terminating(function () use ($response) {
+            if (function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
             }
 
-            if ($this->isInertiaRequest($request)) {
-                $this->injectToolbarData($response);
-
-                return;
-            }
-
-            $this->injectToolbarHtml($request, $response);
+            new CollectorManager(response: $response)->collectData();
         });
     }
 
