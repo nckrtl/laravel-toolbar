@@ -6,6 +6,7 @@ namespace NckRtl\Toolbar;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -109,7 +110,7 @@ class CollectorManager
     /**
      * @return array{caddy_start_ms: float|null, php_start_ms: float, laravel_start_ms: float|null, profiler_end_ms: float|null, collected_at_ms: float}
      */
-    private function timingAnchors(\Illuminate\Http\Request $request): array
+    private function timingAnchors(Request $request): array
     {
         $caddyStart = $request->header('X-Caddy-Start');
         $phpStart = (float) $request->server('REQUEST_TIME_FLOAT', microtime(true));
