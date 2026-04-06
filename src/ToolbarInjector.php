@@ -93,8 +93,7 @@ class ToolbarInjector
         $response,
         ProfileRequestContext $context,
         string $snapshotRequestId,
-    ): void
-    {
+    ): void {
         $summary = ProfileSummaryBuilder::build($request);
         $summary['request_id'] = $snapshotRequestId;
         $summary['profile_request_id'] = $context->requestId;
@@ -243,8 +242,7 @@ class ToolbarInjector
         $response,
         bool $canExposeToolbarData = true,
         bool $headerOnly = false,
-    ): array
-    {
+    ): array {
         $data = new CollectorManager(response: $response)->collectData();
 
         return $this->attachRequestHistory($request, $response, $data, $canExposeToolbarData, $headerOnly);
@@ -256,8 +254,7 @@ class ToolbarInjector
         array $data,
         bool $canExposeToolbarData,
         bool $headerOnly,
-    ): array
-    {
+    ): array {
         if (! isset($response->headers)) {
             return $headerOnly ? [] : $data;
         }

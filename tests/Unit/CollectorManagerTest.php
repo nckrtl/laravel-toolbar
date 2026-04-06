@@ -12,6 +12,7 @@ use NckRtl\Toolbar\CollectorManager;
 use NckRtl\Toolbar\Collectors\LaravelCollector;
 use NckRtl\Toolbar\Collectors\PhpCollector;
 use NckRtl\Toolbar\Http\Middleware\MiddlewareStart;
+use NckRtl\Toolbar\Support\ProfileRequestContext;
 use NckRtl\Toolbar\Tests\Fixtures\TestUser;
 use NckRtl\Toolbar\Tests\Helpers\MockResponse;
 use NckRtl\Toolbar\Toolbar;
@@ -181,7 +182,7 @@ it('caches profiled request data under the generated snapshot id and aliases X-R
 
     $request = Request::create('/test', 'GET');
     $request->headers->set('X-REQUEST-ID', $requestId);
-    $request->attributes->set(\NckRtl\Toolbar\Support\ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-request-123');
+    $request->attributes->set(ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-request-123');
     $request->headers->set('X-TOOLBAR-AUTH', 'user');
     $request->headers->set('X-TOOLBAR-USER', '42');
     app()->instance('request', $request);
@@ -224,7 +225,7 @@ it('stores first-user metadata with the actual authenticated user id', function 
     $requestId = 'first-user-request';
     $request = Request::create('/test', 'GET');
     $request->headers->set('X-REQUEST-ID', $requestId);
-    $request->attributes->set(\NckRtl\Toolbar\Support\ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-first-user-request');
+    $request->attributes->set(ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-first-user-request');
     $request->headers->set('X-TOOLBAR-AUTH', 'first-user');
 
     $toolbar = app(Toolbar::class);
@@ -261,7 +262,7 @@ it('stores guest metadata when explicit user id is invalid', function () {
     $requestId = 'invalid-user-request';
     $request = Request::create('/test', 'GET');
     $request->headers->set('X-REQUEST-ID', $requestId);
-    $request->attributes->set(\NckRtl\Toolbar\Support\ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-invalid-user-request');
+    $request->attributes->set(ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-invalid-user-request');
     $request->headers->set('X-TOOLBAR-AUTH', 'user');
     $request->headers->set('X-TOOLBAR-USER', '999');
 
@@ -300,7 +301,7 @@ it('stores guest metadata when auth mode user is missing a user id', function ()
     $requestId = 'missing-user-request';
     $request = Request::create('/test', 'GET');
     $request->headers->set('X-REQUEST-ID', $requestId);
-    $request->attributes->set(\NckRtl\Toolbar\Support\ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-missing-user-request');
+    $request->attributes->set(ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-missing-user-request');
     $request->headers->set('X-TOOLBAR-AUTH', 'user');
     app()->instance('request', $request);
 
@@ -326,7 +327,7 @@ it('caches metadata-only profiled payloads under the generated snapshot id and a
     $requestId = 'metadata-only-request';
     $request = Request::create('/test', 'GET');
     $request->headers->set('X-REQUEST-ID', $requestId);
-    $request->attributes->set(\NckRtl\Toolbar\Support\ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-metadata-only-request');
+    $request->attributes->set(ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-metadata-only-request');
     app()->instance('request', $request);
 
     $toolbar = app(Toolbar::class);

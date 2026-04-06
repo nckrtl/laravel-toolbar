@@ -54,7 +54,7 @@ function decodeToolbarSummaryPayload(?string $header): array
 }
 
 it('exempts the redirect chain cookie from cookie encryption', function () {
-    $middleware = new EncryptCookies(\Mockery::mock(EncrypterContract::class));
+    $middleware = new EncryptCookies(Mockery::mock(EncrypterContract::class));
 
     expect($middleware->isDisabled(RedirectChainStore::COOKIE_NAME))->toBeTrue();
 });
