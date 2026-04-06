@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 
 readonly class ProfileRequestContext
 {
+    public const SNAPSHOT_REQUEST_ID_ATTRIBUTE = 'toolbar.snapshot_request_id';
+
     public const RESOLVED_AUTH_MODE_ATTRIBUTE = 'toolbar.resolved_auth_mode';
 
     public const RESOLVED_AUTH_USER_ID_ATTRIBUTE = 'toolbar.resolved_auth_user_id';

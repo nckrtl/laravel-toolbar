@@ -14,6 +14,8 @@ class RequestData extends Data
 
     public string $route_name;
 
+    public string $route_uri = '-';
+
     public ?string $editor_url = null;
 
     public ?string $route_editor_url = null;
@@ -30,8 +32,14 @@ class RequestData extends Data
         public ?string $uuid = null,
         public ?int $memory = null,
         public ?int $duration = null,
+        public ?string $route_uri_pattern = null,
+        public array $route_parameters = [],
+        public array $query_parameters = [],
+        public array $headers = [],
+        public array $uploaded_files = [],
     ) {
         $this->setRouteName();
+        $this->setRouteUri();
         $this->setRouteEditorUrl();
         $this->setControllerActionEditorUrl($this->controller_action);
     }
@@ -57,6 +65,11 @@ class RequestData extends Data
         } catch (\Exception $e) {
             $this->route_name = '-';
         }
+    }
+
+    private function setRouteUri(): void
+    {
+        $this->route_uri = $this->route_uri_pattern ?? $this->route?->uri() ?? $this->uri;
     }
 
     private function setRouteEditorUrl(): void

@@ -37,6 +37,10 @@ class CollectorManager
         $toolbar = app(Toolbar::class);
         $request = request();
         $requestContext = ProfileRequestContext::fromRequest($request);
+        $snapshotRequestId = $request->attributes->get(ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE);
+        $publicRequestId = is_string($snapshotRequestId) && $snapshotRequestId !== ''
+            ? $snapshotRequestId
+            : $requestContext->requestId;
         $resolvedAuth = ProfileRequestContext::resolvedAuthFromRequest($request);
 
         $startTime = microtime(true);
@@ -48,7 +52,8 @@ class CollectorManager
                 'metadata' => [
                     'id' => $this->id,
                     'timestamp' => $time,
-                    'request_id' => $requestContext->requestId,
+                    'request_id' => $publicRequestId,
+                    'profile_request_id' => $requestContext->requestId,
                     'auth_mode' => $resolvedAuth['auth_mode'],
                     'auth_user_id' => $resolvedAuth['auth_user_id'],
                     'collectors' => 'No collectors enabled in the toolbar configuration (toolbar.php)',
@@ -58,7 +63,7 @@ class CollectorManager
                 ],
             ];
 
-            $this->cacheCollectedData($requestContext->requestId);
+            $this->cacheCollectedData($publicRequestId, $requestContext->requestId);
 
             return $this->data;
         }
@@ -87,7 +92,8 @@ class CollectorManager
         $this->data['layout'] = $toolbar->config->layout->toArray();
 
         $this->data['metadata']['id'] = $this->id;
-        $this->data['metadata']['request_id'] = $requestContext->requestId;
+        $this->data['metadata']['request_id'] = $publicRequestId;
+        $this->data['metadata']['profile_request_id'] = $requestContext->requestId;
         $this->data['metadata']['auth_mode'] = $resolvedAuth['auth_mode'];
         $this->data['metadata']['auth_user_id'] = $resolvedAuth['auth_user_id'];
         $this->data['metadata']['timing_anchors'] = $this->timingAnchors($request);
@@ -100,7 +106,7 @@ class CollectorManager
             $this->data['metadata']['wall_time']['total'] = number_format(($endTime - $startTime) * 1000, 2).'ms';
         }
 
-        $this->cacheCollectedData($requestContext->requestId);
+        $this->cacheCollectedData($publicRequestId, $requestContext->requestId);
 
         $this->data['metadata']['timing_anchors']['collected_at_ms'] = microtime(true) * 1000;
 
@@ -138,7 +144,7 @@ class CollectorManager
         ];
     }
 
-    private function cacheCollectedData(?string $requestId): void
+    private function cacheCollectedData(?string $requestId, ?string $profileRequestId = null): void
     {
         $cacheKey = $requestId ?? $this->id;
         $plain = json_decode((string) json_encode($this->data), true);
@@ -149,6 +155,14 @@ class CollectorManager
             $plain,
             config('toolbar.request_data_ttl', 30),
         );
+
+        if ($profileRequestId !== null && $profileRequestId !== '' && $profileRequestId !== $cacheKey) {
+            Cache::put(
+                'laravel-toolbar-request-data-'.$profileRequestId,
+                $plain,
+                config('toolbar.request_data_ttl', 30),
+            );
+        }
     }
 
     protected function setTelescopeEntries(): bool

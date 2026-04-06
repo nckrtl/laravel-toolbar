@@ -5,6 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 import { run } from 'vite-plugin-run';
 
 export default defineConfig({
+  staged: {
+    "*": "vp check --fix"
+  },
   plugins: [
     tailwindcss(),
     vue(),

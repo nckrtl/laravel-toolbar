@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NckRtl\Toolbar;
 
 use Illuminate\Http\JsonResponse;
@@ -8,8 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\Str;
 use NckRtl\Toolbar\Support\ProfileRequestContext;
 use NckRtl\Toolbar\Support\ProfileSummaryBuilder;
+use NckRtl\Toolbar\Support\RedirectChainStore;
+use NckRtl\Toolbar\Support\RequestHistoryRowFactory;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -43,7 +48,10 @@ class ToolbarInjector
         $context = ProfileRequestContext::fromRequest($request);
 
         if ($context->requestId !== null) {
-            $this->handleProfiledRequest($request, $response, $context);
+            $snapshotRequestId = $this->resolveProfiledRequestId($request);
+
+            $this->trackRedirectChainForProfiledRequest($request, $response, $snapshotRequestId);
+            $this->handleProfiledRequest($request, $response, $context, $snapshotRequestId);
 
             return;
         }
@@ -54,13 +62,25 @@ class ToolbarInjector
             return;
         }
 
-        if ($this->isInertiaRequest($request)) {
-            $this->injectToolbarData($response);
+        if ($this->shouldInjectHeader($request, $response)) {
+            $this->injectToolbarData($request, $response);
 
             return;
         }
 
-        $this->injectToolbarHtml($request, $response);
+        $shouldInjectHtml = $this->shouldInjectHtml($request, $response);
+
+        if (! $shouldInjectHtml && ! $this->isTrackedRedirectResponse($response)) {
+            $this->clearRedirectChainIfPresent($request, $response);
+
+            return;
+        }
+
+        $data = $this->collectToolbarData($request, $response, canExposeToolbarData: $shouldInjectHtml);
+
+        if ($shouldInjectHtml) {
+            $this->injectToolbarHtml($request, $response, $data);
+        }
     }
 
     /**
@@ -68,9 +88,22 @@ class ToolbarInjector
      * from profiler checkpoints, set it as a response header, then defer the
      * full collection + cache write to after the response is sent.
      */
-    protected function handleProfiledRequest(Request $request, $response, ProfileRequestContext $context): void
+    protected function handleProfiledRequest(
+        Request $request,
+        $response,
+        ProfileRequestContext $context,
+        string $snapshotRequestId,
+    ): void
     {
         $summary = ProfileSummaryBuilder::build($request);
+        $summary['request_id'] = $snapshotRequestId;
+        $summary['profile_request_id'] = $context->requestId;
+        $summary['history_row'] = array_merge(
+            app(RequestHistoryRowFactory::class)->fromRequest($request, $response, $snapshotRequestId),
+            [
+                'duration' => data_get($summary, 'profiler.total_wall_time'),
+            ],
+        );
 
         if (isset($response->headers)) {
             $response->headers->set(
@@ -99,15 +132,19 @@ class ToolbarInjector
     /**
      * Add debug data to Inertia response via header
      */
-    protected function injectToolbarData($response): Response|JsonResponse|RedirectResponse
+    protected function injectToolbarData(Request $request, $response): Response|JsonResponse|RedirectResponse
     {
         // Support both Response and JsonResponse (Inertia uses JsonResponse)
         if (! isset($response->headers)) {
             return $response;
         }
 
-        // Collect data
-        $data = new CollectorManager(response: $response)->collectData();
+        $data = $this->collectToolbarData(
+            $request,
+            $response,
+            canExposeToolbarData: true,
+            headerOnly: true,
+        );
 
         // Add debug data as a custom header
         $response->headers->set(
@@ -116,6 +153,19 @@ class ToolbarInjector
         );
 
         return $response;
+    }
+
+    protected function shouldInjectHeader(Request $request, $response): bool
+    {
+        if (! isset($response->headers)) {
+            return false;
+        }
+
+        if ($response instanceof BinaryFileResponse || $response instanceof StreamedResponse) {
+            return false;
+        }
+
+        return $this->isToolbarHeaderRequest($request);
     }
 
     /**
@@ -157,14 +207,14 @@ class ToolbarInjector
     /**
      * Inject the debugbar into the response
      */
-    protected function injectToolbarHtml(Request $request, $response): void
+    protected function injectToolbarHtml(Request $request, $response, ?array $data = null): void
     {
         if (! $this->shouldInjectHtml($request, $response)) {
             return;
         }
 
         // Collect data
-        $data = new CollectorManager(response: $response)->collectData();
+        $data ??= $this->collectToolbarData($request, $response, canExposeToolbarData: true);
 
         $content = $response->getContent();
 
@@ -186,6 +236,220 @@ class ToolbarInjector
             // Update the content length
             $response->headers->set('Content-Length', (string) strlen($content));
         }
+    }
+
+    protected function collectToolbarData(
+        Request $request,
+        $response,
+        bool $canExposeToolbarData = true,
+        bool $headerOnly = false,
+    ): array
+    {
+        $data = new CollectorManager(response: $response)->collectData();
+
+        return $this->attachRequestHistory($request, $response, $data, $canExposeToolbarData, $headerOnly);
+    }
+
+    protected function attachRequestHistory(
+        Request $request,
+        $response,
+        array $data,
+        bool $canExposeToolbarData,
+        bool $headerOnly,
+    ): array
+    {
+        if (! isset($response->headers)) {
+            return $headerOnly ? [] : $data;
+        }
+
+        $requestId = $this->resolveRequestId($data);
+        $historyRow = app(RequestHistoryRowFactory::class)->fromPayload($request, $data);
+
+        $data['request_id'] = $requestId;
+        unset($data['redirect_chain']);
+
+        $history = [$historyRow];
+
+        try {
+            $store = app(RedirectChainStore::class);
+
+            if ($this->isTrackedRedirectResponse($response)) {
+                $chainId = $store->currentChainId($request) ?? $store->createChainId();
+
+                $store->append($chainId, $historyRow);
+                $response->headers->setCookie($store->makeChainCookie($chainId));
+
+                return $headerOnly
+                    ? $this->compactHeaderPayload($requestId, $historyRow)
+                    : $data;
+            }
+
+            $chainId = $store->currentChainId($request);
+
+            if ($chainId === null) {
+                if ($headerOnly) {
+                    return $this->shouldResetHeaderHistory($historyRow)
+                        ? $this->replacementHeaderPayload($data, $requestId, $history)
+                        : $this->compactHeaderPayload($requestId, $historyRow);
+                }
+
+                $data['selected_request_id'] = $requestId;
+                $data['request_history'] = $history;
+
+                return $data;
+            }
+
+            if (! $canExposeToolbarData) {
+                $store->forget($chainId);
+                $response->headers->setCookie($store->makeForgetCookie());
+
+                return $headerOnly
+                    ? $this->compactHeaderPayload($requestId, $historyRow)
+                    : $data;
+            }
+
+            $history = $store->consume($chainId, $historyRow);
+            $response->headers->setCookie($store->makeForgetCookie());
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($headerOnly) {
+            return $this->shouldResetHeaderHistory($historyRow)
+                ? $this->replacementHeaderPayload($data, $requestId, $history)
+                : $this->compactHeaderPayload($requestId, $historyRow);
+        }
+
+        $data['selected_request_id'] = $requestId;
+        $data['request_history'] = $history;
+
+        return $data;
+    }
+
+    protected function isTrackedRedirectResponse($response): bool
+    {
+        if (! isset($response->headers) || ! method_exists($response, 'getStatusCode')) {
+            return false;
+        }
+
+        $statusCode = (int) $response->getStatusCode();
+
+        if (! in_array($statusCode, [301, 302, 303, 307, 308], true)) {
+            return false;
+        }
+
+        $location = $response->headers->get('Location');
+
+        return is_string($location) && $location !== '';
+    }
+
+    protected function trackRedirectChainForProfiledRequest(Request $request, $response, string $snapshotRequestId): void
+    {
+        if (! isset($response->headers) || ! method_exists($response, 'getStatusCode')) {
+            return;
+        }
+
+        if (! $this->isTrackedRedirectResponse($response)) {
+            $this->clearRedirectChainIfPresent($request, $response);
+
+            return;
+        }
+
+        try {
+            $store = app(RedirectChainStore::class);
+            $chainId = $store->currentChainId($request) ?? $store->createChainId();
+
+            $historyRow = app(RequestHistoryRowFactory::class)
+                ->fromRequest($request, $response, $snapshotRequestId);
+
+            $store->append($chainId, $historyRow);
+
+            $response->headers->setCookie($store->makeChainCookie($chainId));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
+    protected function clearRedirectChainIfPresent(Request $request, $response): void
+    {
+        try {
+            $store = app(RedirectChainStore::class);
+            $chainId = $store->currentChainId($request);
+
+            if ($chainId === null) {
+                return;
+            }
+
+            $store->forget($chainId);
+
+            if (isset($response->headers)) {
+                $response->headers->setCookie($store->makeForgetCookie());
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
+    protected function isToolbarHeaderRequest(Request $request): bool
+    {
+        if ($this->isInertiaRequest($request)) {
+            return true;
+        }
+
+        if ($request->ajax()) {
+            return true;
+        }
+
+        return $request->expectsJson();
+    }
+
+    protected function resolveRequestId(array $data): string
+    {
+        $requestId = data_get($data, 'metadata.request_id');
+
+        if (is_string($requestId) && $requestId !== '') {
+            return $requestId;
+        }
+
+        $id = data_get($data, 'metadata.id');
+
+        return is_string($id) ? $id : '';
+    }
+
+    protected function compactHeaderPayload(string $requestId, array $historyRow): array
+    {
+        return [
+            'request_id' => $requestId,
+            'history_row' => $historyRow,
+        ];
+    }
+
+    protected function replacementHeaderPayload(array $data, string $requestId, array $history): array
+    {
+        $data['request_id'] = $requestId;
+        $data['selected_request_id'] = $requestId;
+        $data['request_history'] = $history;
+
+        return $data;
+    }
+
+    protected function shouldResetHeaderHistory(array $historyRow): bool
+    {
+        return ($historyRow['is_xhr'] ?? true) === false;
+    }
+
+    protected function resolveProfiledRequestId(Request $request): string
+    {
+        $snapshotRequestId = $request->attributes->get(ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE);
+
+        if (is_string($snapshotRequestId) && $snapshotRequestId !== '') {
+            return $snapshotRequestId;
+        }
+
+        $snapshotRequestId = (string) Str::uuid();
+        $request->attributes->set(ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, $snapshotRequestId);
+
+        return $snapshotRequestId;
     }
 
     /**

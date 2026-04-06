@@ -174,13 +174,14 @@ it('caches data for requests', function () {
     expect($cachedData['metadata']['auth_user_id'])->toBeNull();
 });
 
-it('caches request data under X-REQUEST-ID', function () {
+it('caches profiled request data under the generated snapshot id and aliases X-REQUEST-ID', function () {
     Cache::flush();
 
     $requestId = 'test-request-id-123';
 
     $request = Request::create('/test', 'GET');
     $request->headers->set('X-REQUEST-ID', $requestId);
+    $request->attributes->set(\NckRtl\Toolbar\Support\ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-request-123');
     $request->headers->set('X-TOOLBAR-AUTH', 'user');
     $request->headers->set('X-TOOLBAR-USER', '42');
     app()->instance('request', $request);
@@ -193,14 +194,18 @@ it('caches request data under X-REQUEST-ID', function () {
     $manager = new CollectorManager;
     $data = $manager->collectData();
 
-    $cachedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
+    $cachedData = Cache::get('laravel-toolbar-request-data-snapshot-request-123');
+    $aliasedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
 
     expect($cachedData)->not->toBeNull();
+    expect($aliasedData)->not->toBeNull();
     expect($cachedData)->toHaveKey('php');
-    expect($cachedData['metadata']['request_id'])->toBe($requestId);
+    expect($cachedData['metadata']['request_id'])->toBe('snapshot-request-123');
+    expect($cachedData['metadata']['profile_request_id'])->toBe($requestId);
     expect($cachedData['metadata']['auth_mode'])->toBe('guest');
     expect($cachedData['metadata']['auth_user_id'])->toBeNull();
-    expect($data['metadata']['request_id'])->toBe($requestId);
+    expect($data['metadata']['request_id'])->toBe('snapshot-request-123');
+    expect($data['metadata']['profile_request_id'])->toBe($requestId);
 });
 
 it('stores first-user metadata with the actual authenticated user id', function () {
@@ -219,6 +224,7 @@ it('stores first-user metadata with the actual authenticated user id', function 
     $requestId = 'first-user-request';
     $request = Request::create('/test', 'GET');
     $request->headers->set('X-REQUEST-ID', $requestId);
+    $request->attributes->set(\NckRtl\Toolbar\Support\ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-first-user-request');
     $request->headers->set('X-TOOLBAR-AUTH', 'first-user');
 
     $toolbar = app(Toolbar::class);
@@ -236,10 +242,12 @@ it('stores first-user metadata with the actual authenticated user id', function 
         return new Response('OK');
     });
 
-    $cachedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
+    $cachedData = Cache::get('laravel-toolbar-request-data-snapshot-first-user-request');
 
     expect($cachedData['metadata']['auth_mode'])->toBe('first-user');
     expect($cachedData['metadata']['auth_user_id'])->toBe($firstUser->getKey());
+    expect($cachedData['metadata']['request_id'])->toBe('snapshot-first-user-request');
+    expect($cachedData['metadata']['profile_request_id'])->toBe($requestId);
 });
 
 it('stores guest metadata when explicit user id is invalid', function () {
@@ -253,6 +261,7 @@ it('stores guest metadata when explicit user id is invalid', function () {
     $requestId = 'invalid-user-request';
     $request = Request::create('/test', 'GET');
     $request->headers->set('X-REQUEST-ID', $requestId);
+    $request->attributes->set(\NckRtl\Toolbar\Support\ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-invalid-user-request');
     $request->headers->set('X-TOOLBAR-AUTH', 'user');
     $request->headers->set('X-TOOLBAR-USER', '999');
 
@@ -271,11 +280,13 @@ it('stores guest metadata when explicit user id is invalid', function () {
         return new Response('OK');
     });
 
-    $cachedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
+    $cachedData = Cache::get('laravel-toolbar-request-data-snapshot-invalid-user-request');
 
     expect(Auth::check())->toBeFalse();
     expect($cachedData['metadata']['auth_mode'])->toBe('guest');
     expect($cachedData['metadata']['auth_user_id'])->toBeNull();
+    expect($cachedData['metadata']['request_id'])->toBe('snapshot-invalid-user-request');
+    expect($cachedData['metadata']['profile_request_id'])->toBe($requestId);
 });
 
 it('stores guest metadata when auth mode user is missing a user id', function () {
@@ -289,6 +300,7 @@ it('stores guest metadata when auth mode user is missing a user id', function ()
     $requestId = 'missing-user-request';
     $request = Request::create('/test', 'GET');
     $request->headers->set('X-REQUEST-ID', $requestId);
+    $request->attributes->set(\NckRtl\Toolbar\Support\ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-missing-user-request');
     $request->headers->set('X-TOOLBAR-AUTH', 'user');
     app()->instance('request', $request);
 
@@ -300,29 +312,35 @@ it('stores guest metadata when auth mode user is missing a user id', function ()
     $manager = new CollectorManager;
     $manager->collectData();
 
-    $cachedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
+    $cachedData = Cache::get('laravel-toolbar-request-data-snapshot-missing-user-request');
 
     expect($cachedData['metadata']['auth_mode'])->toBe('guest');
     expect($cachedData['metadata']['auth_user_id'])->toBeNull();
+    expect($cachedData['metadata']['request_id'])->toBe('snapshot-missing-user-request');
+    expect($cachedData['metadata']['profile_request_id'])->toBe($requestId);
 });
 
-it('caches metadata-only payloads under X-REQUEST-ID when no collectors are enabled', function () {
+it('caches metadata-only profiled payloads under the generated snapshot id and aliases X-REQUEST-ID', function () {
     Cache::flush();
 
     $requestId = 'metadata-only-request';
     $request = Request::create('/test', 'GET');
     $request->headers->set('X-REQUEST-ID', $requestId);
+    $request->attributes->set(\NckRtl\Toolbar\Support\ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE, 'snapshot-metadata-only-request');
     app()->instance('request', $request);
 
     $toolbar = app(Toolbar::class);
     $toolbar->config->collectors([]);
 
     $data = (new CollectorManager)->collectData();
-    $cachedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
+    $cachedData = Cache::get('laravel-toolbar-request-data-snapshot-metadata-only-request');
+    $aliasedData = Cache::get('laravel-toolbar-request-data-'.$requestId);
 
     expect($data['metadata']['collectors'])->toContain('No collectors enabled');
     expect($cachedData)->not->toBeNull();
-    expect($cachedData['metadata']['request_id'])->toBe($requestId);
+    expect($aliasedData)->not->toBeNull();
+    expect($cachedData['metadata']['request_id'])->toBe('snapshot-metadata-only-request');
+    expect($cachedData['metadata']['profile_request_id'])->toBe($requestId);
     expect($cachedData['metadata']['auth_mode'])->toBe('guest');
 });
 

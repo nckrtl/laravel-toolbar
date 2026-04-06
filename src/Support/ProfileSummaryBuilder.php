@@ -22,6 +22,10 @@ final class ProfileSummaryBuilder
     {
         $context = ProfileRequestContext::fromRequest($request);
         $resolvedAuth = ProfileRequestContext::resolvedAuthFromRequest($request);
+        $snapshotRequestId = $request->attributes->get(ProfileRequestContext::SNAPSHOT_REQUEST_ID_ATTRIBUTE);
+        $requestId = is_string($snapshotRequestId) && $snapshotRequestId !== ''
+            ? $snapshotRequestId
+            : $context->requestId;
 
         $stages = self::buildStages();
         $totalWallMs = self::totalWallTime($stages);
@@ -29,6 +33,8 @@ final class ProfileSummaryBuilder
         $queries = self::buildQuerySummary();
 
         return [
+            'request_id' => $requestId,
+            'profile_request_id' => $context->requestId,
             'auth_mode' => $resolvedAuth['auth_mode'],
             'request' => [
                 'route_name' => (string) ($request->route()?->getName() ?? $request->route()?->getActionName() ?? '-'),

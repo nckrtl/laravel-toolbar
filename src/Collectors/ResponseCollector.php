@@ -26,13 +26,30 @@ class ResponseCollector extends Collector implements CollectorInterface
             return null;
         }
 
+        $response = $collectorManager->response;
+
         return new ResponseData(
-            status_code: $collectorManager->response->getStatusCode(),
-            headers: $collectorManager->response->headers->all(),
+            status_code: $response->getStatusCode(),
+            headers: $response->headers->all(),
             size: new Measurement(
-                value: strlen($collectorManager->response->getContent()),
+                value: strlen($response->getContent()),
                 unit: DataSizeUnit::BYTES
-            )->formatValue()
+            )->formatValue(),
+            content_type: $response->headers->get('Content-Type'),
+            redirect_to: $response->headers->get('Location'),
+            cookies: array_map(
+                static fn ($cookie) => [
+                    'name' => $cookie->getName(),
+                    'value' => $cookie->getValue(),
+                    'path' => $cookie->getPath(),
+                    'domain' => $cookie->getDomain(),
+                    'same_site' => $cookie->getSameSite(),
+                    'secure' => $cookie->isSecure(),
+                    'http_only' => $cookie->isHttpOnly(),
+                    'expires_at' => $cookie->getExpiresTime() > 0 ? date(DATE_ATOM, $cookie->getExpiresTime()) : null,
+                ],
+                $response->headers->getCookies(),
+            ),
         );
     }
 }

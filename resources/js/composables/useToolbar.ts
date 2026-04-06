@@ -1,17 +1,9 @@
-import { ref, type Ref } from 'vue';
-import type { ToolbarData, ToolbarUpdateEvent } from '@/types';
+import type { ComputedRef } from 'vue';
+import { activeToolbarData } from '@/core/request-history';
+import type { ToolbarData } from '@/types';
 
-// ✅ Initialize with data BEFORE any component mounts
-const data: Ref<ToolbarData> = ref(window.__LARAVEL_TOOLBAR_DATA__);
-
-window.addEventListener('laravel-toolbar:update', (event: ToolbarUpdateEvent) => {
-    if (event.detail?.data) {
-        data.value = event.detail.data;
-    }
-});
-
-export const useToolbar = (): { data: Ref<ToolbarData> } => {
+export const useToolbar = (): { data: ComputedRef<ToolbarData> } => {
     return {
-        data,
+        data: activeToolbarData,
     };
 };

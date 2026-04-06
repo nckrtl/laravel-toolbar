@@ -88,6 +88,7 @@ declare namespace NckRtl.Toolbar.Data {
     };
     export type RequestData = {
         route_name: string;
+        route_uri?: string;
         editor_url: string | null;
         route_editor_url: string | null;
         method: string;
@@ -99,6 +100,11 @@ declare namespace NckRtl.Toolbar.Data {
         uuid: string | null;
         memory: number | null;
         duration: number | null;
+        route_uri_pattern?: string | null;
+        route_parameters?: { [key: string]: any };
+        query_parameters?: { [key: string]: any };
+        headers?: { [key: string]: Array<any> };
+        uploaded_files?: Array<any>;
     };
     export type RequestStageData = {
         recordedStart: boolean;
@@ -118,8 +124,11 @@ declare namespace NckRtl.Toolbar.Data {
     };
     export type ResponseData = {
         status_code: number;
-        headers: Array<any>;
+        headers: Array<any> | { [key: string]: Array<any> };
         size: any;
+        content_type?: string | null;
+        redirect_to?: string | null;
+        cookies?: Array<any>;
     };
     export type SubstageData = {
         wall_time: NckRtl.Toolbar.Data.RequestStagePropertyData | null;

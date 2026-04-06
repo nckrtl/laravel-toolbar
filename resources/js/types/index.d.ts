@@ -11,9 +11,28 @@ declare module '*?inline' {
     export default css;
 }
 
+export interface RequestHistoryRow {
+    id: string;
+    is_xhr: boolean;
+    method: string;
+    uri: string;
+    name: string | null;
+    action?: string | null;
+    middleware_count: number | null;
+    response_type?: string | null;
+    status_code: number | null;
+    size: string | null;
+    duration: string | number | null;
+}
+
 export interface ToolbarData {
+    request_id?: string;
+    selected_request_id?: string;
+    request_history?: RequestHistoryRow[];
+    history_row?: RequestHistoryRow;
     metadata?: {
         debug?: boolean;
+        request_id?: string;
         wall_time?: {
             collectors: Record<string, number>;
             total: number;
@@ -23,6 +42,10 @@ export interface ToolbarData {
     profiler?: NckRtl.Toolbar.Data.ProfilerData;
     request?: NckRtl.Toolbar.Data.RequestData;
     response?: NckRtl.Toolbar.Data.ResponseData;
+    redirect_chain?: Array<{
+        request: NckRtl.Toolbar.Data.RequestData;
+        response: NckRtl.Toolbar.Data.ResponseData;
+    }>;
     laravel?: NckRtl.Toolbar.Data.LaravelData;
     php?: NckRtl.Toolbar.Data.PhpData;
     vue?: NckRtl.Toolbar.Data.VueData;
