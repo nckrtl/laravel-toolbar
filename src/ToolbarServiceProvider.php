@@ -3,6 +3,7 @@
 namespace NckRtl\Toolbar;
 
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Inertia\Ssr\Gateway;
 use NckRtl\Toolbar\Console\CustomizeToolbarCommand;
 use NckRtl\Toolbar\Console\StartMcpServerCommand;
 use NckRtl\Toolbar\Services\ProfilerService\ProfiledSsrGateway;
@@ -51,10 +52,10 @@ class ToolbarServiceProvider extends PackageServiceProvider
      */
     private function decorateInertiaSsrGateway(): void
     {
-        if (! interface_exists(\Inertia\Ssr\Gateway::class)) {
+        if (! interface_exists(Gateway::class)) {
             return;
         }
 
-        app()->extend(\Inertia\Ssr\Gateway::class, fn ($gateway) => new ProfiledSsrGateway($gateway));
+        app()->extend(Gateway::class, fn ($gateway) => new ProfiledSsrGateway($gateway));
     }
 }
