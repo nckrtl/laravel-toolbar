@@ -2,6 +2,17 @@
 
 All notable changes to `laravel-toolbar` will be documented in this file.
 
+## v0.1.22 - 2026-04-15
+
+### What's new
+
+- **Inertia SSR shows up as its own stage** in the profiler breakdown. Previously the 20–40ms that Inertia's dispatch (HTTP to vite's /__inertia_ssr in dev, or to the pre-built worker in prod) costs was hidden inside the Controller stage. Now it's a distinct bar with color #005FFF, inserted between Controller and View rendering whenever SSR actually runs.
+- No change for apps without Inertia or with SSR disabled — the stage is simply absent.
+
+Both the full collector pipeline (toolbar UI) and the lightweight `X-Toolbar-Summary` header (consumed by tools like `orbit profile`) reflect the new stage.
+
+**Full Changelog**: https://github.com/nckrtl/laravel-toolbar/compare/v0.1.21...v0.1.22
+
 ## v0.1.21 - 2026-04-15
 
 ### What's new
