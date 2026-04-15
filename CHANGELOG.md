@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-toolbar` will be documented in this file.
 
+## v0.1.21 - 2026-04-15
+
+### What's new
+
+- `X-Toolbar-Summary` response header for profiled requests (enables `orbit profile` breakdown rendering on workspaces, not just the main checkout)
+- Deferred full data collection to `terminate()` via `fastcgi_finish_request()` for faster profiled responses
+- Reduced toolbar data collection overhead
+- Request history and redirect chain tracking
+- Styling fixes
+
+**Full Changelog**: https://github.com/nckrtl/laravel-toolbar/compare/v0.1.20...v0.1.21
+
 ## v0.1.11 - 2026-03-03
 
 Widen laravel/mcp constraint to `^0.5.1 || ^0.6.0` for compatibility with projects using laravel/boost (which requires mcp ^0.5.1).
