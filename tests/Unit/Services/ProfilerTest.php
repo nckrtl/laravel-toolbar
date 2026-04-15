@@ -217,6 +217,44 @@ it('returns request stages array', function () {
     expect($stages)->toBeArray();
 });
 
+it('inserts Inertia SSR stage between Controller and View rendering when SSR checkpoints are recorded', function () {
+    $base = microtime(true);
+    foreach ([
+        [RequestCheckpointId::BEFORE_CONTROLLER, 0.000],
+        [RequestCheckpointId::BEFORE_INERTIA_SSR, 0.001],
+        [RequestCheckpointId::AFTER_INERTIA_SSR, 0.020],
+        [RequestCheckpointId::BEFORE_VIEW_RENDERING, 0.021],
+        [RequestCheckpointId::AFTER_VIEW_RENDERING, 0.022],
+    ] as [$id, $offset]) {
+        Profiler::record($id, new RequestCheckpointData(time: new Measurement($base + $offset, TimeUnit::SECONDS)));
+    }
+
+    [$stages] = Profiler::getRequestStages();
+    $labels = array_map(fn ($s) => $s->label, $stages);
+    $ssrStage = collect($stages)->firstWhere('label', 'Inertia SSR');
+
+    expect($labels)->toContain('Inertia SSR')
+        ->and(array_search('Inertia SSR', $labels, true))
+        ->toBe(array_search('Controller', $labels, true) + 1)
+        ->and($ssrStage->color)->toBe('#005FFF');
+});
+
+it('omits Inertia SSR stage when SSR checkpoints are not recorded', function () {
+    $base = microtime(true);
+    foreach ([
+        [RequestCheckpointId::BEFORE_CONTROLLER, 0.000],
+        [RequestCheckpointId::BEFORE_VIEW_RENDERING, 0.001],
+        [RequestCheckpointId::AFTER_VIEW_RENDERING, 0.002],
+    ] as [$id, $offset]) {
+        Profiler::record($id, new RequestCheckpointData(time: new Measurement($base + $offset, TimeUnit::SECONDS)));
+    }
+
+    [$stages] = Profiler::getRequestStages();
+    $labels = array_map(fn ($s) => $s->label, $stages);
+
+    expect($labels)->not->toContain('Inertia SSR');
+});
+
 it('clears checkpoints via resetState', function () {
     Profiler::record(RequestCheckpointId::BEFORE_MIDDLEWARE);
 

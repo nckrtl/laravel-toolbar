@@ -145,16 +145,29 @@ class Profiler
             ]
         );
 
+        $ssrStart = Profiler::getCheckpoint(RequestCheckpointId::BEFORE_INERTIA_SSR);
+        $ssrEnd = Profiler::getCheckpoint(RequestCheckpointId::AFTER_INERTIA_SSR);
+        $hasSsr = $ssrStart !== null && $ssrEnd !== null;
+
         $requestStages[] = new RequestStageData(
             label: 'Controller',
             start: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_CONTROLLER),
-            end: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_VIEW_RENDERING),
+            end: $hasSsr ? $ssrStart : Profiler::getCheckpoint(RequestCheckpointId::BEFORE_VIEW_RENDERING),
             color: '#64BAFF',
         );
 
+        if ($hasSsr) {
+            $requestStages[] = new RequestStageData(
+                label: 'Inertia SSR',
+                start: $ssrStart,
+                end: $ssrEnd,
+                color: '#005FFF',
+            );
+        }
+
         $requestStages[] = new RequestStageData(
             label: 'View rendering',
-            start: Profiler::getCheckpoint(RequestCheckpointId::BEFORE_VIEW_RENDERING),
+            start: $hasSsr ? $ssrEnd : Profiler::getCheckpoint(RequestCheckpointId::BEFORE_VIEW_RENDERING),
             end: Profiler::getCheckpoint(RequestCheckpointId::AFTER_VIEW_RENDERING),
             color: '#85F1BF'
         );

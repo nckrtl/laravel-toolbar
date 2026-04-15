@@ -12,6 +12,8 @@ enum RequestCheckpointId: string
     case BEFORE_MIDDLEWARE = 'before_middleware';
     case AFTER_MIDDLEWARE = 'after_middleware';
     case BEFORE_CONTROLLER = 'before_controller';
+    case BEFORE_INERTIA_SSR = 'before_inertia_ssr';
+    case AFTER_INERTIA_SSR = 'after_inertia_ssr';
     case BEFORE_VIEW_RENDERING = 'before_view_rendering';
     case AFTER_VIEW_RENDERING = 'after_view_rendering';
     case REQUEST_HANDLED = 'request_handled';

@@ -5,6 +5,7 @@ namespace NckRtl\Toolbar;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use NckRtl\Toolbar\Console\CustomizeToolbarCommand;
 use NckRtl\Toolbar\Console\StartMcpServerCommand;
+use NckRtl\Toolbar\Services\ProfilerService\ProfiledSsrGateway;
 use NckRtl\Toolbar\Support\RedirectChainStore;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -39,5 +40,21 @@ class ToolbarServiceProvider extends PackageServiceProvider
         }
 
         app()->instance(Toolbar::class, new Toolbar);
+
+        $this->decorateInertiaSsrGateway();
+    }
+
+    /**
+     * If the host app uses Inertia, wrap its SSR gateway so the dispatch
+     * call shows up as its own stage in the profiler breakdown. Silent
+     * no-op if Inertia isn't installed or SSR is disabled.
+     */
+    private function decorateInertiaSsrGateway(): void
+    {
+        if (! interface_exists(\Inertia\Ssr\Gateway::class)) {
+            return;
+        }
+
+        app()->extend(\Inertia\Ssr\Gateway::class, fn ($gateway) => new ProfiledSsrGateway($gateway));
     }
 }

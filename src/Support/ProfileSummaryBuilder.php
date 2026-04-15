@@ -56,15 +56,25 @@ final class ProfileSummaryBuilder
      */
     private static function buildStages(): array
     {
+        $hasSsr = Profiler::getCheckpoint(RequestCheckpointId::BEFORE_INERTIA_SSR) !== null
+            && Profiler::getCheckpoint(RequestCheckpointId::AFTER_INERTIA_SSR) !== null;
+
         $stageDefinitions = [
             ['Bootstrapping', RequestCheckpointId::LARAVEL_START, RequestCheckpointId::BEFORE_SERVICES_PROVIDERS],
             ['Booting services providers', RequestCheckpointId::BEFORE_SERVICES_PROVIDERS, RequestCheckpointId::AFTER_SERVICES_PROVIDERS],
             ['Middleware in', RequestCheckpointId::AFTER_SERVICES_PROVIDERS, RequestCheckpointId::BEFORE_CONTROLLER],
-            ['Controller', RequestCheckpointId::BEFORE_CONTROLLER, RequestCheckpointId::BEFORE_VIEW_RENDERING],
-            ['View rendering', RequestCheckpointId::BEFORE_VIEW_RENDERING, RequestCheckpointId::AFTER_VIEW_RENDERING],
+            ['Controller', RequestCheckpointId::BEFORE_CONTROLLER, $hasSsr ? RequestCheckpointId::BEFORE_INERTIA_SSR : RequestCheckpointId::BEFORE_VIEW_RENDERING],
+        ];
+
+        if ($hasSsr) {
+            $stageDefinitions[] = ['Inertia SSR', RequestCheckpointId::BEFORE_INERTIA_SSR, RequestCheckpointId::AFTER_INERTIA_SSR];
+        }
+
+        $stageDefinitions = array_merge($stageDefinitions, [
+            ['View rendering', $hasSsr ? RequestCheckpointId::AFTER_INERTIA_SSR : RequestCheckpointId::BEFORE_VIEW_RENDERING, RequestCheckpointId::AFTER_VIEW_RENDERING],
             ['Middleware out', RequestCheckpointId::AFTER_VIEW_RENDERING, RequestCheckpointId::AFTER_MIDDLEWARE],
             ['Preparing response', RequestCheckpointId::AFTER_MIDDLEWARE, RequestCheckpointId::REQUEST_HANDLED],
-        ];
+        ]);
 
         $stages = [];
 
