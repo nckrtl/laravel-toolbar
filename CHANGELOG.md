@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-toolbar` will be documented in this file.
 
+## v0.2.0 - 2026-04-16
+
+### What's new
+
+- **Pinned panels** — click any toolbar tool to pin its panel open; click again to dismiss. Panel state persists across page loads via localStorage.
+- **Shared panel architecture** — all tool panels moved to tools/panels/*.vue and loaded dynamically via a single SharedPanel component.
+- **Request panel overhaul**: dedicated tabs for middleware (inbound/outbound), route params, query params, and view/Inertia data; middleware editor links and short names; outbound detection via ReflectionMethod; tab persistence; search/filter with empty states; fixed panel height locked to summary.
+- **Scroll fade on mount** — overflow fade indicator applies immediately on render, not only after the first scroll.
+- **Consistent panel heights** — database, models, and requests panels all use a fixed 305px height.
+- **DataList component** for consistent spacing between DataListItem rows.
+- **z-index fix** for the shared panel overlay.
+
+**Full Changelog**: https://github.com/nckrtl/laravel-toolbar/compare/v0.1.22...v0.2.0
+
 ## v0.1.22 - 2026-04-15
 
 ### What's new
