@@ -1,6 +1,7 @@
 <script setup>
-import Group from '@/components/Group.vue';
-import { useToolbar } from '@/composables/useToolbar';
+import Group from "@/components/Group.vue";
+import SharedPanel from "@/components/SharedPanel.vue";
+import { useToolbar } from "@/composables/useToolbar";
 
 const { data } = useToolbar();
 </script>
@@ -26,4 +27,5 @@ const { data } = useToolbar();
             </div>
         </template>
     </div>
+    <SharedPanel />
 </template>

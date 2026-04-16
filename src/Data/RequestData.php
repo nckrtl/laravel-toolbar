@@ -27,6 +27,7 @@ class RequestData extends Data
         public string $uri,
         public string $ip_address,
         public string $controller_action,
+        /** @var array<MiddlewareData> */
         public array $middleware,
         public bool $is_inertia,
         public ?string $uuid = null,
@@ -37,6 +38,8 @@ class RequestData extends Data
         public array $query_parameters = [],
         public array $headers = [],
         public array $uploaded_files = [],
+        public ?string $view_name = null,
+        public ?array $view_data = null,
     ) {
         $this->setRouteName();
         $this->setRouteUri();

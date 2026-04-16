@@ -1,32 +1,16 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import ToolbarItem from "@/components/ToolbarItem.vue";
-import { usePinnedPanel } from "@/composables/usePinnedPanel";
+import SectionHeader from "@/components/SectionHeader.vue";
+import Section from "@/components/Section.vue";
+import DataList from "@/components/DataList.vue";
+import DataListItem from "@/components/DataListItem.vue";
 import Pill from "@/components/Pill.vue";
-
-const props = defineProps({
-    config: { type: Object, required: false },
-    itemClasses: { type: Object, required: false },
-    toolIndex: { type: Number, required: false, default: 0 },
-});
-
-const {
-    isVisible: isOpen,
-    togglePin,
-    onMouseEnter,
-    onMouseLeave,
-} = usePinnedPanel("processes", {
-    size: "xs",
-    align: "right",
-    index: props.toolIndex,
-});
 
 const available = ref(false);
 const processes = ref([]);
 
 const runningCount = computed(() => processes.value.filter((p) => p.status === "running").length);
 const totalCount = computed(() => processes.value.length);
-const allRunning = computed(() => runningCount.value === totalCount.value && totalCount.value > 0);
 
 let eventSource = null;
 
@@ -54,7 +38,6 @@ async function fetchInitialStatus() {
             `/_toolbar/processes/status?domain=${encodeURIComponent(domain)}`,
         );
         const data = await response.json();
-
         available.value = data.available ?? false;
         processes.value = data.processes ?? [];
     } catch {
@@ -64,7 +47,6 @@ async function fetchInitialStatus() {
 
 onMounted(async () => {
     await fetchInitialStatus();
-
     if (available.value) {
         connectSSE();
     }
@@ -76,13 +58,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div
-        v-if="available && processes.length > 0"
-        @mouseenter="onMouseEnter"
-        @mouseleave="onMouseLeave"
-    >
-        <ToolbarItem @click="togglePin" :isActive="isOpen" :class="itemClasses">
-            <div class="flex items-center gap-1 py-0.5">
+    <div>
+        <SectionHeader>
+            <template #icon>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 16 16"
@@ -95,13 +73,24 @@ onUnmounted(() => {
                         clip-rule="evenodd"
                     />
                 </svg>
-                <Pill :color="allRunning ? 'green' : 'red'" size="compact" class="px-1.5">
-                    {{ runningCount }}/{{ totalCount }}
-                </Pill>
-            </div>
-        </ToolbarItem>
+            </template>
+            <template #label>Processes</template>
+            <template #secondaryLabel>{{ runningCount }}/{{ totalCount }}</template>
+        </SectionHeader>
+        <Section>
+            <DataList>
+                <DataListItem v-for="process in processes" :key="process.name">
+                    <template #label>{{ process.name }}</template>
+                    <template #value>
+                        <Pill
+                            :color="process.status === 'running' ? 'green' : 'red'"
+                            size="compact"
+                        >
+                            {{ process.status }}
+                        </Pill>
+                    </template>
+                </DataListItem>
+            </DataList>
+        </Section>
     </div>
-
-    <!-- Hidden when orbit not available or no processes configured -->
-    <span v-else></span>
 </template>

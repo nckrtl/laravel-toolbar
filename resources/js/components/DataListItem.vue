@@ -1,7 +1,14 @@
-<script setup></script>
+<script setup>
+defineProps({
+    align: { type: String, default: "end" },
+});
+</script>
 
 <template>
-    <div class="flex w-full items-end justify-between px-1 py-0.5">
+    <div
+        class="flex w-full justify-between px-1 py-0.5"
+        :class="align === 'start' ? 'items-start' : 'items-end'"
+    >
         <div class="flex items-center gap-2 pr-2 text-white/70 whitespace-nowrap uppercase">
             <slot name="label" />
         </div>

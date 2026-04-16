@@ -27,6 +27,12 @@ declare namespace NckRtl.Toolbar.Data {
         debug: string | null;
         debug_editor_url: string | null;
     };
+    export type MiddlewareData = {
+        editor_url: string | null;
+        class: string;
+        file: string | null;
+        has_outbound: boolean;
+    };
     export type ModelData = {
         sources: { [key: string]: NckRtl.Toolbar.Data.ModelSourceData };
         action: string;
@@ -95,7 +101,7 @@ declare namespace NckRtl.Toolbar.Data {
         uri: string;
         ip_address: string;
         controller_action: string;
-        middleware: Array<any>;
+        middleware: Array<NckRtl.Toolbar.Data.MiddlewareData>;
         is_inertia: boolean;
         uuid: string | null;
         memory: number | null;
@@ -105,6 +111,8 @@ declare namespace NckRtl.Toolbar.Data {
         query_parameters?: { [key: string]: any };
         headers?: { [key: string]: Array<any> };
         uploaded_files?: Array<any>;
+        view_name?: string | null;
+        view_data?: { [key: string]: any } | null;
     };
     export type RequestStageData = {
         recordedStart: boolean;

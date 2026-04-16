@@ -15,6 +15,11 @@ const props = defineProps({
         required: false,
         default: () => ({}),
     },
+    toolIndex: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
 });
 
 const { isVisible: isOpen, togglePin, onMouseEnter, onMouseLeave } = usePinnedPanel("vuedevtools");

@@ -6,7 +6,7 @@ import { run } from "vite-plugin-run";
 
 export default defineConfig({
     staged: {
-        "*": "vp check --fix",
+        "resources/**/*.{vue,ts,js,css}": "vp check --fix",
     },
     server: {
         host: "0.0.0.0",

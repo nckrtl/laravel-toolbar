@@ -1,61 +1,28 @@
 <script setup>
 import ToolbarItem from "@/components/ToolbarItem.vue";
 import VueIcon from "@/icons/VueIcon.vue";
-import Panel from "@/components/Panel.vue";
-import SectionHeader from "@/components/SectionHeader.vue";
-import Section from "@/components/Section.vue";
-import DataListItem from "@/components/DataListItem.vue";
-import { useToolbar } from "@/composables/useToolbar";
 import { usePinnedPanel } from "@/composables/usePinnedPanel";
 
 const props = defineProps({
-    config: {
-        type: Object,
-        required: false,
-    },
-    itemClasses: {
-        type: Object,
-        required: false,
-        default: {},
-    },
+    config: { type: Object, required: false },
+    itemClasses: { type: Object, required: false, default: () => ({}) },
+    toolIndex: { type: Number, required: false, default: 0 },
 });
 
-const { data } = useToolbar();
-
-const { isVisible: isOpen, togglePin, onMouseEnter, onMouseLeave } = usePinnedPanel("vue");
-
-const toggleVueDevtools = () => {
-    let el = document.getElementById("__vue-devtools-container__");
-
-    if (el) {
-        if (el.style.display === "none") {
-            el.style.cssText = "display: block !important; opacity: 1 !important";
-        } else {
-            el.style.cssText = "display: none !important; opacity: 1 !important";
-        }
-    }
-};
+const {
+    isVisible: isOpen,
+    togglePin,
+    onMouseEnter,
+    onMouseLeave,
+} = usePinnedPanel("vue", {
+    size: "xxs",
+    align: "center",
+    index: props.toolIndex,
+});
 </script>
 
 <template>
-    <div class="" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
-        <Panel v-if="isOpen" size="xxs" align="center">
-            <SectionHeader>
-                <template #icon>
-                    <VueIcon />
-                </template>
-                <template #label> Vue </template>
-                <template #secondaryLabel> Docs </template>
-            </SectionHeader>
-            <Section>
-                <DataListItem>
-                    <template #label> Version </template>
-                    <template #value>
-                        <span @click="toggleVueDevtools">{{ data.vue?.version }}</span>
-                    </template>
-                </DataListItem>
-            </Section>
-        </Panel>
+    <div @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
         <ToolbarItem :isActive="isOpen" :class="itemClasses" @click="togglePin">
             <div class="py-[3px]">
                 <VueIcon />

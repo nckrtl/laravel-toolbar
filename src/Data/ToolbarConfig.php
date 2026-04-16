@@ -35,6 +35,7 @@ use NckRtl\Toolbar\Observers\ModelObserver;
 use NckRtl\Toolbar\Observers\QueryObserver;
 use NckRtl\Toolbar\Observers\RequestObserver;
 use NckRtl\Toolbar\Observers\RoutingObserver;
+use NckRtl\Toolbar\Observers\ViewObserver;
 use NckRtl\Toolbar\Toolbar;
 use Spatie\LaravelData\Data;
 
@@ -49,6 +50,8 @@ class ToolbarConfig extends Data
     public bool $enabledInConsole = false;
 
     public bool $isVueDevtoolsEnabled = false;
+
+    public bool $animations = false;
 
     public LayoutConfig $layout;
 
@@ -70,6 +73,7 @@ class ToolbarConfig extends Data
                 new RoutingObserver,
                 new QueryObserver,
                 new ModelObserver,
+                new ViewObserver,
             ])
             ->collectors([
                 new ProfilerCollector,
@@ -241,6 +245,13 @@ class ToolbarConfig extends Data
     public function enableInConsole(bool $enabled = true): self
     {
         $this->enabledInConsole = $enabled;
+
+        return $this;
+    }
+
+    public function animations(bool $enabled = true): self
+    {
+        $this->animations = $enabled;
 
         return $this;
     }

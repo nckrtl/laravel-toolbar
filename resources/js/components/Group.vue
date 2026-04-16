@@ -23,6 +23,7 @@ const getComponent = (component) => {
             <component
                 :is="getComponent(component)"
                 :config="toolConfig"
+                :toolIndex="index"
                 :itemClasses="{
                     'pl-[3px] rounded-l-full border-l': index === 0,
                     'pr-[3px] rounded-r-full border-r':

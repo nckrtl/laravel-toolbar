@@ -1,12 +1,12 @@
 /// <reference types="vite/client" />
 
-declare module '*.vue' {
-    import type { DefineComponent } from 'vue';
+declare module "*.vue" {
+    import type { DefineComponent } from "vue";
     const component: DefineComponent<object, object, unknown>;
     export default component;
 }
 
-declare module '*?inline' {
+declare module "*?inline" {
     const css: string;
     export default css;
 }
@@ -26,6 +26,7 @@ export interface RequestHistoryRow {
 }
 
 export interface ToolbarData {
+    animations?: boolean;
     request_id?: string;
     selected_request_id?: string;
     request_history?: RequestHistoryRow[];
@@ -67,6 +68,6 @@ declare global {
     }
 
     interface WindowEventMap {
-        'laravel-toolbar:update': ToolbarUpdateEvent;
+        "laravel-toolbar:update": ToolbarUpdateEvent;
     }
 }

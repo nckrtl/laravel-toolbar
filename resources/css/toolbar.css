@@ -3,14 +3,14 @@
  * Completely isolated and self-contained - does not depend on host application's Tailwind
  */
 
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@import './fonts.css';
+@import "./fonts.css";
 
 @source '../**/*.vue';
 
 @theme inline {
-    --font-sans: 'JetBrains Mono', ui-monospace, monospace;
+    --font-sans: "JetBrains Mono", ui-monospace, monospace;
     --text-xxs: 0.75rem;
 
     --spacing-xxs: 16rem;
@@ -95,4 +95,23 @@
         /* 0%: transparent */ color-stop(0.1, rgba(0, 0, 0, 1)),
         /* 10%: fully visible */ to(rgba(0, 0, 0, 1)) /* 100%: transparent */
     );
+}
+
+/* ─── Shared Panel transitions ─────────────────────────────────────── */
+
+/* Panel appear / disappear */
+.shared-panel-enter-from,
+.shared-panel-leave-to {
+    opacity: 0;
+    transform: translateY(4px);
+}
+.shared-panel-enter-active {
+    transition:
+        opacity 2500ms ease-out,
+        transform 2500ms ease-out;
+}
+.shared-panel-leave-active {
+    transition:
+        opacity 2500ms ease-in,
+        transform 2500ms ease-in;
 }

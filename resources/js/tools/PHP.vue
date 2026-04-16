@@ -1,45 +1,28 @@
 <script setup>
-import { useToolbar } from "@/composables/useToolbar";
 import { usePinnedPanel } from "@/composables/usePinnedPanel";
 import ToolbarItem from "@/components/ToolbarItem.vue";
-import Panel from "@/components/Panel.vue";
-import SectionHeader from "@/components/SectionHeader.vue";
-import Section from "@/components/Section.vue";
-import DataListItem from "@/components/DataListItem.vue";
 import PhpIcon from "@/icons/PhpIcon.vue";
 
-const { data } = useToolbar();
+const props = defineProps({
+    config: { type: Object, required: false },
+    itemClasses: { type: Object, required: false, default: () => ({}) },
+    toolIndex: { type: Number, required: false, default: 0 },
+});
 
-const { isVisible: isOpen, togglePin, onMouseEnter, onMouseLeave } = usePinnedPanel("php");
+const {
+    isVisible: isOpen,
+    togglePin,
+    onMouseEnter,
+    onMouseLeave,
+} = usePinnedPanel("php", {
+    size: "xxs",
+    align: "right",
+    index: props.toolIndex,
+});
 </script>
 
 <template>
     <div class="flex justify-end" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
-        <Panel v-if="isOpen" align="right" size="xxs">
-            <SectionHeader iconClass="px-2">
-                <template #icon>
-                    <PhpIcon />
-                </template>
-            </SectionHeader>
-            <Section>
-                <DataListItem>
-                    <template #label> Version </template>
-                    <template #value>
-                        {{ data.php?.version }}
-                    </template>
-                </DataListItem>
-                <DataListItem>
-                    <template #label> Memory Limit </template>
-                    <template #value>
-                        {{ data.php?.memory_limit }}
-                    </template>
-                </DataListItem>
-                <DataListItem>
-                    <template #label> Max Exec. Time </template>
-                    <template #value> {{ data.php?.max_execution_time }}s </template>
-                </DataListItem>
-            </Section>
-        </Panel>
         <ToolbarItem
             :isActive="isOpen"
             class="rounded-r-full !border-l-0 pr-0.5"
