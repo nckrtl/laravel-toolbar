@@ -1,16 +1,16 @@
 <script setup>
-import { ref } from 'vue';
-import { useToolbar } from '@/composables/useToolbar';
-import ToolbarItem from '@/components/ToolbarItem.vue';
-import Panel from '@/components/Panel.vue';
-import SectionHeader from '@/components/SectionHeader.vue';
-import Section from '@/components/Section.vue';
-import DataListItem from '@/components/DataListItem.vue';
-import LaravelIcon from '@/icons/LaravelIcon.vue';
-import InertiaIcon from '@/icons/InertiaIcon.vue';
-import { Square3Stack3DIcon } from '@heroicons/vue/16/solid';
-import VueIcon from '@/icons/VueIcon.vue';
-import TailwindIcon from '@/icons/TailwindIcon.vue';
+import { useToolbar } from "@/composables/useToolbar";
+import { usePinnedPanel } from "@/composables/usePinnedPanel";
+import ToolbarItem from "@/components/ToolbarItem.vue";
+import Panel from "@/components/Panel.vue";
+import SectionHeader from "@/components/SectionHeader.vue";
+import Section from "@/components/Section.vue";
+import DataListItem from "@/components/DataListItem.vue";
+import LaravelIcon from "@/icons/LaravelIcon.vue";
+import InertiaIcon from "@/icons/InertiaIcon.vue";
+import { Square3Stack3DIcon } from "@heroicons/vue/16/solid";
+import VueIcon from "@/icons/VueIcon.vue";
+import TailwindIcon from "@/icons/TailwindIcon.vue";
 
 const props = defineProps({
     config: {
@@ -26,11 +26,11 @@ const props = defineProps({
 
 const { data } = useToolbar();
 
-const isOpen = ref(false);
+const { isVisible: isOpen, togglePin, onMouseEnter, onMouseLeave } = usePinnedPanel("techstack");
 </script>
 
 <template>
-    <div class="flex justify-end" @mouseenter="isOpen = true" @mouseleave="isOpen = false">
+    <div class="flex justify-end" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
         <Panel v-if="isOpen" align="right" size="xxs">
             <SectionHeader>
                 <template #icon>
@@ -99,7 +99,7 @@ const isOpen = ref(false);
                                 :href="data.laravel?.debug_editor_url"
                                 target="_blank"
                             >
-                                {{ data.laravel?.debug ? 'true' : 'false' }}
+                                {{ data.laravel?.debug ? "true" : "false" }}
                             </a>
                         </div>
                     </template>
@@ -136,7 +136,7 @@ const isOpen = ref(false);
                 </template>
             </SectionHeader>
         </Panel>
-        <ToolbarItem :isActive="isOpen" :class="itemClasses">
+        <ToolbarItem :isActive="isOpen" :class="itemClasses" @click="togglePin">
             <div class="py-[3px]">
                 <Square3Stack3DIcon class="size-4" />
             </div>

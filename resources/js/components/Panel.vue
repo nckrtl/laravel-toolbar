@@ -2,15 +2,15 @@
 const props = defineProps({
     size: {
         type: String,
-        default: 'sm',
+        default: "sm",
     },
     minHeight: {
         type: String,
-        default: 'auto',
+        default: "auto",
     },
     align: {
         type: String,
-        default: 'left',
+        default: "left",
     },
 });
 </script>
@@ -24,9 +24,12 @@ const props = defineProps({
                 'bottom-9 w-full max-w-xs min-w-xs': size === 'xs',
                 'bottom-9 w-full max-w-sm min-w-sm': size === 'sm',
                 'bottom-9 w-full max-w-md min-w-md': size === 'md',
+                'bottom-9 w-full max-w-lg min-w-lg': size === 'lg',
+                'bottom-9 w-full max-w-4xl min-w-4xl': size === 'xl',
                 'bottom-9 left-[5px] w-[calc(100%+5px)]': size === 'full',
                 'translate-x-2': align === 'right',
                 '-translate-x-2': align === 'left',
+                'left-1/2 -translate-x-1/2': align === 'center',
             },
             $attrs.class,
         ]"

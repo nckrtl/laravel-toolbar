@@ -1,41 +1,42 @@
 {
-  "name": "liftoff-laravel-debugbar",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vp dev",
-    "build": "vp build && node fix-font-urls.js",
-    "preview": "vp preview",
-    "build-watch": "vp build --watch",
-    "prepare": "vp config",
-    "generate-types": "php vendor/bin/testbench typescript:transform",
-    "test:ui": "vitest run"
-  },
-  "dependencies": {
-    "@heroicons/vue": "^2.2.0",
-    "@tailwindcss/vite": "^4.1.17",
-    "@vitejs/plugin-basic-ssl": "^2.1.0",
-    "glob": "^13.0.0",
-    "laravel-vite-plugin": "^2.0.1",
-    "vue": "^3.5.13"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.14",
-    "@types/node": "^24.10.1",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "@vue/test-utils": "^2.4.6",
-    "jsdom": "^26.1.0",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.17",
-    "typescript": "^5.9.3",
-    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-    "vite-plus": "latest",
-    "vite-plugin-run": "^0.6.1",
-    "vitest": "^3.2.4",
-    "vue-tsc": "^3.1.5"
-  },
-  "overrides": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@latest"
-  }
+    "name": "liftoff-laravel-debugbar",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vp dev",
+        "build": "vp build && node fix-font-urls.js",
+        "preview": "vp preview",
+        "build-watch": "vp build --watch",
+        "prepare": "vp config",
+        "generate-types": "php vendor/bin/testbench typescript:transform",
+        "test:ui": "vitest run"
+    },
+    "dependencies": {
+        "@heroicons/vue": "^2.2.0",
+        "@tailwindcss/vite": "^4.1.17",
+        "@vitejs/plugin-basic-ssl": "^2.1.0",
+        "glob": "^13.0.0",
+        "laravel-vite-plugin": "^2.0.1",
+        "vue": "^3.5.13"
+    },
+    "devDependencies": {
+        "@tailwindcss/postcss": "^4.1.14",
+        "@types/node": "^24.10.1",
+        "@vitejs/plugin-vue": "^5.2.1",
+        "@vue/test-utils": "^2.4.6",
+        "jsdom": "^26.1.0",
+        "postcss": "^8.5.6",
+        "tailwindcss": "^4.1.17",
+        "typescript": "^5.9.3",
+        "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+        "vite-plugin-run": "^0.6.1",
+        "vite-plus": "latest",
+        "vitest": "^3.2.4",
+        "vue-tsc": "^3.1.5"
+    },
+    "overrides": {
+        "vite": "npm:@voidzero-dev/vite-plus-core@latest"
+    },
+    "packageManager": "npm@11.12.1"
 }

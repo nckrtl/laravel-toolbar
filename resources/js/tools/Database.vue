@@ -1,10 +1,11 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
-import ToolbarItem from '@/components/ToolbarItem.vue';
-import Panel from '@/components/Panel.vue';
-import { useToolbar } from '@/composables/useToolbar';
-import EmptyListIcon from '@/icons/EmptyListIcon.vue';
-import { FunnelIcon } from '@heroicons/vue/16/solid';
+import { ref, watch, computed } from "vue";
+import ToolbarItem from "@/components/ToolbarItem.vue";
+import Panel from "@/components/Panel.vue";
+import { useToolbar } from "@/composables/useToolbar";
+import { usePinnedPanel } from "@/composables/usePinnedPanel";
+import EmptyListIcon from "@/icons/EmptyListIcon.vue";
+import { FunnelIcon } from "@heroicons/vue/16/solid";
 
 const props = defineProps({
     config: {
@@ -18,23 +19,23 @@ const props = defineProps({
 });
 
 const { data } = useToolbar();
-const isOpen = ref(false);
-const searchPhrase = ref('');
-const filter = ref('none');
+const { isVisible: isOpen, togglePin, onMouseEnter, onMouseLeave } = usePinnedPanel("database");
+const searchPhrase = ref("");
+const filter = ref("none");
 
 const filteredQueries = computed(() => {
     let queries = data.value?.queries?.queries || [];
 
-    if (searchPhrase.value !== '') {
+    if (searchPhrase.value !== "") {
         queries = queries.filter(
             (query) =>
                 query.sql.includes(searchPhrase.value) || query.file.includes(searchPhrase.value),
         );
     }
 
-    if (filter.value !== 'none') {
+    if (filter.value !== "none") {
         queries = queries.filter((query) =>
-            filter.value === 'slow' ? query.isSlow : query.isDuplicate,
+            filter.value === "slow" ? query.isSlow : query.isDuplicate,
         );
     }
 
@@ -46,22 +47,22 @@ const shouldUseFixedPanelHeight = computed(() => {
 });
 
 const panelMinHeight = computed(() => {
-    return shouldUseFixedPanelHeight.value ? 'h-[385px]' : '';
+    return shouldUseFixedPanelHeight.value ? "h-[385px]" : "";
 });
 
 const tableBodyClasses = computed(() => {
     return shouldUseFixedPanelHeight.value
-        ? 'relative max-h-[290px] overflow-y-auto rounded-b-lg pb-3'
-        : 'relative overflow-visible rounded-b-lg pb-0';
+        ? "relative max-h-[290px] overflow-y-auto rounded-b-lg pb-3"
+        : "relative overflow-visible rounded-b-lg pb-0";
 });
 
 const queriesTable = ref(null);
 const queriesTableInner = ref(null);
-const fadeClasses = ['fade-to-bottom', 'fade-to-top', 'fade-to-top-and-bottom'];
+const fadeClasses = ["fade-to-bottom", "fade-to-top", "fade-to-top-and-bottom"];
 
 watch(queriesTable, (newVal) => {
     if (newVal) {
-        newVal.addEventListener('scroll', () => {
+        newVal.addEventListener("scroll", () => {
             const scrollTop = newVal.scrollTop;
 
             if (
@@ -69,13 +70,13 @@ watch(queriesTable, (newVal) => {
                 queriesTableInner.value.clientHeight + 12
             ) {
                 queriesTable.value.classList.remove(...fadeClasses);
-                queriesTable.value.classList.add('fade-to-top');
+                queriesTable.value.classList.add("fade-to-top");
             } else if (scrollTop > 1) {
                 queriesTable.value.classList.remove(...fadeClasses);
-                queriesTable.value.classList.add('fade-to-top-and-bottom');
+                queriesTable.value.classList.add("fade-to-top-and-bottom");
             } else {
                 queriesTable.value.classList.remove(...fadeClasses);
-                queriesTable.value.classList.add('fade-to-bottom');
+                queriesTable.value.classList.add("fade-to-bottom");
             }
         });
     }
@@ -101,8 +102,8 @@ watch(data, (newVal) => {
     <div>
         <Panel
             v-if="isOpen"
-            @mouseenter="isOpen = true"
-            @mouseleave="isOpen = false"
+            @mouseenter="onMouseEnter"
+            @mouseleave="onMouseLeave"
             size="full"
             :minHeight="panelMinHeight"
         >
@@ -346,7 +347,7 @@ watch(data, (newVal) => {
                                                     class="cursor-pointer hover:underline"
                                                     :href="query.editor_url"
                                                     target="_blank"
-                                                    >{{ query.file.split('/').pop() }}:{{
+                                                    >{{ query.file.split("/").pop() }}:{{
                                                         query.line
                                                     }}</a
                                                 >
@@ -362,8 +363,9 @@ watch(data, (newVal) => {
         </Panel>
 
         <ToolbarItem
-            @mouseenter="isOpen = true"
-            @mouseleave="isOpen = false"
+            @mouseenter="onMouseEnter"
+            @mouseleave="onMouseLeave"
+            @click="togglePin"
             :isActive="isOpen"
             :class="itemClasses"
         >

@@ -136,12 +136,12 @@ class QueriesCollector extends Collector implements CollectorInterface
 
 ```vue
 <script setup>
-import { ref, computed } from 'vue';
-import ToolbarItem from '@/components/ToolbarItem.vue'; // Path alias @/
+import { ref, computed } from "vue";
+import ToolbarItem from "@/components/ToolbarItem.vue"; // Path alias @/
 
 const props = defineProps({
     isActive: { type: Boolean, default: false },
-    class: { type: String, default: 'px-2' },
+    class: { type: String, default: "px-2" },
 });
 </script>
 
@@ -202,6 +202,10 @@ it('detects duplicate queries by sql hash', function () {
 - `beforeEach`/`afterEach` for setup/teardown
 - Pest expectation API: `expect()->toBe()`, `->toBeTrue()`, etc.
 - Test files: `*Test.php`
+
+## Design Rules
+
+Frontend design patterns, component conventions, and UI rules are documented in **[DESIGN.md](DESIGN.md)**. Read it before building or modifying any tool component or panel UI.
 
 ## Architecture Notes
 

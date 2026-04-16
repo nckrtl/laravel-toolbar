@@ -1,8 +1,9 @@
 <script setup>
-import { computed, ref } from 'vue';
-import Panel from '@/components/Panel.vue';
-import ToolbarItem from '@/components/ToolbarItem.vue';
-import { useRequestHistory } from '@/composables/useRequestHistory';
+import { computed, ref } from "vue";
+import Panel from "@/components/Panel.vue";
+import ToolbarItem from "@/components/ToolbarItem.vue";
+import { useRequestHistory } from "@/composables/useRequestHistory";
+import { usePinnedPanel } from "@/composables/usePinnedPanel";
 
 const props = defineProps({
     config: {
@@ -15,7 +16,7 @@ const props = defineProps({
     },
 });
 
-const isOpen = ref(false);
+const { isVisible: isOpen, togglePin, onMouseEnter, onMouseLeave } = usePinnedPanel("requests");
 const {
     activeRequestId,
     clearPreview,
@@ -28,56 +29,56 @@ const {
 
 const rows = computed(() => requestHistory.value ?? []);
 
-const methodColor = (method = '') => {
+const methodColor = (method = "") => {
     return (
         {
-            GET: 'text-lime-400',
-            POST: 'text-blue-400',
-            PUT: 'text-yellow-300',
-            DELETE: 'text-danger',
-            PATCH: 'text-indigo-400',
-            OPTIONS: 'text-gray-400',
-            HEAD: 'text-gray-400',
-        }[method] ?? 'text-gray-400'
+            GET: "text-lime-400",
+            POST: "text-blue-400",
+            PUT: "text-yellow-300",
+            DELETE: "text-danger",
+            PATCH: "text-indigo-400",
+            OPTIONS: "text-gray-400",
+            HEAD: "text-gray-400",
+        }[method] ?? "text-gray-400"
     );
 };
 
 const actionLabel = (action = null) => {
     if (!action) {
-        return '—';
+        return "—";
     }
 
-    const parts = action.split('\\');
+    const parts = action.split("\\");
 
     return parts[parts.length - 1] ?? action;
 };
 
 const statusCodeColor = (statusCode) => {
-    if (typeof statusCode !== 'number') {
-        return 'text-white/40';
+    if (typeof statusCode !== "number") {
+        return "text-white/40";
     }
 
     if (statusCode >= 200 && statusCode < 300) {
-        return 'text-emerald-300';
+        return "text-emerald-300";
     }
 
     if (statusCode >= 300 && statusCode < 400) {
-        return 'text-yellow-500';
+        return "text-yellow-500";
     }
 
-    return 'text-danger';
+    return "text-danger";
 };
 
 const rowSurfaceClasses = (requestId) => {
     if (isSelectedRow(requestId)) {
-        return 'border-white/7.5 bg-white/10 group-hover:bg-white/10';
+        return "border-white/7.5 bg-white/10 group-hover:bg-white/10";
     }
 
     if (isActiveRow(requestId)) {
-        return 'border-white/7.5 bg-white/6 group-hover:bg-white/6';
+        return "border-white/7.5 bg-white/6 group-hover:bg-white/6";
     }
 
-    return 'border-white/7.5 bg-white/3 group-hover:bg-white/6';
+    return "border-white/7.5 bg-white/3 group-hover:bg-white/6";
 };
 
 const isSelectedRow = (requestId) => {
@@ -100,18 +101,13 @@ const handleRowClick = async (requestId) => {
 
 const handlePanelLeave = () => {
     clearPreview();
-    isOpen.value = false;
+    onMouseLeave();
 };
 </script>
 
 <template>
     <div>
-        <Panel
-            v-if="isOpen"
-            size="full"
-            @mouseenter="isOpen = true"
-            @mouseleave="handlePanelLeave"
-        >
+        <Panel v-if="isOpen" size="full" @mouseenter="onMouseEnter" @mouseleave="handlePanelLeave">
             <div class="flex items-center justify-between p-1.5">
                 <div class="flex items-center gap-3">
                     <div
@@ -263,7 +259,7 @@ const handlePanelLeave = () => {
                                             :class="rowSurfaceClasses(request.id)"
                                         >
                                             <span class="whitespace-nowrap">
-                                                {{ request.is_xhr ? 'Async' : 'Page' }}
+                                                {{ request.is_xhr ? "Async" : "Page" }}
                                             </span>
                                         </div>
                                     </div>
@@ -274,7 +270,10 @@ const handlePanelLeave = () => {
                                             class="overflow-hidden border-y px-3 py-2 text-ellipsis"
                                             :class="rowSurfaceClasses(request.id)"
                                         >
-                                            <span class="whitespace-nowrap" :class="methodColor(request.method)">
+                                            <span
+                                                class="whitespace-nowrap"
+                                                :class="methodColor(request.method)"
+                                            >
                                                 {{ request.method }}
                                             </span>
                                         </div>
@@ -298,8 +297,11 @@ const handlePanelLeave = () => {
                                             class="overflow-hidden border-y px-3 py-2 text-ellipsis text-white"
                                             :class="rowSurfaceClasses(request.id)"
                                         >
-                                            <span class="whitespace-nowrap" :title="request.name ?? ''">
-                                                {{ request.name ?? '—' }}
+                                            <span
+                                                class="whitespace-nowrap"
+                                                :title="request.name ?? ''"
+                                            >
+                                                {{ request.name ?? "—" }}
                                             </span>
                                         </div>
                                     </div>
@@ -310,7 +312,10 @@ const handlePanelLeave = () => {
                                             class="overflow-hidden border-y px-3 py-2 text-ellipsis text-white"
                                             :class="rowSurfaceClasses(request.id)"
                                         >
-                                            <span class="whitespace-nowrap" :title="request.action ?? ''">
+                                            <span
+                                                class="whitespace-nowrap"
+                                                :title="request.action ?? ''"
+                                            >
                                                 {{ actionLabel(request.action) }}
                                             </span>
                                         </div>
@@ -323,7 +328,7 @@ const handlePanelLeave = () => {
                                             :class="rowSurfaceClasses(request.id)"
                                         >
                                             <span class="whitespace-nowrap">
-                                                {{ request.middleware_count ?? '—' }}
+                                                {{ request.middleware_count ?? "—" }}
                                             </span>
                                         </div>
                                     </div>
@@ -334,8 +339,11 @@ const handlePanelLeave = () => {
                                             class="overflow-hidden border-y px-3 py-2 text-ellipsis text-white"
                                             :class="rowSurfaceClasses(request.id)"
                                         >
-                                            <span class="whitespace-nowrap" :title="request.response_type ?? ''">
-                                                {{ request.response_type ?? '—' }}
+                                            <span
+                                                class="whitespace-nowrap"
+                                                :title="request.response_type ?? ''"
+                                            >
+                                                {{ request.response_type ?? "—" }}
                                             </span>
                                         </div>
                                     </div>
@@ -346,8 +354,11 @@ const handlePanelLeave = () => {
                                             class="overflow-hidden border-y px-3 py-2 text-ellipsis"
                                             :class="rowSurfaceClasses(request.id)"
                                         >
-                                            <span class="whitespace-nowrap" :class="statusCodeColor(request.status_code)">
-                                                {{ request.status_code ?? '—' }}
+                                            <span
+                                                class="whitespace-nowrap"
+                                                :class="statusCodeColor(request.status_code)"
+                                            >
+                                                {{ request.status_code ?? "—" }}
                                             </span>
                                         </div>
                                     </div>
@@ -359,7 +370,7 @@ const handlePanelLeave = () => {
                                             :class="rowSurfaceClasses(request.id)"
                                         >
                                             <span class="whitespace-nowrap">
-                                                {{ request.size ?? '—' }}
+                                                {{ request.size ?? "—" }}
                                             </span>
                                         </div>
                                     </div>
@@ -371,7 +382,7 @@ const handlePanelLeave = () => {
                                             :class="rowSurfaceClasses(request.id)"
                                         >
                                             <span class="whitespace-nowrap">
-                                                {{ request.duration ?? '—' }}
+                                                {{ request.duration ?? "—" }}
                                             </span>
                                         </div>
                                     </div>
@@ -386,8 +397,9 @@ const handlePanelLeave = () => {
         <ToolbarItem
             :class="itemClasses"
             :isActive="isOpen"
-            @mouseenter="isOpen = true"
-            @mouseleave="isOpen = false"
+            @mouseenter="onMouseEnter"
+            @mouseleave="onMouseLeave"
+            @click="togglePin"
         >
             <div class="flex items-center gap-1 py-0.5">
                 <svg

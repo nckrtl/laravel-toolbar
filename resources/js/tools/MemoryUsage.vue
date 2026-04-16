@@ -1,11 +1,12 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import ToolbarItem from '@/components/ToolbarItem.vue';
-import { useToolbar } from '@/composables/useToolbar';
-import Panel from '@/components/Panel.vue';
-import SectionHeader from '@/components/SectionHeader.vue';
-import Section from '@/components/Section.vue';
-import DataListItem from '@/components/DataListItem.vue';
+import { ref, computed, onMounted } from "vue";
+import ToolbarItem from "@/components/ToolbarItem.vue";
+import { useToolbar } from "@/composables/useToolbar";
+import { usePinnedPanel } from "@/composables/usePinnedPanel";
+import Panel from "@/components/Panel.vue";
+import SectionHeader from "@/components/SectionHeader.vue";
+import Section from "@/components/Section.vue";
+import DataListItem from "@/components/DataListItem.vue";
 
 const props = defineProps({
     config: {
@@ -20,14 +21,14 @@ const props = defineProps({
 
 const { data } = useToolbar();
 
-const isOpen = ref(false);
+const { isVisible: isOpen, togglePin, onMouseEnter, onMouseLeave } = usePinnedPanel("memory");
 
 const hoverIndex = ref(null);
 </script>
 
 <template>
-    <div @mouseenter="isOpen = true" @mouseleave="isOpen = false">
-        <Panel v-if="isOpen" size="md">
+    <div @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+        <Panel v-if="isOpen" size="md" align="center">
             <SectionHeader>
                 <template #icon>
                     <svg
@@ -96,15 +97,15 @@ const hoverIndex = ref(null);
                             }}</span>
                             <span v-else>{{
                                 requestStage.memory_real_delta.percentage > 0
-                                    ? '+' + requestStage.memory_real_delta.percentage + '%'
-                                    : requestStage.memory_real_delta.percentage + '%'
+                                    ? "+" + requestStage.memory_real_delta.percentage + "%"
+                                    : requestStage.memory_real_delta.percentage + "%"
                             }}</span>
                         </template>
                     </template>
                 </DataListItem>
             </Section>
         </Panel>
-        <ToolbarItem :isActive="isOpen" :class="itemClasses">
+        <ToolbarItem :isActive="isOpen" :class="itemClasses" @click="togglePin">
             <div class="flex items-center gap-1 py-0.5">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

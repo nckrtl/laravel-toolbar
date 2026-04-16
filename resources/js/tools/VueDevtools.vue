@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import ToolbarItem from '@/components/ToolbarItem.vue';
-import VueIcon from '@/icons/VueIcon.vue';
-import Panel from '@/components/Panel.vue';
+import { ref, onMounted, onUnmounted } from "vue";
+import ToolbarItem from "@/components/ToolbarItem.vue";
+import VueIcon from "@/icons/VueIcon.vue";
+import Panel from "@/components/Panel.vue";
+import { usePinnedPanel } from "@/composables/usePinnedPanel";
 
 const props = defineProps({
     config: {
@@ -16,7 +17,7 @@ const props = defineProps({
     },
 });
 
-const isOpen = ref(false);
+const { isVisible: isOpen, togglePin, onMouseEnter, onMouseLeave } = usePinnedPanel("vuedevtools");
 const vueDevtoolsContainer = ref(null);
 const vueDevtoolsFrame = ref(null);
 const isInitialized = ref(false);
@@ -41,7 +42,7 @@ function waitForElement(selector, condition = () => true, timeout = 5000) {
             childList: true,
             subtree: true,
             attributes: true,
-            attributeFilter: ['src'],
+            attributeFilter: ["src"],
         });
 
         setTimeout(() => {
@@ -58,42 +59,42 @@ function waitForElement(selector, condition = () => true, timeout = 5000) {
 
 function applyOurStyles(frame, iframe) {
     frame.setAttribute(
-        'style',
-        'width: 100% !important; height: 100% !important; z-index: 99999 !important;',
+        "style",
+        "width: 100% !important; height: 100% !important; z-index: 99999 !important;",
     );
     if (iframe) {
-        iframe.setAttribute('style', 'width: 100%; height: 100%;');
+        iframe.setAttribute("style", "width: 100%; height: 100%;");
     }
 }
 
 function setupPersistentStyleGuard(frame, iframe) {
     persistentStyleObserver = new MutationObserver(() => {
-        if (!frame.style.width.includes('100%')) {
+        if (!frame.style.width.includes("100%")) {
             applyOurStyles(frame, iframe);
         }
     });
 
     persistentStyleObserver.observe(frame, {
         attributes: true,
-        attributeFilter: ['style'],
+        attributeFilter: ["style"],
     });
 }
 
 async function initDevtools() {
     try {
-        const frame = await waitForElement('.vue-devtools-frame');
+        const frame = await waitForElement(".vue-devtools-frame");
 
-        let iframe = frame.querySelector('iframe');
+        let iframe = frame.querySelector("iframe");
 
         if (!iframe) {
             const toggleBtn = document.querySelector(
-                '#__vue-devtools-container__ .panel-entry-btn',
+                "#__vue-devtools-container__ .panel-entry-btn",
             );
             toggleBtn?.click();
 
             iframe = await waitForElement(
-                '.vue-devtools-frame iframe',
-                (el) => el.hasAttribute('src') && el.src !== '',
+                ".vue-devtools-frame iframe",
+                (el) => el.hasAttribute("src") && el.src !== "",
             );
         }
 
@@ -107,7 +108,7 @@ async function initDevtools() {
             isInitialized.value = true;
         }, 500);
     } catch (error) {
-        console.warn('Vue DevTools initialization failed:', error);
+        console.warn("Vue DevTools initialization failed:", error);
     }
 }
 
@@ -126,8 +127,8 @@ onUnmounted(() => {
 <template>
     <div>
         <Panel
-            @mouseenter="isOpen = true"
-            @mouseleave="isOpen = false"
+            @mouseenter="onMouseEnter"
+            @mouseleave="onMouseLeave"
             size="full"
             minHeight="h-[480px] !p-0 rounded-2xl overflow-hidden"
             class="transition-[opacity,visibility] duration-0"
@@ -143,8 +144,9 @@ onUnmounted(() => {
             </div>
         </Panel>
         <ToolbarItem
-            @mouseenter="isOpen = true"
-            @mouseleave="isOpen = false"
+            @mouseenter="onMouseEnter"
+            @mouseleave="onMouseLeave"
+            @click="togglePin"
             :isActive="isOpen"
             :class="itemClasses"
         >

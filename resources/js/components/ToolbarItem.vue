@@ -6,11 +6,11 @@ const props = defineProps({
     },
     class: {
         type: String,
-        default: 'px-2',
+        default: "px-2",
     },
     innerPadding: {
         type: String,
-        default: 'px-2',
+        default: "px-2",
     },
 });
 </script>
@@ -19,7 +19,14 @@ const props = defineProps({
     <div class="text-xxs relative border-0! py-[3px] text-white" :class="[props.class]">
         <div
             class="relative cursor-default rounded-full p-px"
-            :class="{ 'bg-linear-to-tr from-white/25 via-white/15 to-white/25': isActive }"
+            :style="
+                isActive
+                    ? {
+                          backgroundImage:
+                              'linear-gradient(to top right, rgba(255,255,255,0.25), rgba(255,255,255,0.15), rgba(255,255,255,0.25))',
+                      }
+                    : {}
+            "
         >
             <div
                 class="flex items-center gap-2 rounded-full p-0.5"
