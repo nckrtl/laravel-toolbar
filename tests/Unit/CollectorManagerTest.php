@@ -353,7 +353,8 @@ it('uses the configured request data ttl when caching', function () {
         new PhpCollector,
     ]);
 
-    Cache::shouldReceive('put')
+    Cache::partialMock()
+        ->shouldReceive('put')
         ->once()
         ->withArgs(function (string $key, array $data, int $ttl): bool {
             return str_starts_with($key, 'laravel-toolbar-request-data-')
