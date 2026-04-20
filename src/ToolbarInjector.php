@@ -312,6 +312,14 @@ class ToolbarInjector
         }
 
         if ($headerOnly) {
+            // Inertia follows redirect chains via XHR — the frontend appends rows itself,
+            // so always send a compact payload rather than a full history replacement.
+            if ($this->isInertiaRequest($request)) {
+                $historyRow['is_xhr'] = true;
+
+                return $this->compactHeaderPayload($requestId, $historyRow);
+            }
+
             return $this->shouldResetHeaderHistory($historyRow)
                 ? $this->replacementHeaderPayload($data, $requestId, $history)
                 : $this->compactHeaderPayload($requestId, $historyRow);
