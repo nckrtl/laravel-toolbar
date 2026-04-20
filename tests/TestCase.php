@@ -37,5 +37,6 @@ class TestCase extends Orchestra
 
         config()->set('cache.default', 'array');
         config()->set('cache.stores.array', ['driver' => 'array']);
+        config()->set('data.cache.store', 'array');
     }
 }
