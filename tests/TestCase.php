@@ -34,5 +34,8 @@ class TestCase extends Orchestra
             'database' => ':memory:',
             'prefix' => '',
         ]);
+
+        config()->set('cache.default', 'array');
+        config()->set('cache.stores.array', ['driver' => 'array']);
     }
 }
