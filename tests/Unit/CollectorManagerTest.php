@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -355,8 +357,8 @@ it('uses the configured request data ttl when caching', function () {
 
     // Older versions of spatie/laravel-data call cache()->store() during data structure
     // setup — allow that call while asserting our own Cache::put TTL.
-    $arrayStore = new \Illuminate\Cache\ArrayStore;
-    $cacheRepository = new \Illuminate\Cache\Repository($arrayStore);
+    $arrayStore = new ArrayStore;
+    $cacheRepository = new Repository($arrayStore);
 
     Cache::shouldReceive('store')->andReturn($cacheRepository);
     Cache::shouldReceive('put')
