@@ -33,7 +33,7 @@ class RequestCollector extends Collector implements CollectorInterface
         $route = $request->route();
         $isInertia = $request->header('X-Inertia') === 'true';
 
-        [$viewName, $viewData] = $this->resolveViewData($isInertia, $collectorManager);
+        [$viewName, $viewData, $isInertia] = $this->resolveViewData($isInertia, $collectorManager);
 
         return new RequestData(
             is_inertia: $isInertia,
@@ -55,17 +55,19 @@ class RequestCollector extends Collector implements CollectorInterface
     }
 
     /**
-     * Resolve the view name and data.
+     * Resolve the view name, data, and whether this is an Inertia request.
      *
-     * For Inertia requests, the component name and props come from the response JSON.
-     * For Blade views, they come from the ViewObserver.
+     * For Inertia XHR requests, the component name and props come from the response JSON.
+     * For Inertia full-page loads and Blade views, they come from the ViewObserver.
      *
-     * @return array{0: string|null, 1: array|null}
+     * @return array{0: string|null, 1: array|null, 2: bool}
      */
     private function resolveViewData(bool $isInertia, CollectorManager $collectorManager): array
     {
         if ($isInertia) {
-            return $this->resolveInertiaData($collectorManager);
+            [$component, $props] = $this->resolveInertiaData($collectorManager);
+
+            return [$component, $props, true];
         }
 
         return $this->resolveBladeViewData();
@@ -101,21 +103,36 @@ class RequestCollector extends Collector implements CollectorInterface
     }
 
     /**
-     * @return array{0: string|null, 1: array|null}
+     * Resolve view data from the ViewObserver.
+     * Detects full-page Inertia renders via the `page.component` structure Inertia passes to the root view.
+     *
+     * @return array{0: string|null, 1: array|null, 2: bool}
      */
     private function resolveBladeViewData(): array
     {
         if (! app()->bound(Toolbar::class)) {
-            return [null, null];
+            return [null, null, false];
         }
 
         $observer = app(Toolbar::class)->config->getObserver(ViewObserver::class);
 
         if (! $observer instanceof ViewObserver) {
-            return [null, null];
+            return [null, null, false];
         }
 
-        return [$observer->viewName, $observer->viewData];
+        $viewData = $observer->viewData;
+
+        if (
+            is_array($viewData) &&
+            is_array($viewData['page'] ?? null) &&
+            is_string($viewData['page']['component'] ?? null)
+        ) {
+            $props = is_array($viewData['page']['props'] ?? null) ? $viewData['page']['props'] : null;
+
+            return [$viewData['page']['component'], $props, true];
+        }
+
+        return [$observer->viewName, $viewData, false];
     }
 
     /**

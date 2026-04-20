@@ -165,12 +165,10 @@ watch(queriesTable, (newVal) => {
                             <tr>
                                 <td colspan="4" class="text-center text-white/50">
                                     <div
-                                        class="flex flex-col items-center justify-center gap-4 py-16"
+                                        class="flex flex-col items-center justify-center gap-4 py-20"
                                     >
                                         <EmptyListIcon class="w-24" />
-                                        <span class="text-white/75"
-                                            >No {{ filter }} queries found</span
-                                        >
+                                        <span class="text-white/75">No queries found</span>
                                     </div>
                                 </td>
                             </tr>
