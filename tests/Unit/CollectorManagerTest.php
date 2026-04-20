@@ -353,8 +353,13 @@ it('uses the configured request data ttl when caching', function () {
         new PhpCollector,
     ]);
 
-    Cache::partialMock()
-        ->shouldReceive('put')
+    // Older versions of spatie/laravel-data call cache()->store() during data structure
+    // setup — allow that call while asserting our own Cache::put TTL.
+    $arrayStore = new \Illuminate\Cache\ArrayStore;
+    $cacheRepository = new \Illuminate\Cache\Repository($arrayStore);
+
+    Cache::shouldReceive('store')->andReturn($cacheRepository);
+    Cache::shouldReceive('put')
         ->once()
         ->withArgs(function (string $key, array $data, int $ttl): bool {
             return str_starts_with($key, 'laravel-toolbar-request-data-')
