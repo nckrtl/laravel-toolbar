@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-toolbar` will be documented in this file.
 
+## v0.2.2 - 2026-05-12
+
+### What's changed
+
+- Widen `laravel/mcp` constraint to `^0.5.1 || ^0.6.0 || ^0.7.0` so apps on the newer MCP release can install the toolbar without downgrading.
+- Bundle styling fix from `8aa4c70`.
+
+**Full Changelog**: https://github.com/nckrtl/laravel-toolbar/compare/v0.2.1...v0.2.2
+
 ## v0.2.0 - 2026-04-16
 
 ### What's new
