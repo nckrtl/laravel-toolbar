@@ -59,8 +59,10 @@ watch(queriesTable, (newVal) => {
 
 <template>
     <div class="flex flex-col overflow-hidden h-[305px]">
-        <div class="flex items-center justify-between">
-            <div class="flex min-w-64 items-center gap-3 p-1.5">
+        <div
+            class="queries-header flex shrink-0 flex-col items-stretch sm:flex-row sm:items-center sm:justify-between"
+        >
+            <div class="flex w-full min-w-0 items-center gap-3 p-1.5 sm:w-auto sm:flex-1">
                 <div
                     class="relative flex h-7 w-7 items-center justify-center rounded-md border border-white/8 bg-white/6"
                 >
@@ -82,21 +84,29 @@ watch(queriesTable, (newVal) => {
                 <span>Queries</span>
             </div>
 
-            <div class="flex items-center gap-10">
+            <div
+                class="queries-stats flex w-full shrink-0 items-center justify-between gap-4 pr-2 pl-2 sm:ml-auto sm:w-auto sm:justify-start sm:gap-10 sm:pl-0"
+            >
                 <div class="flex items-center gap-2">
-                    <span class="text-xxs font-medium text-white/50 uppercase"> Queries </span>
+                    <span class="text-xxs font-medium whitespace-nowrap text-white/50 uppercase">
+                        Queries
+                    </span>
                     <span>
                         {{ filteredQueries.length }}
                     </span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="text-xxs font-medium text-white/50 uppercase"> Duration </span>
+                    <span class="text-xxs font-medium whitespace-nowrap text-white/50 uppercase">
+                        Duration
+                    </span>
                     <span>
                         <span>{{ data.queries?.totalTime }}ms</span>
                     </span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="text-xxs font-medium text-white/50 uppercase"> Database </span>
+                    <span class="text-xxs font-medium whitespace-nowrap text-white/50 uppercase">
+                        Database
+                    </span>
                     <span v-for="(database, index) in data.queries?.databases" :key="database.name">
                         <a
                             :href="database.tablePlusConnectionUrl ?? '#'"
@@ -110,11 +120,10 @@ watch(queriesTable, (newVal) => {
                     </span>
                 </div>
             </div>
-            <div class="relative min-w-64"></div>
         </div>
-        <div class="h-2 w-full"></div>
-        <div class="relative">
-            <table class="relative mt-0 w-full table-fixed text-left">
+        <div class="h-2 w-full shrink-0"></div>
+        <div class="relative min-h-0 flex-1 overflow-x-auto">
+            <table class="relative mt-0 w-full min-w-[48rem] table-fixed text-left">
                 <thead v-if="filteredQueries.length > 0">
                     <tr>
                         <th class="sticky top-0 z-10 my-0.5 w-[60%] text-[#A3A3A3] uppercase">
@@ -158,7 +167,7 @@ watch(queriesTable, (newVal) => {
                     </tr>
                 </thead>
             </table>
-            <div ref="queriesTable" :class="tableBodyClasses">
+            <div ref="queriesTable" class="min-w-[48rem]" :class="tableBodyClasses">
                 <table ref="queriesTableInner" class="relative mt-0 w-full table-fixed text-left">
                     <tbody>
                         <template v-if="filteredQueries.length === 0">

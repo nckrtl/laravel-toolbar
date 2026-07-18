@@ -507,8 +507,10 @@ watch(
 </script>
 
 <template>
-    <div class="grid grid-cols-2 -mx-2 -my-2 divide-x divide-white/8 pb-2">
-        <div class="flex flex-col gap-1 py-2 pl-2 pr-3">
+    <div
+        class="-mx-2 -my-2 grid grid-cols-1 divide-y divide-white/8 pb-2 md:grid-cols-2 md:divide-x md:divide-y-0"
+    >
+        <div class="flex flex-col gap-1 px-2 py-2 md:pl-2 md:pr-3">
             <SectionHeader>
                 <template #icon>
                     <svg
@@ -873,8 +875,7 @@ watch(
                                         typeof value === "object"
                                             ? JSON.stringify(value, null, 2)
                                             : String(value ?? "—")
-                                    }}</pre
-                                >
+                                    }}</pre>
                             </div>
                         </div>
                     </Section>
@@ -960,7 +961,7 @@ watch(
             </div>
         </div>
 
-        <div class="flex flex-col gap-1 py-2 pl-3 pr-2">
+        <div class="flex flex-col gap-1 px-2 py-2 md:pl-3 md:pr-2">
             <SectionHeader>
                 <template #icon>
                     <svg

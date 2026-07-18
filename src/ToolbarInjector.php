@@ -534,12 +534,14 @@ class ToolbarInjector
 
         $jsUrl = url('/_toolbar/'.$assets['js']);
         $cssUrl = url('/_toolbar/'.$assets['css']);
+        $assetVersion = hash('sha256', $assets['js'].'|'.$assets['css']);
 
         $script = "<script src=\"{$jsUrl}\" data-navigate-once{$nonceAttribute}></script>";
 
         return $this->toolbarHtml(
             data: $data,
             cssUrl: $cssUrl,
+            assetVersion: $assetVersion,
             script: $script,
             nonceAttribute: $nonceAttribute,
             isDev: false
@@ -549,18 +551,20 @@ class ToolbarInjector
     protected function toolbarHtmlWithViteAssets(string $data, string $viteUrl, string $nonceAttribute): string
     {
         $cssUrl = "{$viteUrl}/resources/css/toolbar.css?inline";
+        $assetVersion = hash('sha256', $viteUrl.'|development');
         $script = "<script type=\"module\" src=\"{$viteUrl}/resources/js/toolbar.dev.js\" data-navigate-once{$nonceAttribute}></script>";
 
         return $this->toolbarHtml(
             data: $data,
             cssUrl: $cssUrl,
+            assetVersion: $assetVersion,
             script: $script,
             nonceAttribute: $nonceAttribute,
             isDev: true
         );
     }
 
-    protected function toolbarHtml(string $data, string $cssUrl, string $script, string $nonceAttribute, bool $isDev = false): string
+    protected function toolbarHtml(string $data, string $cssUrl, string $assetVersion, string $script, string $nonceAttribute, bool $isDev = false): string
     {
         $comment = $isDev ? '<!-- Laravel Toolbar (Development Mode with HMR) -->' : '<!-- Laravel Toolbar -->';
 
@@ -577,12 +581,14 @@ class ToolbarInjector
         <script{$nonceAttribute}>
             window.__LARAVEL_TOOLBAR_DATA__ = {$data};
             window.__LARAVEL_TOOLBAR_CSS_URL__ = "{$cssUrl}";
+            window.__LARAVEL_TOOLBAR_ASSET_VERSION__ = "{$assetVersion}";
 
             (function() {
                 var cached = sessionStorage.getItem('laravel-toolbar-html-cache');
                 var cachedCss = sessionStorage.getItem('laravel-toolbar-css-cache');
+                var cachedVersion = sessionStorage.getItem('laravel-toolbar-asset-version');
 
-                if (cached && cachedCss) {
+                if (cached && cachedCss && cachedVersion === window.__LARAVEL_TOOLBAR_ASSET_VERSION__) {
 
                     // Strip inline styles - Vue will re-add them when it hydrates
                     if("{$nonce}" !== "")
@@ -600,6 +606,10 @@ class ToolbarInjector
                         window.__TOOLBAR_SHADOW_PRECREATED__ = shadow;
                         window.__TOOLBAR_STYLESHEET__ = sheet;
                     }
+                } else if (cached || cachedCss || cachedVersion) {
+                    sessionStorage.removeItem('laravel-toolbar-html-cache');
+                    sessionStorage.removeItem('laravel-toolbar-css-cache');
+                    sessionStorage.removeItem('laravel-toolbar-asset-version');
                 }
             })();
 

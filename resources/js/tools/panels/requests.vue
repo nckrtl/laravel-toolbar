@@ -123,8 +123,8 @@ const handleRowClick = async (requestId) => {
 
         <div class="h-2 w-full"></div>
 
-        <div class="relative flex flex-col flex-1">
-            <table class="relative mt-0 w-full table-fixed text-left">
+        <div class="relative flex flex-1 flex-col overflow-x-auto">
+            <table class="relative mt-0 w-full min-w-[64rem] table-fixed text-left">
                 <thead v-if="rows.length > 0">
                     <tr>
                         <th class="sticky top-0 z-10 my-0.5 w-[8%] text-[#A3A3A3] uppercase">
@@ -215,7 +215,7 @@ const handleRowClick = async (requestId) => {
 
             <div
                 ref="requestsTable"
-                class="requests-table max-h-[220px] overflow-y-auto rounded-b-lg pb-3"
+                class="requests-table max-h-[220px] min-w-[64rem] overflow-y-auto rounded-b-lg pb-3"
                 @mouseleave="clearPreview"
             >
                 <table class="relative mt-0 w-full table-fixed text-left">

@@ -81,7 +81,7 @@ watch(queriesTable, (newVal) => {
 <template>
     <div class="flex flex-col overflow-hidden h-[305px]">
         <div class="flex shrink-0 items-center justify-between">
-            <div class="flex min-w-64 items-center gap-3 p-1.5">
+            <div class="flex min-w-0 flex-1 items-center gap-3 p-1.5">
                 <div
                     class="relative flex h-7 w-7 items-center justify-center rounded-md border border-white/8 bg-white/6"
                 >
@@ -101,9 +101,11 @@ watch(queriesTable, (newVal) => {
                 <span>Models</span>
             </div>
 
-            <div class="flex items-center gap-10">
+            <div class="models-stats ml-auto flex shrink-0 items-center gap-4 pr-2 sm:gap-10">
                 <div class="flex items-center gap-2">
-                    <span class="text-xxs font-medium text-white/50 uppercase"> Models </span>
+                    <span class="text-xxs font-medium whitespace-nowrap text-white/50 uppercase">
+                        Models
+                    </span>
                     <span>
                         {{
                             Object.values(data.models ?? []).reduce(
@@ -114,7 +116,7 @@ watch(queriesTable, (newVal) => {
                     </span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="text-xxs font-medium text-white/50 uppercase">
+                    <span class="text-xxs font-medium whitespace-nowrap text-white/50 uppercase">
                         Distinct Models
                     </span>
                     <span>
@@ -122,11 +124,10 @@ watch(queriesTable, (newVal) => {
                     </span>
                 </div>
             </div>
-            <div class="relative min-w-64"></div>
         </div>
         <div class="h-2 w-full shrink-0"></div>
-        <div class="relative flex min-h-0 flex-1 flex-col">
-            <table class="relative mt-0 w-full table-fixed text-left">
+        <div class="relative min-h-0 flex-1 overflow-x-auto">
+            <table class="relative mt-0 w-full min-w-[48rem] table-fixed text-left">
                 <thead v-if="Object.values(data.models ?? []).length > 0">
                     <tr>
                         <th class="sticky top-0 z-10 my-0.5 w-[60%] text-[#A3A3A3] uppercase">
@@ -168,7 +169,7 @@ watch(queriesTable, (newVal) => {
                     </tr>
                 </thead>
             </table>
-            <div ref="queriesTable" class="relative overflow-y-auto max-h-[220px]">
+            <div ref="queriesTable" class="relative max-h-[220px] min-w-[48rem] overflow-y-auto">
                 <table class="relative mt-0 w-full table-fixed text-left">
                     <tbody>
                         <template v-if="Object.values(data.models ?? []).length === 0">

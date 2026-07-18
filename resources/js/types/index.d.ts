@@ -63,6 +63,7 @@ declare global {
     interface Window {
         __LARAVEL_TOOLBAR_DATA__: ToolbarData;
         __LARAVEL_TOOLBAR_CSS_URL__: string;
+        __LARAVEL_TOOLBAR_ASSET_VERSION__: string;
         __TOOLBAR_SHADOW_PRECREATED__?: ShadowRoot;
         __TOOLBAR_STYLESHEET__?: CSSStyleSheet;
     }

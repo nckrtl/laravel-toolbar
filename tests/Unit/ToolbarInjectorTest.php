@@ -155,3 +155,19 @@ it('includes csp nonce when available', function () {
 
     expect($response->getContent())->toContain('nonce="test-nonce"');
 });
+
+it('only restores a toolbar shell cached for the current asset build', function () {
+    $injector = new ToolbarInjector;
+    $request = Request::create('/', 'GET');
+    $response = MockResponse::make('<html><body></body></html>');
+
+    $injector->inject($request, $response);
+
+    expect($response->getContent())
+        ->toContain('window.__LARAVEL_TOOLBAR_ASSET_VERSION__')
+        ->toContain("sessionStorage.getItem('laravel-toolbar-asset-version')")
+        ->toContain('cachedVersion === window.__LARAVEL_TOOLBAR_ASSET_VERSION__')
+        ->toContain("sessionStorage.removeItem('laravel-toolbar-html-cache')")
+        ->toContain("sessionStorage.removeItem('laravel-toolbar-css-cache')")
+        ->toContain("sessionStorage.removeItem('laravel-toolbar-asset-version')");
+});

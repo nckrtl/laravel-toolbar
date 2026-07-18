@@ -34,7 +34,7 @@ const sizeClass = computed(() => {
             sm: "w-full max-w-sm min-w-sm",
             md: "w-full max-w-md min-w-md",
             lg: "w-full max-w-lg min-w-lg",
-            xl: "w-full max-w-4xl min-w-4xl",
+            xl: "w-full min-w-0 max-w-4xl md:min-w-4xl",
             full: "w-full min-w-[calc(100vw-10px)] max-w-[calc(100vw-10px)]",
         }[size] ?? "w-full max-w-sm min-w-sm"
     );

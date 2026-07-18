@@ -1,28 +1,30 @@
 // cache.ts - HTML and CSS shell caching utilities
 
-const HTML_KEY = 'laravel-toolbar-html-cache';
-const CSS_KEY = 'laravel-toolbar-css-cache';
+const HTML_KEY = "laravel-toolbar-html-cache";
+const CSS_KEY = "laravel-toolbar-css-cache";
+const VERSION_KEY = "laravel-toolbar-asset-version";
 
 /**
  * Save toolbar HTML and CSS to sessionStorage before page unload
  */
 export function setupCacheSaving(shadowRoot: ShadowRoot): void {
     const saveCache = (): void => {
-        const toolbarRoot = shadowRoot.getElementById('laravel-toolbar-root');
+        const toolbarRoot = shadowRoot.getElementById("laravel-toolbar-root");
         if (toolbarRoot) {
             try {
                 sessionStorage.setItem(HTML_KEY, toolbarRoot.innerHTML);
+                sessionStorage.setItem(VERSION_KEY, window.__LARAVEL_TOOLBAR_ASSET_VERSION__);
 
                 const sheet = shadowRoot.adoptedStyleSheets[0];
                 if (sheet) {
                     const rules = Array.from(sheet.cssRules || []);
-                    const cssText = rules.map((rule) => rule.cssText).join('\n');
+                    const cssText = rules.map((rule) => rule.cssText).join("\n");
                     if (cssText) {
                         sessionStorage.setItem(CSS_KEY, cssText);
                     }
                 }
             } catch (e) {
-                console.error('❌ Error saving cache:', e);
+                console.error("❌ Error saving cache:", e);
             }
         }
     };
@@ -30,7 +32,7 @@ export function setupCacheSaving(shadowRoot: ShadowRoot): void {
     // Save after a delay to ensure everything is loaded
     setTimeout(saveCache, 2000);
 
-    window.addEventListener('beforeunload', saveCache);
+    window.addEventListener("beforeunload", saveCache);
 }
 
 /**
@@ -38,6 +40,14 @@ export function setupCacheSaving(shadowRoot: ShadowRoot): void {
  * Returns true if cache was restored
  */
 export function restoreCachedHtml(appContainer: HTMLElement): boolean {
+    const cachedVersion = sessionStorage.getItem(VERSION_KEY);
+
+    if (cachedVersion !== window.__LARAVEL_TOOLBAR_ASSET_VERSION__) {
+        clearCache();
+
+        return false;
+    }
+
     const cached = sessionStorage.getItem(HTML_KEY);
     if (cached) {
         appContainer.innerHTML = cached;
@@ -52,4 +62,5 @@ export function restoreCachedHtml(appContainer: HTMLElement): boolean {
 export function clearCache(): void {
     sessionStorage.removeItem(HTML_KEY);
     sessionStorage.removeItem(CSS_KEY);
+    sessionStorage.removeItem(VERSION_KEY);
 }
