@@ -176,6 +176,26 @@ const requestCodeColor = (code) => {
     return "text-danger";
 };
 
+const statusPillColor = computed(() => {
+    const status = response.value?.status_code;
+
+    if (typeof status !== "number") {
+        return "slate";
+    }
+
+    if (status >= 200 && status < 300) {
+        return "green";
+    }
+
+    if (status >= 300 && status < 400) {
+        return "yellow";
+    }
+
+    return "red";
+});
+
+const activePillColor = computed(() => (isOpen.value ? (data.value.primary_color ?? null) : null));
+
 const methodColor = (method = "") => {
     return (
         {
@@ -376,9 +396,12 @@ watch(responseHeadersList, attachScrollFade);
             @click="togglePin"
             :isActive="isOpen"
             :class="itemClasses"
-            innerPadding="pl-0.5"
+            innerPadding=""
+            :padSurfaceVertically="false"
         >
-            <Pill class="px-1.5 py-[5px]" color="green">{{ response?.status_code ?? "--" }}</Pill>
+            <Pill class="px-1.5 py-[5px]" :color="statusPillColor" :customColor="activePillColor">{{
+                response?.status_code ?? "--"
+            }}</Pill>
         </ToolbarItem>
     </div>
 </template>

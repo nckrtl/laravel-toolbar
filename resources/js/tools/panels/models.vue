@@ -126,7 +126,7 @@ watch(queriesTable, (newVal) => {
             </div>
         </div>
         <div class="h-2 w-full shrink-0"></div>
-        <div class="relative min-h-0 flex-1 overflow-x-auto">
+        <div class="scrollbar-none relative min-h-0 flex-1 overflow-x-auto">
             <table class="relative mt-0 w-full min-w-[48rem] table-fixed text-left">
                 <thead v-if="Object.values(data.models ?? []).length > 0">
                     <tr>

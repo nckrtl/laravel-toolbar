@@ -13,7 +13,8 @@ const filteredQueries = computed(() => {
     if (searchPhrase.value !== "") {
         queries = queries.filter(
             (query) =>
-                query.sql.includes(searchPhrase.value) || query.file.includes(searchPhrase.value),
+                query.sql.includes(searchPhrase.value) ||
+                (query.file ?? "").includes(searchPhrase.value),
         );
     }
 
@@ -25,6 +26,16 @@ const filteredQueries = computed(() => {
 
     return queries;
 });
+
+const queryLocation = (query) => {
+    if (!query.file) {
+        return "—";
+    }
+
+    const fileName = query.file.split("/").pop() ?? query.file;
+
+    return query.line ? `${fileName}:${query.line}` : fileName;
+};
 
 const tableBodyClasses = "relative max-h-[220px] overflow-y-auto rounded-b-lg pb-3";
 
@@ -122,7 +133,7 @@ watch(queriesTable, (newVal) => {
             </div>
         </div>
         <div class="h-2 w-full shrink-0"></div>
-        <div class="relative min-h-0 flex-1 overflow-x-auto">
+        <div class="scrollbar-none relative min-h-0 flex-1 overflow-x-auto">
             <table class="relative mt-0 w-full min-w-[48rem] table-fixed text-left">
                 <thead v-if="filteredQueries.length > 0">
                     <tr>
@@ -279,13 +290,13 @@ watch(queriesTable, (newVal) => {
                                     >
                                         <span class="whitespace-nowrap">
                                             <a
+                                                v-if="query.editor_url"
                                                 class="cursor-pointer hover:underline"
                                                 :href="query.editor_url"
                                                 target="_blank"
-                                                >{{ query.file.split("/").pop() }}:{{
-                                                    query.line
-                                                }}</a
+                                                >{{ queryLocation(query) }}</a
                                             >
+                                            <span v-else>{{ queryLocation(query) }}</span>
                                         </span>
                                     </div>
                                 </div>

@@ -54,6 +54,14 @@
     @apply font-sans antialiased;
 }
 
+.scrollbar-none {
+    scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+
 .fade-overlay {
     background: linear-gradient(
         to bottom,

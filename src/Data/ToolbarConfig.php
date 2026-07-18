@@ -53,6 +53,8 @@ class ToolbarConfig extends Data
 
     public bool $animations = false;
 
+    public ?string $primaryColor = null;
+
     public LayoutConfig $layout;
 
     public function __construct()
@@ -252,6 +254,13 @@ class ToolbarConfig extends Data
     public function animations(bool $enabled = true): self
     {
         $this->animations = $enabled;
+
+        return $this;
+    }
+
+    public function primaryColor(?string $color): self
+    {
+        $this->primaryColor = $color;
 
         return $this;
     }

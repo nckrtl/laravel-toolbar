@@ -25,9 +25,10 @@ const getComponent = (component) => {
                 :config="toolConfig"
                 :toolIndex="index"
                 :itemClasses="{
-                    'pl-[3px] rounded-l-full border-l': index === 0,
-                    'pr-[3px] rounded-r-full border-r':
-                        index === Object.keys(config.tools).length - 1,
+                    'pl-[3px]': index === 0,
+                    'rounded-l-full border-l': index === 0,
+                    'pr-[5px] md:pr-[3px]': index === Object.keys(config.tools).length - 1,
+                    'rounded-r-full border-r': index === Object.keys(config.tools).length - 1,
                     'border-x-0': index > 0 && index < Object.keys(config.tools).length - 1,
                 }"
             />

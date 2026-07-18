@@ -123,7 +123,7 @@ const handleRowClick = async (requestId) => {
 
         <div class="h-2 w-full"></div>
 
-        <div class="relative flex flex-1 flex-col overflow-x-auto">
+        <div class="scrollbar-none relative flex flex-1 flex-col overflow-x-auto">
             <table class="relative mt-0 w-full min-w-[64rem] table-fixed text-left">
                 <thead v-if="rows.length > 0">
                     <tr>

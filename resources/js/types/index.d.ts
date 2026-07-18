@@ -27,6 +27,7 @@ export interface RequestHistoryRow {
 
 export interface ToolbarData {
     animations?: boolean;
+    primary_color?: string | null;
     request_id?: string;
     selected_request_id?: string;
     request_history?: RequestHistoryRow[];

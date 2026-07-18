@@ -29,11 +29,11 @@ const sizeClass = computed(() => {
     const size = activePanelConfig.value?.size ?? "sm";
     return (
         {
-            xxs: "w-full max-w-xxs min-w-xxs",
-            xs: "w-full max-w-xs min-w-xs",
-            sm: "w-full max-w-sm min-w-sm",
-            md: "w-full max-w-md min-w-md",
-            lg: "w-full max-w-lg min-w-lg",
+            xxs: "w-full min-w-[calc(100vw-10px)] max-w-[calc(100vw-10px)] md:min-w-xxs md:max-w-xxs",
+            xs: "w-full min-w-[calc(100vw-10px)] max-w-[calc(100vw-10px)] md:min-w-xs md:max-w-xs",
+            sm: "w-full min-w-[calc(100vw-10px)] max-w-[calc(100vw-10px)] md:min-w-sm md:max-w-sm",
+            md: "w-full min-w-[calc(100vw-10px)] max-w-[calc(100vw-10px)] md:min-w-md md:max-w-md",
+            lg: "w-full min-w-[calc(100vw-10px)] max-w-[calc(100vw-10px)] md:min-w-lg md:max-w-lg",
             xl: "w-full min-w-0 max-w-4xl md:min-w-4xl",
             full: "w-full min-w-[calc(100vw-10px)] max-w-[calc(100vw-10px)]",
         }[size] ?? "w-full max-w-sm min-w-sm"

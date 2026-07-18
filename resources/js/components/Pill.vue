@@ -10,12 +10,16 @@ const props = defineProps({
         type: String,
         default: "default",
     },
+    customColor: {
+        type: String,
+        default: null,
+    },
 });
 
 const colors = computed(() => {
     return {
         blue: "bg-blue-900 text-blue-200",
-        green: "bg-lime-400 text-[#132000]",
+        green: "bg-emerald-400 text-emerald-950",
         red: "bg-red-900 text-red-200",
         slate: "bg-white/10 text-white/60",
         yellow: "bg-yellow-900 text-yellow-200",
@@ -35,7 +39,12 @@ const sizes = computed(() => {
         class="text-shadow relative inline-flex items-center rounded-full leading-none whitespace-nowrap"
         :class="[colors[color] ?? colors.slate, sizes[size] ?? sizes.default]"
         :style="{
-            textShadow: props.color === 'green' ? 'none' : '0 0 4px rgba(255, 255, 255, 0.5)',
+            textShadow:
+                props.customColor || props.color === 'green'
+                    ? 'none'
+                    : '0 0 4px rgba(255, 255, 255, 0.5)',
+            backgroundColor: props.customColor ?? undefined,
+            color: props.customColor ? '#132000' : undefined,
         }"
     >
         <div

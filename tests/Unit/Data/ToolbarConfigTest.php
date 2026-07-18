@@ -31,6 +31,15 @@ it('has debug mode disabled by default', function () {
     expect($config->debug)->toBeFalse();
 });
 
+it('configures an optional primary accent color', function () {
+    $config = new ToolbarConfig;
+
+    $result = $config->primaryColor('#a3e635');
+
+    expect($result)->toBe($config)
+        ->and($config->primaryColor)->toBe('#a3e635');
+});
+
 it('enables debug mode', function () {
     $config = new ToolbarConfig;
     $config->debug(true);

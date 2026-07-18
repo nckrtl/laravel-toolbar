@@ -91,6 +91,7 @@ class CollectorManager
 
         $this->data['layout'] = $toolbar->config->layout->toArray();
         $this->data['animations'] = $toolbar->config->animations;
+        $this->data['primary_color'] = $toolbar->config->primaryColor;
 
         $this->data['metadata']['id'] = $this->id;
         $this->data['metadata']['request_id'] = $publicRequestId;

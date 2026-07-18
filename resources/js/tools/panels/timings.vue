@@ -39,13 +39,13 @@ const computedStages = computed(() => {
             </template>
         </SectionHeader>
 
-        <Section>
-            <div class="flex w-full px-0.5">
+        <Section class="gap-0!">
+            <div class="timings-bar flex w-full px-0.5 pt-3.5 pb-1.5">
                 <template v-for="(requestStage, index) in computedStages" :key="index">
                     <div
                         @mouseenter="hoverIndex = index"
                         @mouseleave="hoverIndex = null"
-                        class="flex min-w-2 py-1.5"
+                        class="flex min-w-2"
                         :style="{ width: requestStage.wall_time.percentage + '%' }"
                     >
                         <div

@@ -13,11 +13,11 @@ const { data } = useToolbar();
     >
         <template v-for="(groups, section) in data.layout.sections">
             <div
-                class="flex gap-1"
+                class="flex gap-1 p-[5px]"
                 :class="{
-                    'absolute bottom-0 left-0 min-h-9.5 justify-start p-[5px]': section === 'left',
-                    'justify-center p-[5px]': section === 'center',
-                    'absolute right-0 bottom-0 min-h-9.5 justify-end p-[5px]': section === 'right',
+                    'absolute bottom-0 left-0 min-h-9.5 justify-start': section === 'left',
+                    'justify-center': section === 'center',
+                    'absolute right-0 bottom-0 min-h-9.5 justify-end': section === 'right',
                     'w-full': section === 'center',
                 }"
             >

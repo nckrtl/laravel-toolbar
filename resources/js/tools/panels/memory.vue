@@ -33,13 +33,13 @@ const hoverIndex = ref(null);
                 {{ data.profiler?.total_allocated_memory?.formattedValue }}
             </template>
         </SectionHeader>
-        <Section>
-            <div class="flex w-full px-0.5" v-if="data.profiler?.stages">
+        <Section class="gap-0!">
+            <div class="memory-bar flex w-full px-0.5 pt-3.5 pb-1.5" v-if="data.profiler?.stages">
                 <template v-for="(requestStage, index) in data.profiler?.stages" :key="index">
                     <div
                         @mouseenter="hoverIndex = index"
                         @mouseleave="hoverIndex = null"
-                        class="flex min-w-2 py-1.5"
+                        class="flex min-w-2"
                         :style="{ width: requestStage.memory_real_delta.percentage + '%' }"
                     >
                         <div

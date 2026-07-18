@@ -233,4 +233,31 @@ describe("Request tool", () => {
         expect(text).toContain("201 Created");
         expect(wrapper.findComponent(Request).findComponent(Pill).text()).toBe("201");
     });
+
+    it("uses the response status color until the configured accent becomes active", async () => {
+        setToolbarData(
+            makeToolbarData({
+                primary_color: "#a3e635",
+                response: makeResponse(500),
+                request_history: [
+                    makeHistoryRow("request-1", {
+                        status_code: 500,
+                    }),
+                ],
+            }),
+        );
+
+        const wrapper = mount(Harness);
+        const requestTool = wrapper.findComponent(Request);
+        const pill = requestTool.findComponent(Pill);
+
+        expect(pill.props("color")).toBe("red");
+        expect(pill.props("customColor")).toBeNull();
+        expect(requestTool.findComponent(ToolbarItem).props("innerPadding")).toBe("");
+        expect(requestTool.findComponent(ToolbarItem).props("padSurfaceVertically")).toBe(false);
+
+        await openPanel(wrapper);
+
+        expect(requestTool.findComponent(Pill).props("customColor")).toBe("#a3e635");
+    });
 });
