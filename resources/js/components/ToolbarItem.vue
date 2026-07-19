@@ -23,6 +23,7 @@ const props = defineProps({
 
 const { data } = useToolbar();
 const primaryColor = computed(() => data.value.primary_color ?? null);
+const primaryTextColor = computed(() => data.value.primary_text_color ?? "#000000");
 
 const activeStyle = computed(() => {
     if (!props.isActive) {
@@ -48,7 +49,7 @@ const activeInnerStyle = computed(() => {
 
     return {
         backgroundColor: primaryColor.value,
-        color: "#000000",
+        color: primaryTextColor.value,
     };
 });
 </script>

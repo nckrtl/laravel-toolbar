@@ -55,6 +55,8 @@ class ToolbarConfig extends Data
 
     public ?string $primaryColor = null;
 
+    public ?string $primaryTextColor = null;
+
     public LayoutConfig $layout;
 
     public function __construct()
@@ -258,9 +260,10 @@ class ToolbarConfig extends Data
         return $this;
     }
 
-    public function primaryColor(?string $color): self
+    public function primaryColor(?string $backgroundColor, ?string $textColor = null): self
     {
-        $this->primaryColor = $color;
+        $this->primaryColor = $backgroundColor;
+        $this->primaryTextColor = $textColor;
 
         return $this;
     }

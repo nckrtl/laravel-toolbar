@@ -5,9 +5,9 @@
     "type": "module",
     "scripts": {
         "dev": "vp dev",
-        "build": "vp build && node fix-font-urls.js",
+        "build": "vite build && node fix-font-urls.js",
         "preview": "vp preview",
-        "build-watch": "vp build --watch",
+        "build-watch": "vite build --watch",
         "prepare": "vp config",
         "generate-types": "php vendor/bin/testbench typescript:transform",
         "test:ui": "vitest run"

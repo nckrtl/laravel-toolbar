@@ -92,15 +92,19 @@ it('collects data from all enabled collectors', function () {
     expect($data['laravel'])->not->toBeNull();
 });
 
-it('includes the configured primary accent color in toolbar data', function () {
+it('includes the configured primary background and text colors in toolbar data', function () {
     $toolbar = app(Toolbar::class);
     $toolbar->config
         ->collectors([new PhpCollector])
-        ->primaryColor('#a3e635');
+        ->primaryColor(
+            backgroundColor: '#a3e635',
+            textColor: '#ffffff',
+        );
 
     $data = new CollectorManager()->collectData();
 
-    expect($data['primary_color'])->toBe('#a3e635');
+    expect($data['primary_color'])->toBe('#a3e635')
+        ->and($data['primary_text_color'])->toBe('#ffffff');
 });
 
 it('skips disabled collectors', function () {

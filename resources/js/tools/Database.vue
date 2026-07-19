@@ -42,7 +42,8 @@ const {
                     />
                 </svg>
                 <span
-                    >{{ data.queries?.queries.length }}<span class="px-0.5 text-white/50">:</span
+                    >{{ data.queries?.queries.length
+                    }}<span class="query-duration-separator px-0.5 opacity-50">:</span
                     >{{ Math.round(data.queries?.totalTime) }}ms</span
                 >
             </div>

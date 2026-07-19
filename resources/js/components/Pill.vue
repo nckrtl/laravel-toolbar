@@ -14,6 +14,10 @@ const props = defineProps({
         type: String,
         default: null,
     },
+    customTextColor: {
+        type: String,
+        default: null,
+    },
 });
 
 const colors = computed(() => {
@@ -44,7 +48,7 @@ const sizes = computed(() => {
                     ? 'none'
                     : '0 0 4px rgba(255, 255, 255, 0.5)',
             backgroundColor: props.customColor ?? undefined,
-            color: props.customColor ? '#132000' : undefined,
+            color: props.customColor ? (props.customTextColor ?? '#132000') : undefined,
         }"
     >
         <div

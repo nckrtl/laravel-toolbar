@@ -195,6 +195,9 @@ const statusPillColor = computed(() => {
 });
 
 const activePillColor = computed(() => (isOpen.value ? (data.value.primary_color ?? null) : null));
+const activePillTextColor = computed(() =>
+    isOpen.value ? (data.value.primary_text_color ?? null) : null,
+);
 
 const methodColor = (method = "") => {
     return (
@@ -402,7 +405,8 @@ watch(responseHeadersList, attachScrollFade);
             <Pill
                 class="py-[6px] pr-[7px] pl-[8px]"
                 :color="statusPillColor"
-                :customColor="activePillColor"
+                :custom-color="activePillColor"
+                :custom-text-color="activePillTextColor"
                 >{{ response?.status_code ?? "--" }}</Pill
             >
         </ToolbarItem>

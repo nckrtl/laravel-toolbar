@@ -1,8 +1,18 @@
 import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
+import DatabaseTool from "@/tools/Database.vue";
 import DatabasePanel from "@/tools/panels/database.vue";
 
 describe("Database panel", () => {
+    it("lets the query separator inherit the active toolbar text color", () => {
+        const wrapper = mount(DatabaseTool);
+
+        const separator = wrapper.get(".query-duration-separator");
+
+        expect(separator.classes()).toContain("opacity-50");
+        expect(separator.classes()).not.toContain("text-white/50");
+    });
+
     it("renders every query when source locations are unavailable", () => {
         window.dispatchEvent(
             new CustomEvent("laravel-toolbar:update", {

@@ -31,13 +31,17 @@ it('has debug mode disabled by default', function () {
     expect($config->debug)->toBeFalse();
 });
 
-it('configures an optional primary accent color', function () {
+it('configures optional primary background and text colors', function () {
     $config = new ToolbarConfig;
 
-    $result = $config->primaryColor('#a3e635');
+    $result = $config->primaryColor(
+        backgroundColor: '#a3e635',
+        textColor: '#ffffff',
+    );
 
     expect($result)->toBe($config)
-        ->and($config->primaryColor)->toBe('#a3e635');
+        ->and($config->primaryColor)->toBe('#a3e635')
+        ->and($config->primaryTextColor)->toBe('#ffffff');
 });
 
 it('enables debug mode', function () {

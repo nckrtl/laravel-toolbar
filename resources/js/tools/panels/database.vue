@@ -8,6 +8,14 @@ const { data } = useToolbar();
 const searchPhrase = ref("");
 const filter = ref("none");
 
+const queryDurationColor = computed(() => {
+    if (!data.value.primary_color) {
+        return "rgb(150 132 255 / 50%)";
+    }
+
+    return `color-mix(in srgb, ${data.value.primary_color} 50%, transparent)`;
+});
+
 const filteredQueries = computed(() => {
     let queries = data.value?.queries?.queries || [];
 
@@ -170,8 +178,9 @@ const queryLocation = (query) => {
                         <td class="w-[60%]">
                             <div class="absolute bottom-0.5 left-2.5 h-px w-[calc(100%-20px)]">
                                 <div
-                                    class="absolute h-full bg-[#9684FF]/50"
+                                    class="query-duration-indicator absolute h-full"
                                     :style="{
+                                        backgroundColor: queryDurationColor,
                                         width: `${query.percentage * 100}%`,
                                         left: `${query.offset * 100}%`,
                                     }"
