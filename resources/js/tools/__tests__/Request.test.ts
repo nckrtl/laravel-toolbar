@@ -97,6 +97,15 @@ afterEach(() => {
 });
 
 describe("Request tool", () => {
+    it("uses the tuned padding for the status pill", () => {
+        const wrapper = mount(Harness);
+        const pill = wrapper.findComponent(Request).findComponent(Pill);
+
+        expect(pill.classes()).toContain("pl-[8px]");
+        expect(pill.classes()).toContain("pr-[7px]");
+        expect(pill.classes()).toContain("py-[6px]");
+    });
+
     it("renders the active request payload", async () => {
         setToolbarData(
             makeToolbarData({

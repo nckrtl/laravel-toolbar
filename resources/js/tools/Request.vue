@@ -399,9 +399,12 @@ watch(responseHeadersList, attachScrollFade);
             innerPadding=""
             :padSurfaceVertically="false"
         >
-            <Pill class="px-1.5 py-[5px]" :color="statusPillColor" :customColor="activePillColor">{{
-                response?.status_code ?? "--"
-            }}</Pill>
+            <Pill
+                class="py-[6px] pr-[7px] pl-[8px]"
+                :color="statusPillColor"
+                :customColor="activePillColor"
+                >{{ response?.status_code ?? "--" }}</Pill
+            >
         </ToolbarItem>
     </div>
 </template>

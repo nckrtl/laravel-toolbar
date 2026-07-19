@@ -2,6 +2,7 @@ import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 import { describe, expect, it } from "vitest";
 import SharedPanel from "@/components/SharedPanel.vue";
+import ScrollableTable from "@/components/ScrollableTable.vue";
 import { activeToolId, usePinnedPanel } from "@/composables/usePinnedPanel";
 import DatabasePanel from "@/tools/panels/database.vue";
 import MemoryPanel from "@/tools/panels/memory.vue";
@@ -39,6 +40,44 @@ const setProfilerData = () => {
                             },
                         ],
                     } as NckRtl.Toolbar.Data.ProfilerData,
+                },
+            },
+        }),
+    );
+};
+
+const setModelsData = () => {
+    window.dispatchEvent(
+        new CustomEvent("laravel-toolbar:update", {
+            detail: {
+                data: {
+                    ...window.__LARAVEL_TOOLBAR_DATA__,
+                    profiler: {
+                        total_wall_time: { formattedValue: "0 ms" },
+                        total_real_memory: null,
+                        total_allocated_memory: null,
+                        stages: [],
+                    } as NckRtl.Toolbar.Data.ProfilerData,
+                    models: {
+                        "App\\Models\\Demo\\Store": {
+                            count: 1,
+                            action: "retrieved",
+                            sources: {
+                                source: {
+                                    count: 1,
+                                    file: "RunToolbarDemoWorkload.php",
+                                    line: 28,
+                                    editor_url: "#",
+                                },
+                                controller: {
+                                    count: 1,
+                                    file: "StoreController.php",
+                                    line: 42,
+                                    editor_url: "#",
+                                },
+                            },
+                        },
+                    },
                 },
             },
         }),
@@ -106,6 +145,9 @@ describe("responsive toolbar panels", () => {
         const wrapper = mount(DatabasePanel);
         const header = wrapper.find(".queries-header");
         const metrics = wrapper.find(".queries-stats");
+        const databaseMetric = metrics
+            .findAll("div")
+            .find((element) => element.text().trim().startsWith("Database"));
         const labels = metrics
             .findAll("span")
             .filter((element) =>
@@ -114,20 +156,37 @@ describe("responsive toolbar panels", () => {
         const tableBody = wrapper
             .findAll("div")
             .find((element) => element.classes().includes("max-h-[220px]"));
-        const tableScroller = tableBody?.element.parentElement;
+        const scrollableTable = wrapper.findComponent(ScrollableTable);
 
+        expect(wrapper.classes()).not.toContain("overflow-hidden");
         expect(header.classes()).toContain("shrink-0");
-        expect(header.classes()).toContain("flex-col");
-        expect(header.classes()).toContain("sm:flex-row");
+        expect(header.classes()).toContain("items-center");
+        expect(header.classes()).toContain("justify-between");
+        expect(header.classes()).not.toContain("flex-col");
         expect(metrics.classes()).toContain("shrink-0");
-        expect(metrics.classes()).toContain("w-full");
-        expect(metrics.classes()).toContain("sm:w-auto");
-        expect(metrics.classes()).toContain("pr-2");
+        expect(metrics.classes()).toContain("ml-auto");
+        expect(metrics.classes()).toContain("w-auto");
+        expect(metrics.classes()).toContain("justify-end");
+        expect(metrics.classes()).toContain("pr-0");
+        expect(databaseMetric?.classes()).toContain("hidden");
+        expect(databaseMetric?.classes()).toContain("sm:flex");
         expect(labels).toHaveLength(3);
         expect(labels.every((label) => label.classes().includes("whitespace-nowrap"))).toBe(true);
-        expect(tableBody?.classes()).toContain("min-w-[48rem]");
-        expect(tableScroller?.classList.contains("overflow-x-auto")).toBe(true);
-        expect(tableScroller?.classList.contains("scrollbar-none")).toBe(true);
+        expect(scrollableTable.exists()).toBe(true);
+        expect(scrollableTable.props("minWidth")).toBe("48rem");
+        expect(scrollableTable.classes()).toContain("-mx-2");
+        expect(scrollableTable.find(".scrollable-table-track").classes()).toContain("px-2");
+        expect(scrollableTable.find(".scrollable-table-header").element.nextElementSibling).toBe(
+            scrollableTable.find(".scrollable-table-body").element,
+        );
+        expect(wrapper.find(".mobile-table-right-fade").exists()).toBe(false);
+        expect(tableBody?.classes()).toContain("scrollable-table-body");
+        expect(
+            scrollableTable
+                .find(".scrollable-table-horizontal-scroller")
+                .classes()
+                .includes("overflow-x-auto"),
+        ).toBe(true);
     });
 
     it("matches the memory bar spacing above the first stage", () => {
@@ -152,7 +211,8 @@ describe("responsive toolbar panels", () => {
         expect(bar.classes()).toContain("pb-1.5");
     });
 
-    it("keeps model metrics on one line and the table inside its own horizontal scroller", () => {
+    it("keeps model metrics on one line and distributes every table row with the same percentage grid", async () => {
+        setModelsData();
         const wrapper = mount(ModelsPanel);
         const metrics = wrapper.find(".models-stats");
         const labels = metrics
@@ -161,13 +221,46 @@ describe("responsive toolbar panels", () => {
         const tableBody = wrapper
             .findAll("div")
             .find((element) => element.classes().includes("max-h-[220px]"));
-        const tableScroller = tableBody?.element.parentElement;
+        const scrollableTable = wrapper.findComponent(ScrollableTable);
+        const headerColumns = wrapper.findAll("thead th");
+        const firstModelRowColumns = wrapper.findAll("tbody tr")[0]?.findAll("td") ?? [];
+        const columnWidths = ["w-[35%]", "w-[10%]", "w-[15%]", "w-[40%]"];
 
+        expect(wrapper.classes()).not.toContain("overflow-hidden");
         expect(metrics.classes()).toContain("pr-2");
         expect(labels).toHaveLength(2);
         expect(labels.every((label) => label.classes().includes("whitespace-nowrap"))).toBe(true);
-        expect(tableBody?.classes()).toContain("min-w-[48rem]");
-        expect(tableScroller?.classList.contains("overflow-x-auto")).toBe(true);
-        expect(tableScroller?.classList.contains("scrollbar-none")).toBe(true);
+        expect(scrollableTable.exists()).toBe(true);
+        expect(scrollableTable.props("minWidth")).toBe("52rem");
+        expect(scrollableTable.classes()).toContain("-mx-2");
+        expect(scrollableTable.find(".scrollable-table-track").classes()).toContain("px-2");
+        expect(scrollableTable.find(".scrollable-table-header").element.nextElementSibling).toBe(
+            scrollableTable.find(".scrollable-table-body").element,
+        );
+        expect(wrapper.find(".mobile-table-right-fade").exists()).toBe(false);
+        expect(tableBody?.classes()).toContain("scrollable-table-body");
+        expect(wrapper.attributes("style")).toBeUndefined();
+        expect(
+            headerColumns.map((column) =>
+                columnWidths.find((width) => column.classes().includes(width)),
+            ),
+        ).toEqual(columnWidths);
+        expect(
+            firstModelRowColumns.map((column) =>
+                columnWidths.find((width) => column.classes().includes(width)),
+            ),
+        ).toEqual(columnWidths);
+
+        await wrapper.find("tbody tr.group").trigger("click");
+
+        expect(wrapper.findAll("colgroup col").map((column) => column.attributes("style"))).toEqual(
+            ["width: 35%;", "width: 10%;", "width: 15%;", "width: 40%;"],
+        );
+        expect(
+            scrollableTable
+                .find(".scrollable-table-horizontal-scroller")
+                .classes()
+                .includes("overflow-x-auto"),
+        ).toBe(true);
     });
 });

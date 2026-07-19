@@ -5,7 +5,9 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/nckrtl/laravel-toolbar/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/nckrtl/laravel-toolbar/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/nckrtl/laravel-toolbar.svg?style=flat-square)](https://packagist.org/packages/nckrtl/laravel-toolbar)
 
-A powerful development toolbar for Laravel that sits at the bottom of your screen, providing real-time insights into your application's performance, database queries, request lifecycle, and more. Built with Vue.js and works standalone with optional Laravel Telescope integration for enhanced data collection.
+Laravel Toolbar pins to the bottom of your app and shows what every request is doing in real time: timings, memory, database queries, Eloquent models, request details, and more. It works out of the box, with optional Laravel Telescope integration for enhanced data collection.
+
+See it in action at [toolbar.nckrtl.com](https://toolbar.nckrtl.com), where you can explore every collector and interact with live profiled requests.
 
 ## Features
 
@@ -26,7 +28,7 @@ A powerful development toolbar for Laravel that sits at the bottom of your scree
 ## Requirements
 
 - PHP 8.4+
-- Laravel 11.x or 12.x
+- Laravel 11.x, 12.x, or 13.x
 
 ## Installation
 

@@ -14,7 +14,7 @@ const getComponent = (component) => {
 </script>
 
 <template>
-    <div class="relative flex overflow-hidden rounded-full">
+    <div class="relative flex items-center overflow-hidden rounded-full">
         <div
             class="absolute h-full w-full rounded-full bg-[#101010]/95 backdrop-blur-sm dark:border dark:border-white/8"
         ></div>
@@ -27,7 +27,7 @@ const getComponent = (component) => {
                 :itemClasses="{
                     'pl-[3px]': index === 0,
                     'rounded-l-full border-l': index === 0,
-                    'pr-[5px] md:pr-[3px]': index === Object.keys(config.tools).length - 1,
+                    'pr-[3px]': index === Object.keys(config.tools).length - 1,
                     'rounded-r-full border-r': index === Object.keys(config.tools).length - 1,
                     'border-x-0': index > 0 && index < Object.keys(config.tools).length - 1,
                 }"

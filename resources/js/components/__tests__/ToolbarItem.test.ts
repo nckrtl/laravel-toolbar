@@ -41,6 +41,8 @@ describe("ToolbarItem", () => {
         expect(wrapper.find(".text-xxs").classes()).toContain("py-0.5");
         expect(wrapper.find(".cursor-default").classes()).toContain("p-[3px]");
         expect(wrapper.find(".cursor-default > div").classes()).not.toContain("p-0.5");
+        expect(wrapper.find(".cursor-default > div").classes()).toContain("px-[7px]");
+        expect(wrapper.find(".cursor-default > div").classes()).not.toContain("px-2");
         expect(wrapper.find(".cursor-default > div").classes()).toContain("py-px");
         expect(wrapper.find(".cursor-default > div").classes()).toContain("relative");
         expect(wrapper.find(".active-top-border").classes()).toContain("border-t");

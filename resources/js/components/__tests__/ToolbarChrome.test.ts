@@ -41,10 +41,11 @@ describe("responsive toolbar chrome", () => {
         expect(centerSection.classes()).toContain("p-[5px]");
         expect(centerSection.classes()).not.toContain("pb-0");
         expect(group.classes()).toContain("rounded-full");
+        expect(group.classes()).toContain("items-center");
         expect(groupBackground.classes()).toContain("rounded-full");
     });
 
-    it("tunes the mobile outer padding of the first and last tools", () => {
+    it("keeps the final tool clearance aligned with the group height", () => {
         const group = mount(Group, {
             props: {
                 config: {
@@ -62,7 +63,8 @@ describe("responsive toolbar chrome", () => {
             "pl-[3px]": true,
         });
         expect(lastClasses).toMatchObject({
-            "pr-[5px] md:pr-[3px]": true,
+            "pr-[3px]": true,
         });
+        expect(lastClasses).not.toHaveProperty("pr-[5px] md:pr-[3px]");
     });
 });

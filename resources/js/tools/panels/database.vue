@@ -1,5 +1,6 @@
 <script setup>
-import { ref, watch, computed, nextTick } from "vue";
+import { computed, ref } from "vue";
+import ScrollableTable from "@/components/ScrollableTable.vue";
 import { useToolbar } from "@/composables/useToolbar";
 import EmptyListIcon from "@/icons/EmptyListIcon.vue";
 
@@ -36,44 +37,12 @@ const queryLocation = (query) => {
 
     return query.line ? `${fileName}:${query.line}` : fileName;
 };
-
-const tableBodyClasses = "relative max-h-[220px] overflow-y-auto rounded-b-lg pb-3";
-
-const queriesTable = ref(null);
-const queriesTableInner = ref(null);
-const fadeClasses = ["fade-to-bottom", "fade-to-top", "fade-to-top-and-bottom"];
-
-const updateFade = () => {
-    const el = queriesTable.value;
-    if (!el) return;
-    const scrollTop = el.scrollTop;
-    const overflows = el.scrollHeight > el.clientHeight;
-    const atBottom = scrollTop + el.clientHeight >= el.scrollHeight - 2;
-    el.classList.remove(...fadeClasses);
-    if (!overflows) return;
-    if (atBottom) {
-        el.classList.add("fade-to-top");
-    } else if (scrollTop > 1) {
-        el.classList.add("fade-to-top-and-bottom");
-    } else {
-        el.classList.add("fade-to-bottom");
-    }
-};
-
-watch(queriesTable, (newVal) => {
-    if (newVal) {
-        newVal.addEventListener("scroll", updateFade);
-        nextTick(updateFade);
-    }
-});
 </script>
 
 <template>
-    <div class="flex flex-col overflow-hidden h-[305px]">
-        <div
-            class="queries-header flex shrink-0 flex-col items-stretch sm:flex-row sm:items-center sm:justify-between"
-        >
-            <div class="flex w-full min-w-0 items-center gap-3 p-1.5 sm:w-auto sm:flex-1">
+    <div class="flex h-[305px] flex-col">
+        <div class="queries-header flex shrink-0 items-center justify-between">
+            <div class="flex w-auto min-w-0 flex-none items-center gap-3 p-1.5 sm:flex-1">
                 <div
                     class="relative flex h-7 w-7 items-center justify-center rounded-md border border-white/8 bg-white/6"
                 >
@@ -96,7 +65,7 @@ watch(queriesTable, (newVal) => {
             </div>
 
             <div
-                class="queries-stats flex w-full shrink-0 items-center justify-between gap-4 pr-2 pl-2 sm:ml-auto sm:w-auto sm:justify-start sm:gap-10 sm:pl-0"
+                class="queries-stats ml-auto flex w-auto shrink-0 items-center justify-end gap-4 pr-0 pl-0 sm:gap-10"
             >
                 <div class="flex items-center gap-2">
                     <span class="text-xxs font-medium whitespace-nowrap text-white/50 uppercase">
@@ -114,7 +83,7 @@ watch(queriesTable, (newVal) => {
                         <span>{{ data.queries?.totalTime }}ms</span>
                     </span>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="hidden items-center gap-2 sm:flex">
                     <span class="text-xxs font-medium whitespace-nowrap text-white/50 uppercase">
                         Database
                     </span>
@@ -133,178 +102,174 @@ watch(queriesTable, (newVal) => {
             </div>
         </div>
         <div class="h-2 w-full shrink-0"></div>
-        <div class="scrollbar-none relative min-h-0 flex-1 overflow-x-auto">
-            <table class="relative mt-0 w-full min-w-[48rem] table-fixed text-left">
-                <thead v-if="filteredQueries.length > 0">
-                    <tr>
-                        <th class="sticky top-0 z-10 my-0.5 w-[60%] text-[#A3A3A3] uppercase">
-                            <div class="pb-0.5">
-                                <div
-                                    class="rounded-l-md border-y border-l border-white/7.5 bg-white/3 px-3 py-2"
-                                >
-                                    Query
-                                </div>
-                            </div>
-                        </th>
-                        <th
-                            class="sticky top-0 z-10 my-0.5 w-[10%] text-right text-[#A3A3A3] uppercase"
-                        >
-                            <div class="pb-0.5">
-                                <div class="border-y border-white/7.5 bg-white/3 px-3 py-2">
-                                    Duration
-                                </div>
-                            </div>
-                        </th>
-                        <th
-                            class="shadow-3xl sticky top-0 z-10 my-0.5 w-[10%] text-center text-[#A3A3A3] uppercase shadow-black"
-                        >
-                            <div class="pb-0.5">
-                                <div class="border-y border-white/7.5 bg-white/3 px-3 py-2">
-                                    Issue
-                                </div>
-                            </div>
-                        </th>
-                        <th
-                            class="shadow-3xl sticky top-0 z-10 my-0.5 w-[20%] text-[#A3A3A3] uppercase shadow-black"
-                        >
-                            <div class="pb-0.5">
-                                <div
-                                    class="rounded-r-md border-y border-r border-white/7.5 bg-white/3 px-3 py-2"
-                                >
-                                    Location
-                                </div>
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-            </table>
-            <div ref="queriesTable" class="min-w-[48rem]" :class="tableBodyClasses">
-                <table ref="queriesTableInner" class="relative mt-0 w-full table-fixed text-left">
-                    <tbody>
-                        <template v-if="filteredQueries.length === 0">
-                            <tr>
-                                <td colspan="4" class="text-center text-white/50">
+        <ScrollableTable min-width="48rem" body-class="max-h-[220px] rounded-b-lg pb-3">
+            <template #header>
+                <table class="relative mt-0 w-full table-fixed text-left">
+                    <thead v-if="filteredQueries.length > 0">
+                        <tr>
+                            <th class="sticky top-0 z-10 my-0.5 w-[60%] text-[#A3A3A3] uppercase">
+                                <div class="pb-0.5">
                                     <div
-                                        class="flex flex-col items-center justify-center gap-4 py-20"
+                                        class="rounded-l-md border-y border-l border-white/7.5 bg-white/3 px-3 py-2"
                                     >
-                                        <EmptyListIcon class="w-24" />
-                                        <span class="text-white/75">No queries found</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </template>
-                        <tr
-                            v-else
-                            v-for="(query, index) in filteredQueries"
-                            :key="index"
-                            class="group relative"
-                        >
-                            <td class="w-[60%]">
-                                <div class="absolute bottom-0.5 left-2.5 h-px w-[calc(100%-20px)]">
-                                    <div
-                                        class="absolute h-full bg-[#9684FF]/50"
-                                        :style="{
-                                            width: `${query.percentage * 100}%`,
-                                            left: `${query.offset * 100}%`,
-                                        }"
-                                    ></div>
-                                </div>
-                                <div class="py-0.5">
-                                    <div
-                                        class="overflow-hidden rounded-l-md border-y border-l px-3 py-2 text-ellipsis"
-                                        :class="{
-                                            'border-yellow-400/10 bg-yellow-400/6 text-yellow-100 group-hover:bg-yellow-400/10':
-                                                query.isDuplicate,
-                                            'border-cyan-400/15 bg-cyan-400/8 text-cyan-100 group-hover:bg-cyan-400/10':
-                                                query.isSlow,
-                                            'border-white/7.5 bg-white/3 group-hover:bg-white/5':
-                                                !query.isDuplicate && !query.isSlow,
-                                        }"
-                                    >
-                                        <span class="whitespace-nowrap">
-                                            {{ query.sql }}
-                                        </span>
+                                        Query
                                     </div>
                                 </div>
-                            </td>
-                            <td class="w-[10%] text-right">
-                                <div class="py-0.5">
-                                    <div
-                                        class="overflow-hidden border-y px-3 py-2 text-ellipsis"
-                                        :class="{
-                                            'border-yellow-400/10 bg-yellow-400/6 text-yellow-100 group-hover:bg-yellow-400/10':
-                                                query.isDuplicate,
-                                            'border-cyan-400/15 bg-cyan-400/8 text-cyan-100 group-hover:bg-cyan-400/10':
-                                                query.isSlow,
-                                            'border-white/7.5 bg-white/3 group-hover:bg-white/5':
-                                                !query.isDuplicate && !query.isSlow,
-                                        }"
-                                    >
-                                        <span class="whitespace-nowrap">
-                                            {{ query.duration }}ms
-                                        </span>
+                            </th>
+                            <th
+                                class="sticky top-0 z-10 my-0.5 w-[10%] text-right text-[#A3A3A3] uppercase"
+                            >
+                                <div class="pb-0.5">
+                                    <div class="border-y border-white/7.5 bg-white/3 px-3 py-2">
+                                        Duration
                                     </div>
                                 </div>
-                            </td>
-                            <td class="w-[10%] text-center">
-                                <div class="h-10 py-0.5">
-                                    <div
-                                        class="h-full overflow-hidden border-y px-3 py-2 text-ellipsis"
-                                        :class="{
-                                            'border-yellow-400/10 bg-yellow-400/6 text-yellow-100 group-hover:bg-yellow-400/10':
-                                                query.isDuplicate,
-                                            'border-cyan-400/15 bg-cyan-400/8 text-cyan-100 group-hover:bg-cyan-400/10':
-                                                query.isSlow,
-                                            'border-white/7.5 bg-white/3 group-hover:bg-white/5':
-                                                !query.isDuplicate && !query.isSlow,
-                                        }"
-                                    >
-                                        <span
-                                            v-if="query.isDuplicate"
-                                            class="text-xxxs rounded bg-yellow-400/10 px-2 py-2 font-bold tracking-wider whitespace-nowrap text-yellow-400 uppercase"
-                                        >
-                                            Dupe
-                                        </span>
-                                        <span
-                                            v-if="query.isSlow"
-                                            class="text-xxxs rounded bg-cyan-400/10 px-2 py-2 font-bold tracking-wider whitespace-nowrap text-cyan-400 uppercase"
-                                        >
-                                            Slow
-                                        </span>
-                                        <span v-else class="opacity-20">-</span>
+                            </th>
+                            <th
+                                class="shadow-3xl sticky top-0 z-10 my-0.5 w-[10%] text-center text-[#A3A3A3] uppercase shadow-black"
+                            >
+                                <div class="pb-0.5">
+                                    <div class="border-y border-white/7.5 bg-white/3 px-3 py-2">
+                                        Issue
                                     </div>
                                 </div>
-                            </td>
-                            <td class="w-[20%]">
-                                <div class="h-10 py-0.5">
+                            </th>
+                            <th
+                                class="shadow-3xl sticky top-0 z-10 my-0.5 w-[20%] text-[#A3A3A3] uppercase shadow-black"
+                            >
+                                <div class="pb-0.5">
                                     <div
-                                        class="h-full overflow-hidden rounded-r-md border-y border-r px-3 py-2 text-ellipsis"
-                                        :class="{
-                                            'border-yellow-400/10 bg-yellow-400/6 text-yellow-100 group-hover:bg-yellow-400/10':
-                                                query.isDuplicate,
-                                            'border-cyan-400/15 bg-cyan-400/8 text-cyan-100 group-hover:bg-cyan-400/10':
-                                                query.isSlow,
-                                            'border-white/7.5 bg-white/3 group-hover:bg-white/5':
-                                                !query.isDuplicate && !query.isSlow,
-                                        }"
+                                        class="rounded-r-md border-y border-r border-white/7.5 bg-white/3 px-3 py-2"
                                     >
-                                        <span class="whitespace-nowrap">
-                                            <a
-                                                v-if="query.editor_url"
-                                                class="cursor-pointer hover:underline"
-                                                :href="query.editor_url"
-                                                target="_blank"
-                                                >{{ queryLocation(query) }}</a
-                                            >
-                                            <span v-else>{{ queryLocation(query) }}</span>
-                                        </span>
+                                        Location
                                     </div>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </template>
+            <table class="relative mt-0 w-full table-fixed text-left">
+                <tbody>
+                    <template v-if="filteredQueries.length === 0">
+                        <tr>
+                            <td colspan="4" class="text-center text-white/50">
+                                <div class="flex flex-col items-center justify-center gap-4 py-20">
+                                    <EmptyListIcon class="w-24" />
+                                    <span class="text-white/75">No queries found</span>
                                 </div>
                             </td>
                         </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    </template>
+                    <tr
+                        v-else
+                        v-for="(query, index) in filteredQueries"
+                        :key="index"
+                        class="group relative"
+                    >
+                        <td class="w-[60%]">
+                            <div class="absolute bottom-0.5 left-2.5 h-px w-[calc(100%-20px)]">
+                                <div
+                                    class="absolute h-full bg-[#9684FF]/50"
+                                    :style="{
+                                        width: `${query.percentage * 100}%`,
+                                        left: `${query.offset * 100}%`,
+                                    }"
+                                ></div>
+                            </div>
+                            <div class="py-0.5">
+                                <div
+                                    class="overflow-hidden rounded-l-md border-y border-l px-3 py-2 text-ellipsis"
+                                    :class="{
+                                        'border-yellow-400/10 bg-yellow-400/6 text-yellow-100 group-hover:bg-yellow-400/10':
+                                            query.isDuplicate,
+                                        'border-cyan-400/15 bg-cyan-400/8 text-cyan-100 group-hover:bg-cyan-400/10':
+                                            query.isSlow,
+                                        'border-white/7.5 bg-white/3 group-hover:bg-white/5':
+                                            !query.isDuplicate && !query.isSlow,
+                                    }"
+                                >
+                                    <span class="whitespace-nowrap">
+                                        {{ query.sql }}
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="w-[10%] text-right">
+                            <div class="py-0.5">
+                                <div
+                                    class="overflow-hidden border-y px-3 py-2 text-ellipsis"
+                                    :class="{
+                                        'border-yellow-400/10 bg-yellow-400/6 text-yellow-100 group-hover:bg-yellow-400/10':
+                                            query.isDuplicate,
+                                        'border-cyan-400/15 bg-cyan-400/8 text-cyan-100 group-hover:bg-cyan-400/10':
+                                            query.isSlow,
+                                        'border-white/7.5 bg-white/3 group-hover:bg-white/5':
+                                            !query.isDuplicate && !query.isSlow,
+                                    }"
+                                >
+                                    <span class="whitespace-nowrap"> {{ query.duration }}ms </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="w-[10%] text-center">
+                            <div class="h-10 py-0.5">
+                                <div
+                                    class="h-full overflow-hidden border-y px-3 py-2 text-ellipsis"
+                                    :class="{
+                                        'border-yellow-400/10 bg-yellow-400/6 text-yellow-100 group-hover:bg-yellow-400/10':
+                                            query.isDuplicate,
+                                        'border-cyan-400/15 bg-cyan-400/8 text-cyan-100 group-hover:bg-cyan-400/10':
+                                            query.isSlow,
+                                        'border-white/7.5 bg-white/3 group-hover:bg-white/5':
+                                            !query.isDuplicate && !query.isSlow,
+                                    }"
+                                >
+                                    <span
+                                        v-if="query.isDuplicate"
+                                        class="text-xxxs rounded bg-yellow-400/10 px-2 py-2 font-bold tracking-wider whitespace-nowrap text-yellow-400 uppercase"
+                                    >
+                                        Dupe
+                                    </span>
+                                    <span
+                                        v-if="query.isSlow"
+                                        class="text-xxxs rounded bg-cyan-400/10 px-2 py-2 font-bold tracking-wider whitespace-nowrap text-cyan-400 uppercase"
+                                    >
+                                        Slow
+                                    </span>
+                                    <span v-else class="opacity-20">-</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="w-[20%]">
+                            <div class="h-10 py-0.5">
+                                <div
+                                    class="h-full overflow-hidden rounded-r-md border-y border-r px-3 py-2 text-ellipsis"
+                                    :class="{
+                                        'border-yellow-400/10 bg-yellow-400/6 text-yellow-100 group-hover:bg-yellow-400/10':
+                                            query.isDuplicate,
+                                        'border-cyan-400/15 bg-cyan-400/8 text-cyan-100 group-hover:bg-cyan-400/10':
+                                            query.isSlow,
+                                        'border-white/7.5 bg-white/3 group-hover:bg-white/5':
+                                            !query.isDuplicate && !query.isSlow,
+                                    }"
+                                >
+                                    <span class="whitespace-nowrap">
+                                        <a
+                                            v-if="query.editor_url"
+                                            class="cursor-pointer hover:underline"
+                                            :href="query.editor_url"
+                                            target="_blank"
+                                            >{{ queryLocation(query) }}</a
+                                        >
+                                        <span v-else>{{ queryLocation(query) }}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </ScrollableTable>
     </div>
 </template>

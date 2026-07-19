@@ -13,7 +13,7 @@ const props = defineProps({
     },
     innerPadding: {
         type: String,
-        default: "px-2",
+        default: "px-[7px]",
     },
     padSurfaceVertically: {
         type: Boolean,
