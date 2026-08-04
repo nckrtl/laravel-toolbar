@@ -11,11 +11,14 @@ const props = defineProps({
     config: { type: Object, required: false },
 });
 
-const { processes, error, loading, pendingByName, runningCount, totalCount, subscribe, runAction } =
-    useOrbitProcesses();
+const { processes, error, loading, pendingByName, subscribe, runAction } = useOrbitProcesses();
 
 const menuOpen = ref(false);
 const menuRoot = ref(null);
+
+const processConfig = (name) => props.config?.processes?.[name] ?? null;
+const processLabel = (name) => processConfig(name)?.label ?? name;
+const processUrl = (name) => processConfig(name)?.url ?? null;
 
 let unsubscribe = null;
 
@@ -165,61 +168,58 @@ const handleBulkAction = async (action) => {
             </template>
             <template #label>Orbit</template>
             <template #secondaryLabel>
-                <div class="flex items-center gap-1">
-                    <span v-if="!error">{{ runningCount }}/{{ totalCount }}</span>
-                    <div v-if="processes.length > 0" ref="menuRoot" class="relative">
+                <div v-if="processes.length > 0" ref="menuRoot" class="relative">
+                    <button
+                        type="button"
+                        class="rounded p-0.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                        :class="{ 'animate-pulse text-white': isAnyBulkPending }"
+                        aria-label="Bulk process actions"
+                        aria-haspopup="menu"
+                        :aria-expanded="menuOpen"
+                        @click.stop="toggleMenu"
+                    >
+                        <EllipsisHorizontalIcon class="size-3.5" />
+                    </button>
+
+                    <div
+                        v-if="menuOpen"
+                        class="absolute top-full right-0 z-10 mt-1 min-w-[8.5rem] rounded-lg border border-white/10 bg-[#1a1a1a] py-1 shadow-lg shadow-black/40"
+                        role="menu"
+                        aria-label="Bulk process actions"
+                    >
                         <button
                             type="button"
-                            class="rounded p-0.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                            :class="{ 'animate-pulse text-white': isAnyBulkPending }"
-                            aria-label="Bulk process actions"
-                            aria-haspopup="menu"
-                            :aria-expanded="menuOpen"
-                            @click.stop="toggleMenu"
+                            role="menuitem"
+                            class="flex w-full items-center gap-1.5 px-2.5 py-1.5 text-left text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/80"
+                            :class="{ 'animate-pulse text-white': isStartAllPending }"
+                            :disabled="!canStartAll"
+                            @click="handleBulkAction('start')"
                         >
-                            <EllipsisHorizontalIcon class="size-3.5" />
+                            <PlayIcon class="size-3.5 shrink-0" />
+                            Start all
                         </button>
-
-                        <div
-                            v-if="menuOpen"
-                            class="absolute top-full right-0 z-10 mt-1 min-w-[8.5rem] rounded-lg border border-white/10 bg-[#1a1a1a] py-1 shadow-lg shadow-black/40"
-                            role="menu"
-                            aria-label="Bulk process actions"
+                        <button
+                            type="button"
+                            role="menuitem"
+                            class="flex w-full items-center gap-1.5 px-2.5 py-1.5 text-left text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/80"
+                            :class="{ 'animate-pulse text-white': isRestartAllPending }"
+                            :disabled="!canRestartAll"
+                            @click="handleBulkAction('restart')"
                         >
-                            <button
-                                type="button"
-                                role="menuitem"
-                                class="flex w-full items-center gap-1.5 px-2.5 py-1.5 text-left text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/80"
-                                :class="{ 'animate-pulse text-white': isStartAllPending }"
-                                :disabled="!canStartAll"
-                                @click="handleBulkAction('start')"
-                            >
-                                <PlayIcon class="size-3.5 shrink-0" />
-                                Start all
-                            </button>
-                            <button
-                                type="button"
-                                role="menuitem"
-                                class="flex w-full items-center gap-1.5 px-2.5 py-1.5 text-left text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/80"
-                                :class="{ 'animate-pulse text-white': isRestartAllPending }"
-                                :disabled="!canRestartAll"
-                                @click="handleBulkAction('restart')"
-                            >
-                                <ArrowPathIcon class="size-3.5 shrink-0" />
-                                Restart all
-                            </button>
-                            <button
-                                type="button"
-                                role="menuitem"
-                                class="flex w-full items-center gap-1.5 px-2.5 py-1.5 text-left text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/80"
-                                :class="{ 'animate-pulse text-white': isStopAllPending }"
-                                :disabled="!canStopAll"
-                                @click="handleBulkAction('stop')"
-                            >
-                                <StopIcon class="size-3.5 shrink-0" />
-                                Stop all
-                            </button>
-                        </div>
+                            <ArrowPathIcon class="size-3.5 shrink-0" />
+                            Restart all
+                        </button>
+                        <button
+                            type="button"
+                            role="menuitem"
+                            class="flex w-full items-center gap-1.5 px-2.5 py-1.5 text-left text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/80"
+                            :class="{ 'animate-pulse text-white': isStopAllPending }"
+                            :disabled="!canStopAll"
+                            @click="handleBulkAction('stop')"
+                        >
+                            <StopIcon class="size-3.5 shrink-0" />
+                            Stop all
+                        </button>
                     </div>
                 </div>
             </template>
@@ -266,9 +266,23 @@ const handleBulkAction = async (action) => {
                                 :aria-label="`Status: ${process.status}`"
                                 role="img"
                             />
-                            <span class="text-white/80" :title="process.name">{{
-                                process.name
-                            }}</span>
+                            <a
+                                v-if="processUrl(process.name)"
+                                :href="processUrl(process.name)"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-white/80 transition-colors hover:text-white"
+                                :title="processLabel(process.name)"
+                            >
+                                {{ processLabel(process.name) }}
+                            </a>
+                            <span
+                                v-else
+                                class="text-white/80"
+                                :title="processLabel(process.name)"
+                            >
+                                {{ processLabel(process.name) }}
+                            </span>
                         </div>
                     </template>
                     <template #value>
@@ -281,8 +295,8 @@ const handleBulkAction = async (action) => {
                                         pendingByName[process.name] === 'start',
                                 }"
                                 :disabled="isStartDisabled(process)"
-                                :title="`Start ${process.name}`"
-                                :aria-label="`Start ${process.name}`"
+                                :title="`Start ${processLabel(process.name)}`"
+                                :aria-label="`Start ${processLabel(process.name)}`"
                                 @click="handleAction('start', process)"
                             >
                                 <PlayIcon class="size-3.5" />
@@ -295,8 +309,8 @@ const handleBulkAction = async (action) => {
                                         pendingByName[process.name] === 'restart',
                                 }"
                                 :disabled="isRestartDisabled(process)"
-                                :title="`Restart ${process.name}`"
-                                :aria-label="`Restart ${process.name}`"
+                                :title="`Restart ${processLabel(process.name)}`"
+                                :aria-label="`Restart ${processLabel(process.name)}`"
                                 @click="handleAction('restart', process)"
                             >
                                 <ArrowPathIcon class="size-3.5" />
@@ -309,8 +323,8 @@ const handleBulkAction = async (action) => {
                                         pendingByName[process.name] === 'stop',
                                 }"
                                 :disabled="isStopDisabled(process)"
-                                :title="`Stop ${process.name}`"
-                                :aria-label="`Stop ${process.name}`"
+                                :title="`Stop ${processLabel(process.name)}`"
+                                :aria-label="`Stop ${processLabel(process.name)}`"
                                 @click="handleAction('stop', process)"
                             >
                                 <StopIcon class="size-3.5" />

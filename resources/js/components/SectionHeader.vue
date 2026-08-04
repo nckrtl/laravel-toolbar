@@ -18,7 +18,7 @@ const props = defineProps({
             </div>
             <slot name="label" />
         </div>
-        <div class="px-3 opacity-50">
+        <div class="px-3 text-white/50">
             <slot name="secondaryLabel" />
         </div>
     </div>

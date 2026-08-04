@@ -1,6 +1,6 @@
 <script setup>
 defineProps({
-    align: { type: String, default: "end" },
+    align: { type: String, default: 'end' },
 });
 </script>
 
@@ -12,7 +12,7 @@ defineProps({
         <div class="flex items-center gap-2 pr-2 text-white/70 whitespace-nowrap uppercase">
             <slot name="label" />
         </div>
-        <div class="mb-1 min-w-6 grow border-b-2 border-dotted border-white/20 px-2"></div>
+        <div class="mb-1 min-w-6 grow self-end border-b-2 border-dotted border-white/20 px-2"></div>
         <div class="overflow-hidden pl-2 text-ellipsis">
             <slot name="value" />
         </div>
