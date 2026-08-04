@@ -1,9 +1,8 @@
 <script setup>
-import { onMounted, onUnmounted } from "vue";
-import ToolbarItem from "@/components/ToolbarItem.vue";
-import Pill from "@/components/Pill.vue";
-import { usePinnedPanel } from "@/composables/usePinnedPanel";
-import { useOrbitProcesses } from "@/composables/useOrbitProcesses";
+import { computed, onMounted, onUnmounted } from 'vue';
+import ToolbarItem from '@/components/ToolbarItem.vue';
+import { usePinnedPanel } from '@/composables/usePinnedPanel';
+import { useOrbitProcesses } from '@/composables/useOrbitProcesses';
 
 const props = defineProps({
     config: { type: Object, required: false },
@@ -16,14 +15,14 @@ const {
     togglePin,
     onMouseEnter,
     onMouseLeave,
-} = usePinnedPanel("orbit", {
-    size: "sm",
-    align: "right",
+} = usePinnedPanel('orbit', {
+    size: 'sm',
+    align: 'right',
     index: props.toolIndex,
     config: props.config ?? null,
 });
 
-const { processes, runningCount, totalCount, error, subscribe } = useOrbitProcesses();
+const { runningCount, totalCount, error, subscribe } = useOrbitProcesses();
 
 let unsubscribe = null;
 
@@ -36,35 +35,39 @@ onUnmounted(() => {
     unsubscribe = null;
 });
 
-const signalColor = () => {
+const healthDotClass = computed(() => {
+    if (error.value || totalCount.value === 0) {
+        return 'bg-white/35';
+    }
+
+    if (runningCount.value === totalCount.value) {
+        return 'bg-emerald-400';
+    }
+
+    return 'bg-orange-400';
+});
+
+const healthAriaLabel = computed(() => {
     if (error.value) {
-        return "slate";
+        return 'Orbit process health unavailable';
     }
 
     if (totalCount.value === 0) {
-        return "slate";
+        return 'No Orbit process state';
     }
 
-    if (processes.value.some((process) => process.status === "crashed")) {
-        return "red";
+    if (runningCount.value === totalCount.value) {
+        return 'All Orbit processes running';
     }
 
-    if (
-        processes.value.some((process) =>
-            ["starting", "stopping", "restarting", "unknown"].includes(process.status),
-        )
-    ) {
-        return "yellow";
-    }
-
-    return runningCount.value === totalCount.value ? "green" : "yellow";
-};
+    return 'Some Orbit processes not running';
+});
 </script>
 
 <template>
     <div @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
         <ToolbarItem @click="togglePin" :isActive="isOpen" :class="itemClasses">
-            <div class="flex items-center gap-1 py-0.5">
+            <div class="relative py-0.5">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 100 100"
@@ -77,10 +80,12 @@ const signalColor = () => {
                         fill="currentColor"
                     />
                 </svg>
-                <Pill :color="signalColor()" size="compact" class="px-1.5">
-                    <template v-if="error">—</template>
-                    <template v-else>{{ runningCount }}/{{ totalCount }}</template>
-                </Pill>
+                <span
+                    class="absolute -top-0.5 -right-0.5 size-1.5 rounded-full"
+                    :class="healthDotClass"
+                    role="img"
+                    :aria-label="healthAriaLabel"
+                />
             </div>
         </ToolbarItem>
     </div>

@@ -1,72 +1,52 @@
 <script setup>
-import { onMounted, onUnmounted } from "vue";
-import SectionHeader from "@/components/SectionHeader.vue";
-import Section from "@/components/Section.vue";
-import DataList from "@/components/DataList.vue";
-import DataListItem from "@/components/DataListItem.vue";
-import Pill from "@/components/Pill.vue";
-import { PlayIcon, StopIcon, ArrowPathIcon } from "@heroicons/vue/16/solid";
-import { useOrbitProcesses } from "@/composables/useOrbitProcesses";
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import SectionHeader from '@/components/SectionHeader.vue';
+import Section from '@/components/Section.vue';
+import DataList from '@/components/DataList.vue';
+import DataListItem from '@/components/DataListItem.vue';
+import { ArrowPathIcon, EllipsisHorizontalIcon, PlayIcon, StopIcon } from '@heroicons/vue/16/solid';
+import { useOrbitProcesses } from '@/composables/useOrbitProcesses';
 
 const props = defineProps({
     config: { type: Object, required: false },
 });
 
-const {
-    processes,
-    error,
-    loading,
-    pendingByName,
-    runningCount,
-    totalCount,
-    subscribe,
-    runAction,
-} = useOrbitProcesses();
+const { processes, error, loading, pendingByName, runningCount, totalCount, subscribe, runAction } =
+    useOrbitProcesses();
+
+const menuOpen = ref(false);
+const menuRoot = ref(null);
 
 let unsubscribe = null;
 
 onMounted(() => {
     unsubscribe = subscribe(props.config?.gateway_url);
+    document.addEventListener('pointerdown', onDocumentPointerDown, true);
+    document.addEventListener('keydown', onDocumentKeydown, true);
 });
 
 onUnmounted(() => {
     unsubscribe?.();
     unsubscribe = null;
+    document.removeEventListener('pointerdown', onDocumentPointerDown, true);
+    document.removeEventListener('keydown', onDocumentKeydown, true);
 });
-
-const statusPillColor = (status) => {
-    switch (status) {
-        case "running":
-            return "green";
-        case "crashed":
-            return "red";
-        case "stopped":
-            return "slate";
-        case "starting":
-        case "restarting":
-            return "blue";
-        case "stopping":
-        case "unknown":
-        default:
-            return "yellow";
-    }
-};
 
 const statusDotClass = (status) => {
     switch (status) {
-        case "running":
-            return "bg-emerald-400";
-        case "crashed":
-            return "bg-red-400";
-        case "stopped":
-            return "bg-white/35";
-        case "starting":
-        case "restarting":
-            return "bg-blue-400";
-        case "stopping":
-        case "unknown":
+        case 'running':
+            return 'bg-emerald-400';
+        case 'crashed':
+            return 'bg-red-400';
+        case 'stopped':
+            return 'bg-white/35';
+        case 'starting':
+        case 'restarting':
+            return 'bg-blue-400';
+        case 'stopping':
+        case 'unknown':
         default:
-            return "bg-yellow-400";
+            return 'bg-yellow-400';
     }
 };
 
@@ -74,22 +54,95 @@ const isPending = (name) => Boolean(pendingByName.value[name]);
 
 const isStartDisabled = (process) =>
     isPending(process.name) ||
-    process.status === "running" ||
-    process.status === "starting" ||
-    process.status === "restarting" ||
-    process.status === "stopping";
+    process.status === 'running' ||
+    process.status === 'starting' ||
+    process.status === 'restarting' ||
+    process.status === 'stopping';
 
 const isStopDisabled = (process) =>
-    isPending(process.name) || process.status === "stopped" || process.status === "stopping";
+    isPending(process.name) || process.status === 'stopped' || process.status === 'stopping';
 
 const isRestartDisabled = (process) =>
     isPending(process.name) ||
-    process.status === "starting" ||
-    process.status === "stopping" ||
-    process.status === "restarting";
+    process.status === 'starting' ||
+    process.status === 'stopping' ||
+    process.status === 'restarting';
+
+const startAllTargets = computed(() =>
+    processes.value.filter((process) => !isStartDisabled(process)),
+);
+const restartAllTargets = computed(() =>
+    processes.value.filter((process) => !isRestartDisabled(process)),
+);
+const stopAllTargets = computed(() =>
+    processes.value.filter((process) => !isStopDisabled(process)),
+);
+
+const isStartAllPending = computed(() =>
+    processes.value.some((process) => pendingByName.value[process.name] === 'start'),
+);
+const isRestartAllPending = computed(() =>
+    processes.value.some((process) => pendingByName.value[process.name] === 'restart'),
+);
+const isStopAllPending = computed(() =>
+    processes.value.some((process) => pendingByName.value[process.name] === 'stop'),
+);
+
+const isAnyBulkPending = computed(
+    () => isStartAllPending.value || isRestartAllPending.value || isStopAllPending.value,
+);
+
+const canStartAll = computed(() => startAllTargets.value.length > 0);
+const canRestartAll = computed(() => restartAllTargets.value.length > 0);
+const canStopAll = computed(() => stopAllTargets.value.length > 0);
 
 const handleAction = async (action, process) => {
     await runAction(action, process.name, props.config?.gateway_url);
+};
+
+const closeMenu = () => {
+    menuOpen.value = false;
+};
+
+const toggleMenu = () => {
+    menuOpen.value = !menuOpen.value;
+};
+
+const onDocumentPointerDown = (event) => {
+    if (!menuOpen.value || !menuRoot.value) {
+        return;
+    }
+
+    // composedPath is required in Shadow DOM; event.target is retargeted to the host.
+    const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+    if (!path.includes(menuRoot.value)) {
+        closeMenu();
+    }
+};
+
+const onDocumentKeydown = (event) => {
+    if (event.key === 'Escape' && menuOpen.value) {
+        closeMenu();
+    }
+};
+
+const handleBulkAction = async (action) => {
+    const targets =
+        action === 'start'
+            ? startAllTargets.value
+            : action === 'restart'
+              ? restartAllTargets.value
+              : stopAllTargets.value;
+
+    closeMenu();
+
+    if (targets.length === 0) {
+        return;
+    }
+
+    await Promise.all(
+        targets.map((process) => runAction(action, process.name, props.config?.gateway_url)),
+    );
 };
 </script>
 
@@ -112,7 +165,63 @@ const handleAction = async (action, process) => {
             </template>
             <template #label>Orbit</template>
             <template #secondaryLabel>
-                <span v-if="!error">{{ runningCount }}/{{ totalCount }}</span>
+                <div class="flex items-center gap-1">
+                    <span v-if="!error">{{ runningCount }}/{{ totalCount }}</span>
+                    <div v-if="processes.length > 0" ref="menuRoot" class="relative">
+                        <button
+                            type="button"
+                            class="rounded p-0.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                            :class="{ 'animate-pulse text-white': isAnyBulkPending }"
+                            aria-label="Bulk process actions"
+                            aria-haspopup="menu"
+                            :aria-expanded="menuOpen"
+                            @click.stop="toggleMenu"
+                        >
+                            <EllipsisHorizontalIcon class="size-3.5" />
+                        </button>
+
+                        <div
+                            v-if="menuOpen"
+                            class="absolute top-full right-0 z-10 mt-1 min-w-[8.5rem] rounded-lg border border-white/10 bg-[#1a1a1a] py-1 shadow-lg shadow-black/40"
+                            role="menu"
+                            aria-label="Bulk process actions"
+                        >
+                            <button
+                                type="button"
+                                role="menuitem"
+                                class="flex w-full items-center gap-1.5 px-2.5 py-1.5 text-left text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/80"
+                                :class="{ 'animate-pulse text-white': isStartAllPending }"
+                                :disabled="!canStartAll"
+                                @click="handleBulkAction('start')"
+                            >
+                                <PlayIcon class="size-3.5 shrink-0" />
+                                Start all
+                            </button>
+                            <button
+                                type="button"
+                                role="menuitem"
+                                class="flex w-full items-center gap-1.5 px-2.5 py-1.5 text-left text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/80"
+                                :class="{ 'animate-pulse text-white': isRestartAllPending }"
+                                :disabled="!canRestartAll"
+                                @click="handleBulkAction('restart')"
+                            >
+                                <ArrowPathIcon class="size-3.5 shrink-0" />
+                                Restart all
+                            </button>
+                            <button
+                                type="button"
+                                role="menuitem"
+                                class="flex w-full items-center gap-1.5 px-2.5 py-1.5 text-left text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/80"
+                                :class="{ 'animate-pulse text-white': isStopAllPending }"
+                                :disabled="!canStopAll"
+                                @click="handleBulkAction('stop')"
+                            >
+                                <StopIcon class="size-3.5 shrink-0" />
+                                Stop all
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </template>
         </SectionHeader>
 
@@ -125,7 +234,6 @@ const handleAction = async (action, process) => {
         </div>
 
         <Section class="mt-1">
-            <div class="px-1 text-white/50 uppercase">Processes</div>
             <DataList>
                 <template v-if="loading && processes.length === 0 && !error">
                     <DataListItem>
@@ -164,55 +272,49 @@ const handleAction = async (action, process) => {
                         </div>
                     </template>
                     <template #value>
-                        <div class="flex items-center gap-1.5">
-                            <Pill :color="statusPillColor(process.status)" size="compact">
-                                {{ process.status }}
-                            </Pill>
-
-                            <div class="flex items-center gap-0.5">
-                                <button
-                                    type="button"
-                                    class="rounded p-0.5 text-white/55 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/55"
-                                    :class="{
-                                        'animate-pulse text-white':
-                                            pendingByName[process.name] === 'start',
-                                    }"
-                                    :disabled="isStartDisabled(process)"
-                                    :title="`Start ${process.name}`"
-                                    :aria-label="`Start ${process.name}`"
-                                    @click="handleAction('start', process)"
-                                >
-                                    <PlayIcon class="size-3.5" />
-                                </button>
-                                <button
-                                    type="button"
-                                    class="rounded p-0.5 text-white/55 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/55"
-                                    :class="{
-                                        'animate-pulse text-white':
-                                            pendingByName[process.name] === 'restart',
-                                    }"
-                                    :disabled="isRestartDisabled(process)"
-                                    :title="`Restart ${process.name}`"
-                                    :aria-label="`Restart ${process.name}`"
-                                    @click="handleAction('restart', process)"
-                                >
-                                    <ArrowPathIcon class="size-3.5" />
-                                </button>
-                                <button
-                                    type="button"
-                                    class="rounded p-0.5 text-white/55 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/55"
-                                    :class="{
-                                        'animate-pulse text-white':
-                                            pendingByName[process.name] === 'stop',
-                                    }"
-                                    :disabled="isStopDisabled(process)"
-                                    :title="`Stop ${process.name}`"
-                                    :aria-label="`Stop ${process.name}`"
-                                    @click="handleAction('stop', process)"
-                                >
-                                    <StopIcon class="size-3.5" />
-                                </button>
-                            </div>
+                        <div class="flex items-center gap-0.5">
+                            <button
+                                type="button"
+                                class="rounded p-0.5 text-white/55 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/55"
+                                :class="{
+                                    'animate-pulse text-white':
+                                        pendingByName[process.name] === 'start',
+                                }"
+                                :disabled="isStartDisabled(process)"
+                                :title="`Start ${process.name}`"
+                                :aria-label="`Start ${process.name}`"
+                                @click="handleAction('start', process)"
+                            >
+                                <PlayIcon class="size-3.5" />
+                            </button>
+                            <button
+                                type="button"
+                                class="rounded p-0.5 text-white/55 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/55"
+                                :class="{
+                                    'animate-pulse text-white':
+                                        pendingByName[process.name] === 'restart',
+                                }"
+                                :disabled="isRestartDisabled(process)"
+                                :title="`Restart ${process.name}`"
+                                :aria-label="`Restart ${process.name}`"
+                                @click="handleAction('restart', process)"
+                            >
+                                <ArrowPathIcon class="size-3.5" />
+                            </button>
+                            <button
+                                type="button"
+                                class="rounded p-0.5 text-white/55 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/55"
+                                :class="{
+                                    'animate-pulse text-white':
+                                        pendingByName[process.name] === 'stop',
+                                }"
+                                :disabled="isStopDisabled(process)"
+                                :title="`Stop ${process.name}`"
+                                :aria-label="`Stop ${process.name}`"
+                                @click="handleAction('stop', process)"
+                            >
+                                <StopIcon class="size-3.5" />
+                            </button>
                         </div>
                     </template>
                 </DataListItem>
