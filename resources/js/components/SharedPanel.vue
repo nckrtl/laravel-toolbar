@@ -56,9 +56,10 @@ const sizeClass = computed(() => {
             @mouseleave="onSharedPanelMouseLeave"
         >
             <div
+                :key="activeToolId"
                 class="text-xxs rounded-2xl border border-white/10 bg-[#111111]/95 px-2 pt-2 text-white backdrop-blur-xl overflow-hidden"
             >
-                <component :is="activeContent" :key="activeToolId" :config="config" />
+                <component :is="activeContent" :config="config" />
             </div>
         </div>
     </Transition>

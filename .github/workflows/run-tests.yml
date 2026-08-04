@@ -3,11 +3,38 @@ name: run-tests
 on:
   push:
     paths:
-      - '**.php'
-      - '.github/workflows/run-tests.yml'
-      - 'phpunit.xml.dist'
-      - 'composer.json'
-      - 'composer.lock'
+      - "**.php"
+      - ".github/workflows/run-tests.yml"
+      - "phpunit.xml.dist"
+      - "composer.json"
+      - "composer.lock"
+      - "resources/**"
+      - "build/**"
+      - "tests/browser/**"
+      - "package.json"
+      - "package-lock.json"
+      - "vite.config.ts"
+      - "vitest.config.ts"
+      - "playwright.config.ts"
+      - "fix-font-urls.js"
+      - "tsconfig.json"
+  pull_request:
+    paths:
+      - "**.php"
+      - ".github/workflows/run-tests.yml"
+      - "phpunit.xml.dist"
+      - "composer.json"
+      - "composer.lock"
+      - "resources/**"
+      - "build/**"
+      - "tests/browser/**"
+      - "package.json"
+      - "package-lock.json"
+      - "vite.config.ts"
+      - "vitest.config.ts"
+      - "playwright.config.ts"
+      - "fix-font-urls.js"
+      - "tsconfig.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,13 +49,26 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         php: [8.4]
-        laravel: [12.*, 11.*]
+        laravel: ["13.*", "12.*", "11.*"]
         stability: [prefer-lowest, prefer-stable]
         include:
-          - laravel: 12.*
-            testbench: 10.*
-          - laravel: 11.*
-            testbench: 9.*
+          # Pest 5 needs symfony/process ^8.1, only satisfied by Laravel 13.
+          - laravel: "13.*"
+            testbench: "11.*"
+            pest: "^5.0"
+            pest_plugin_arch: "^5.0"
+            pest_plugin_laravel: "^5.0"
+          # Keep Laravel 11/12 package compatibility coverage on Pest 4 overrides.
+          - laravel: "12.*"
+            testbench: "10.*"
+            pest: "^4.0"
+            pest_plugin_arch: "^4.0"
+            pest_plugin_laravel: "^4.0"
+          - laravel: "11.*"
+            testbench: "9.*"
+            pest: "^4.0"
+            pest_plugin_arch: "^4.0"
+            pest_plugin_laravel: "^4.0"
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -50,7 +90,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "pestphp/pest:${{ matrix.pest }}" "pestphp/pest-plugin-arch:${{ matrix.pest_plugin_arch }}" "pestphp/pest-plugin-laravel:${{ matrix.pest_plugin_laravel }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
@@ -59,8 +99,42 @@ jobs:
       - name: Execute tests
         run: vendor/bin/pest --ci
 
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Unit / component tests (jsdom)
+        run: npm run test:ui
+
+      - name: Production build
+        run: npm run build
+
+      # Fail if the committed build/ artifacts do not match a fresh production build.
+      # Prevents auto-release from tagging stale JS/CSS while tests ran on regenerated assets.
+      - name: Assert committed build assets are up to date
+        run: git diff --exit-code -- build
+
+      - name: Production-bundle browser tests
+        run: npm run test:browser
+
   auto-release:
-    needs: test
+    needs: [test, frontend]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:

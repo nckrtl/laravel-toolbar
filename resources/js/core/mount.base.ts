@@ -58,6 +58,19 @@ export function setupShadowDOM(): ShadowDOMSetupResult {
     return { shadowRoot, appContainer };
 }
 
+/**
+ * Production Vue errorHandler: always emit console.error so blank panels are diagnosable
+ * even when the debug logger is a production no-op.
+ */
+export function attachToolbarErrorHandler(app: App): void {
+    app.config.errorHandler = (err, instance, info) => {
+        console.error('[Laravel Toolbar] Vue error:', err, info);
+        log('❌ Vue error:', err);
+        log('Component:', instance);
+        log('Error info:', info);
+    };
+}
+
 export function mountVueApp(appContainer: HTMLElement): App<Element> {
     log('🎯 Mounting Vue app');
 
@@ -68,11 +81,7 @@ export function mountVueApp(appContainer: HTMLElement): App<Element> {
         },
     });
 
-    app.config.errorHandler = (err, instance, info) => {
-        log('❌ Vue error:', err);
-        log('Component:', instance);
-        log('Error info:', info);
-    };
+    attachToolbarErrorHandler(app);
 
     app.mount(appContainer);
     appRef = app;

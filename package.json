@@ -10,7 +10,9 @@
         "build-watch": "vite build --watch",
         "prepare": "vp config",
         "generate-types": "php vendor/bin/testbench typescript:transform",
-        "test:ui": "vitest run"
+        "test:ui": "vitest run",
+        "test:browser": "playwright test",
+        "test:frontend": "npm run test:ui && npm run build && npm run test:browser"
     },
     "dependencies": {
         "@heroicons/vue": "^2.2.0",
@@ -18,9 +20,10 @@
         "@vitejs/plugin-basic-ssl": "^2.1.0",
         "glob": "^13.0.0",
         "laravel-vite-plugin": "^2.0.1",
-        "vue": "^3.5.13"
+        "vue": "^3.5.40"
     },
     "devDependencies": {
+        "@playwright/test": "^1.62.1",
         "@tailwindcss/postcss": "^4.1.14",
         "@types/node": "^24.10.1",
         "@vitejs/plugin-vue": "^5.2.1",
