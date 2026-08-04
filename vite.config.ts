@@ -3,7 +3,7 @@ import vue from "@vitejs/plugin-vue";
 import laravel from "laravel-vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { run } from "vite-plugin-run";
-import { isolateVueRuntime } from "./vite.plugins/isolateVueRuntime";
+import { wrapToolbarBundle } from "./vite.plugins/wrapClassicScriptBundle";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -35,7 +35,8 @@ export default defineConfig({
             run: ["php", "vendor/bin/testbench", "typescript:transform"],
             pattern: ["src/Data/**/*.php"],
         }),
-        // Production only: rewrite Vue shared registry keys before content hash.
-        ...(isProd ? [isolateVueRuntime()] : []),
+        // Production only: IIFE-wrap classic toolbar.prod so minified top-level
+        // bindings stay lexical (host Lodash window._ cannot clobber them).
+        ...(isProd ? [wrapToolbarBundle()] : []),
     ],
 });

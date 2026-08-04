@@ -12,116 +12,100 @@ import {
     resolveProductionToolbarAsset,
 } from './helpers/mountToolbar';
 import { QUERY_COUNT, TOTAL_MODEL_HYDRATIONS } from './fixtures/toolbarPayload';
+import {
+    CLASSIC_SCRIPT_IIFE_BANNER,
+    isWrappedClassicScript,
+    unwrapClassicScriptBundle,
+} from '../../vite.plugins/wrapClassicScriptBundle';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
 /**
- * Regression for dual Vite/Inertia Vue runtimes sharing
- * globalThis.__VUE_INSTANCE_SETTERS__ (blank tools / slot TypeErrors on Servauto).
+ * Root cause (Servauto): unwrapped classic toolbar bundle exposes minified Vue
+ * withCtx as top-level `function _` → `window._`. Host ES module assigns Lodash
+ * to `window._`, so later slot creation returns Lodash wrappers and renderSlot
+ * throws `r is not a function` (blank tools / nested panels).
  *
- * Live race (reproduced for hostVue=bundled + delayed CSS):
- * 1. Classic toolbar script runs — Vue runtime registers, starts loadProductionCSS
- * 2. CSS response held pending (no Vue app mount yet)
- * 3. Host Vite module mounts and registers INSTANCE_SETTERS
- * 4. CSS resolves → toolbar mountVueApp runs after host registration
- * 5. Compact hydration / panel switches while both runtimes are live
+ * Fix: IIFE-wrap the production toolbar classic script (lexical top-level bindings).
  *
- * Isolation is a Vite renderChunk rewrite of setter keys so the transformed
- * content participates in the asset content hash / manifest entry.
+ * Fixture: parser-time `<script type=module src=host>` (sets Lodash-like `_`)
+ * + classic toolbar at body end. Decisive work: switch ToolbarItem/ScrollableTable
+ * slots AFTER host has overwritten `window._`.
  */
-test.describe('Vue runtime isolation vs bundled host', () => {
-    test('production toolbar bundle rewrites shared Vue instance setter keys', () => {
+test.describe('classic-script IIFE vs host Lodash window._', () => {
+    test('production toolbar bundle is IIFE-wrapped before content hash', () => {
         const asset = resolveProductionToolbarAsset();
         const source = fs.readFileSync(asset, 'utf8');
 
-        // renderChunk plugin must rewrite before hash — no host-shared keys remain.
         expect(
-            source.includes('__VUE_INSTANCE_SETTERS__'),
-            'toolbar.prod must not register on the host-shared __VUE_INSTANCE_SETTERS__ key',
-        ).toBe(false);
-        expect(source.includes('__VUE_SSR_SETTERS__')).toBe(false);
-        // Isolated keys prove Vue is still the multi-setter runtime, just namespaced.
-        expect(source.includes('__LARAVEL_TOOLBAR_VUE_INSTANCE_SETTERS__')).toBe(true);
-        expect(source.includes('__LARAVEL_TOOLBAR_VUE_SSR_SETTERS__')).toBe(true);
+            isWrappedClassicScript(source),
+            'toolbar.prod must carry classic-iife banner (wrap before content hash)',
+        ).toBe(true);
+        expect(source.startsWith(CLASSIC_SCRIPT_IIFE_BANNER)).toBe(true);
+        expect(source).toContain('(function(){');
+        expect(source.trimEnd().endsWith('})();')).toBe(true);
     });
 
-    test('bundled host fixture itself is an esm-bundler Vue (registers INSTANCE_SETTERS)', () => {
+    test('bundled host fixture overwrites window._ like Lodash', () => {
         const hostPath = path.join(
             ROOT,
             'tests/browser/fixtures/dist-host/host-vue-bundled.js',
         );
         expect(fs.existsSync(hostPath)).toBe(true);
         const source = fs.readFileSync(hostPath, 'utf8');
+        expect(source.includes('__wrapped__') || source.includes('lodashLike')).toBe(true);
         expect(source.includes('__VUE_INSTANCE_SETTERS__')).toBe(true);
     });
 
-    test('delayed CSS race: toolbar script → host mid-await → CSS release → tools work', async ({
+    test('RED without IIFE: unwrapped production copy fails post-host slot switch', async ({
         page,
     }) => {
         test.setTimeout(90_000);
         const errors = installErrorCapture(page);
 
-        // compact + delayed CSS (default for bundled) mirrors Servauto interleaving.
+        const wrapped = fs.readFileSync(resolveProductionToolbarAsset(), 'utf8');
+        expect(isWrappedClassicScript(wrapped)).toBe(true);
+        const unwrapped = unwrapClassicScriptBundle(wrapped);
+        expect(isWrappedClassicScript(unwrapped)).toBe(false);
+
         await mountProductionToolbar(page, {
             hostVue: 'bundled',
             pin: 'models',
             animations: true,
-            bootstrap: 'compact',
+            bootstrap: 'full',
             interleaveHostDuringCss: true,
+            // Exact production body minus IIFE — proves the wrap is load-bearing.
+            toolbarScriptBody: unwrapped,
         });
 
         await assertHostRootMounted(page);
 
-        const orderMeta = await page.evaluate(() => ({
-            scriptOrder: (window as any).__SCRIPT_ORDER__ as string[] | undefined,
-            hasSetters: Boolean((window as any).__HOST_HAS_INSTANCE_SETTERS__),
-            setterCount: ((globalThis as any).__VUE_INSTANCE_SETTERS__ || []).length,
-            hasToolbarPrivateSetters: typeof (globalThis as any)
-                .__LARAVEL_TOOLBAR_VUE_INSTANCE_SETTERS__ !== 'undefined',
-        }));
-
-        // toolbar-script (CSS pending) → host → toolbar-mounted (after CSS)
-        expect(orderMeta.scriptOrder).toEqual([
-            'toolbar-script',
-            'host',
-            'toolbar-mounted',
-        ]);
-        expect(orderMeta.hasSetters).toBe(true);
-        // Host alone on the shared key; isolated toolbar uses private keys.
-        expect(orderMeta.setterCount).toBe(1);
-        expect(orderMeta.hasToolbarPrivateSetters).toBe(true);
-
-        const chrome = await inspectPanel(page);
-        expect(chrome.toolRootCount).toBe(6);
-        expect(chrome.blankToolCount).toBe(0);
-        expect(chrome.toolbarText.length).toBeGreaterThan(0);
-        expect(chrome.toolbarText).toContain(`${QUERY_COUNT}:`);
-        expect(chrome.hasScrollable).toBe(true);
-        expect(chrome.rowCount).toBeGreaterThan(0);
-        expect(chrome.text).toContain(String(TOTAL_MODEL_HYDRATIONS));
-
+        // Post-host slot mount: this is where Servauto blanks nested panels.
         await clickToolbarTool(page, 'database');
-        const database = await inspectPanel(page);
-        expect(database.blankToolCount).toBe(0);
-        expect(database.hasScrollable).toBe(true);
-        expect(database.rowCount).toBe(QUERY_COUNT);
-        expect(database.text).toContain('select * from "tasks" where "id" = 0');
+        const state = await inspectPanel(page);
 
-        await assertHostRemainsReactive(page);
+        const slotFailure =
+            state.blankToolCount > 0 ||
+            !state.hasScrollable ||
+            state.rowCount !== QUERY_COUNT ||
+            errors.errors.some(
+                (e) =>
+                    e.includes('is not a function') ||
+                    e.includes('renderSlot') ||
+                    e.includes('TypeError'),
+            );
 
-        const after = await page.evaluate(() => ({
-            hostSetters: ((globalThis as any).__VUE_INSTANCE_SETTERS__ || []).length,
-            toolbarSetters: (
-                (globalThis as any).__LARAVEL_TOOLBAR_VUE_INSTANCE_SETTERS__ || []
-            ).length,
-        }));
-        expect(after.hostSetters).toBe(1);
-        expect(after.toolbarSetters).toBeGreaterThanOrEqual(1);
+        expect(
+            slotFailure,
+            `Expected unwrapped classic script to fail after host Lodash window._ ` +
+                `(blankToolCount=${state.blankToolCount}, hasScrollable=${state.hasScrollable}, ` +
+                `rowCount=${state.rowCount}, errors=${errors.errors.join(' | ') || 'none'})`,
+        ).toBe(true);
 
-        errors.assertClean();
+        // Do NOT call errors.assertClean() — this scenario is expected to error.
     });
 
-    test('bundled host (full payload + delayed CSS) keeps six tools and nested panels', async ({
+    test('post-host Lodash _ overwrite: Models→Database slot mounts stay healthy', async ({
         page,
     }) => {
         test.setTimeout(90_000);
@@ -137,39 +121,166 @@ test.describe('Vue runtime isolation vs bundled host', () => {
 
         await assertHostRootMounted(page);
 
-        const order = await page.evaluate(
-            () => (window as any).__SCRIPT_ORDER__ as string[] | undefined,
+        const meta = await page.evaluate(() => {
+            const underscore = (window as any)._;
+            return {
+                hostMounted: Boolean((window as any).__HOST_MOUNTED__),
+                lodashOverwrite: Boolean((window as any).__HOST_LODASH_OVERWRITE__),
+                windowUnderscoreIsFunction: typeof underscore === 'function',
+                wrappedShape: (() => {
+                    if (typeof underscore !== 'function') {
+                        return null;
+                    }
+                    const w = underscore(() => 'slot');
+                    return w && typeof w === 'object' ? Object.keys(w).sort() : typeof w;
+                })(),
+                windowUnderscoreIsWithCtx: (() => {
+                    if (typeof underscore !== 'function') {
+                        return false;
+                    }
+                    // Vue withCtx returns a function; Lodash-like returns a wrapper object.
+                    return typeof underscore(() => 'x') === 'function';
+                })(),
+                scriptOrder: (window as any).__SCRIPT_ORDER__ as string[],
+            };
+        });
+
+        expect(meta.hostMounted).toBe(true);
+        expect(meta.lodashOverwrite).toBe(true);
+        expect(meta.windowUnderscoreIsFunction).toBe(true);
+        expect(meta.wrappedShape).toEqual(
+            expect.arrayContaining([
+                '__actions__',
+                '__chain__',
+                '__index__',
+                '__values__',
+                '__wrapped__',
+            ]),
         );
-        expect(order).toEqual(['toolbar-script', 'host', 'toolbar-mounted']);
+        expect(meta.windowUnderscoreIsWithCtx).toBe(false);
+        expect(meta.scriptOrder).toContain('host');
+        expect(meta.scriptOrder).toContain('toolbar-mounted');
 
-        const hostMeta = await page.evaluate(() => ({
-            hasSetters: Boolean((window as any).__HOST_HAS_INSTANCE_SETTERS__),
-            setterCount: ((globalThis as any).__VUE_INSTANCE_SETTERS__ || []).length,
-        }));
-        expect(hostMeta.hasSetters).toBe(true);
-        expect(hostMeta.setterCount).toBe(1);
-
-        const chrome = await inspectPanel(page);
-        expect(chrome.toolRootCount).toBe(6);
-        expect(chrome.blankToolCount).toBe(0);
-        expect(chrome.toolbarText.length).toBeGreaterThan(0);
-        expect(chrome.hasScrollable).toBe(true);
-        expect(chrome.rowCount).toBeGreaterThan(0);
-        expect(chrome.text).toContain(String(TOTAL_MODEL_HYDRATIONS));
+        let state = await inspectPanel(page);
+        expect(state.toolRootCount).toBe(6);
+        expect(state.blankToolCount).toBe(0);
 
         await clickToolbarTool(page, 'database');
-        const database = await inspectPanel(page);
-        expect(database.hasScrollable).toBe(true);
-        expect(database.rowCount).toBe(QUERY_COUNT);
-        expect(database.text).toContain('select * from "tasks" where "id" = 0');
+        state = await inspectPanel(page);
+        expect(state.blankToolCount, 'chrome blank after post-host Database switch').toBe(0);
+        expect(state.hasScrollable).toBe(true);
+        expect(state.rowCount).toBe(QUERY_COUNT);
+        expect(state.text).toContain('select * from "tasks" where "id" = 0');
+
+        await clickToolbarTool(page, 'models');
+        state = await inspectPanel(page);
+        expect(state.blankToolCount).toBe(0);
+        expect(state.hasScrollable).toBe(true);
+        expect(state.rowCount).toBeGreaterThan(0);
+        expect(state.text).toContain(String(TOTAL_MODEL_HYDRATIONS));
 
         await assertHostRemainsReactive(page);
+        errors.assertClean();
+    });
 
-        const after = await page.evaluate(
-            () => ((globalThis as any).__VUE_INSTANCE_SETTERS__ || []).length,
-        );
-        expect(after).toBe(1);
+    test('post-host compact hydrate + all six tools with tool-specific content', async ({
+        page,
+    }) => {
+        test.setTimeout(90_000);
+        const errors = installErrorCapture(page);
 
+        await mountProductionToolbar(page, {
+            hostVue: 'bundled',
+            pin: null, // explicit null must stay unpinned (not coerced to models)
+            animations: true,
+            bootstrap: 'compact',
+            interleaveHostDuringCss: true,
+        });
+
+        await assertHostRootMounted(page);
+
+        const chrome = await inspectPanel(page);
+        expect(chrome.pin).toBeNull();
+        expect(chrome.toolRootCount).toBe(6);
+        expect(chrome.blankToolCount).toBe(0);
+        expect(chrome.toolbarText).toContain(`${QUERY_COUNT}:`);
+
+        const cases: Array<{
+            tool: Parameters<typeof clickToolbarTool>[1];
+            assert: (state: Awaited<ReturnType<typeof inspectPanel>>) => void;
+        }> = [
+            {
+                tool: 'requests',
+                assert: (state) => {
+                    expect(state.blankToolCount).toBe(0);
+                    expect(state.hasPanel).toBe(true);
+                    expect(state.hasRequestsTable).toBe(true);
+                    expect(state.requestsDataRowCount).toBeGreaterThanOrEqual(1);
+                    expect(state.text).toContain('/tasks');
+                    expect(state.text).toMatch(/GET/);
+                },
+            },
+            {
+                tool: 'request',
+                assert: (state) => {
+                    expect(state.blankToolCount).toBe(0);
+                    expect(state.hasPanel).toBe(true);
+                    expect(state.text).toContain('/tasks');
+                    expect(state.text).toContain('GET');
+                    expect(state.text).toMatch(/TaskController@index/);
+                },
+            },
+            {
+                tool: 'timings',
+                assert: (state) => {
+                    expect(state.blankToolCount).toBe(0);
+                    expect(state.hasPanel).toBe(true);
+                    expect(state.hasTimingsBar).toBe(true);
+                    expect(state.text).toMatch(/Bootstrapping/i);
+                    expect(state.text).toMatch(/Routing/i);
+                },
+            },
+            {
+                tool: 'memory',
+                assert: (state) => {
+                    expect(state.blankToolCount).toBe(0);
+                    expect(state.hasPanel).toBe(true);
+                    expect(state.hasMemoryBar).toBe(true);
+                    expect(state.text).toMatch(/Bootstrapping/i);
+                    expect(state.text).toMatch(/Routing/i);
+                },
+            },
+            {
+                tool: 'database',
+                assert: (state) => {
+                    expect(state.blankToolCount).toBe(0);
+                    expect(state.hasPanel).toBe(true);
+                    expect(state.hasScrollable).toBe(true);
+                    expect(state.rowCount).toBe(QUERY_COUNT);
+                    expect(state.text).toContain('Queries');
+                    expect(state.text).toContain('select * from "tasks"');
+                },
+            },
+            {
+                tool: 'models',
+                assert: (state) => {
+                    expect(state.blankToolCount).toBe(0);
+                    expect(state.hasPanel).toBe(true);
+                    expect(state.hasScrollable).toBe(true);
+                    expect(state.rowCount).toBeGreaterThan(0);
+                    expect(state.text).toContain('Models');
+                    expect(state.text).toContain(String(TOTAL_MODEL_HYDRATIONS));
+                    expect(state.text).toContain('Entity0');
+                },
+            },
+        ];
+
+        for (const item of cases) {
+            await clickToolbarTool(page, item.tool);
+            item.assert(await inspectPanel(page));
+        }
+
+        await assertHostRemainsReactive(page);
         errors.assertClean();
     });
 });

@@ -87,7 +87,7 @@ for (const hostVue of hostMatrix) {
 
             await mountProductionToolbar(page, {
                 hostVue,
-                pin: null,
+                pin: null, // unpinned; must not coerce to default models pin
                 animations: true,
                 bootstrap: 'full',
             });
@@ -97,6 +97,7 @@ for (const hostVue of hostMatrix) {
             }
 
             const chrome = await inspectPanel(page);
+            expect(chrome.pin).toBeNull();
             expect(chrome.toolRootCount).toBe(6);
             expect(chrome.blankToolCount).toBe(0);
 

@@ -6,7 +6,7 @@ All notable changes to `laravel-toolbar` will be documented in this file.
 
 ### Fixed
 
-- Dual Vite/Inertia Vue runtimes no longer share `globalThis.__VUE_INSTANCE_SETTERS__`, which blanked toolbar tools with slot TypeErrors (`r is not a function` / `t.default is not a function`). Production builds rewrite setter keys in a `renderChunk` plugin so the asset hash and manifest invalidate; browser fixtures cover toolbar-first + delayed-CSS host interleaving, compact hydration, and panel switches.
+- Production toolbar classic script is IIFE-wrapped before content hashing so minified top-level bindings stay lexical. Host apps that assign Lodash to `window._` no longer overwrite Vue `withCtx` (which returned Lodash wrappers and broke `renderSlot` with `r is not a function`, blank tools/panels). Browser fixtures use a parser-time host ES module that clobbers `window._`, prove the unwrapped bundle fails post-host slot switches, and assert all six tools with nested panel content after host boot.
 - Large Inertia navigations now send bounded toolbar metadata instead of copying the full collected profile into `X-Toolbar`; full request data remains available through request history.
 
 ## v0.3.1 - 2026-07-19
