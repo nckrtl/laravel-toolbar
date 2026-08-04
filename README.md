@@ -162,6 +162,36 @@ Lower priority values render first (left to right). Use values between defaults 
 - `Section::CENTER` - Center of the toolbar (default)
 - `Section::RIGHT` - Right side of the toolbar
 
+### Orbit process control (opt-in)
+
+Orbit process tooling is **not** enabled by default. Only apps that explicitly add `OrbitTool` to the layout open a gateway SSE stream or show the Orbit toolbar item.
+
+The browser talks to the Orbit gateway directly via `@hardimpactdev/orbit-sdk-typescript` (no Laravel proxy). Process status is driven by the gateway SSE stream — not polling.
+
+```php
+use NckRtl\Toolbar\Data\Layout\GroupConfig;
+use NckRtl\Toolbar\Data\Layout\LayoutConfig;
+use NckRtl\Toolbar\Data\Tools\OrbitTool;
+use NckRtl\Toolbar\Enums\Layout\Section;
+
+public function update(ToolbarConfig $toolbarConfig): void
+{
+    $toolbarConfig->layout(function (LayoutConfig $layout): void {
+        $layout->addGroup(
+            (new GroupConfig(priority: 10))->setTools(
+                new OrbitTool(gateway_url: 'https://gateway.orbit'),
+            )->section(Section::RIGHT)
+        );
+    });
+}
+```
+
+Requirements on the host machine/network:
+
+- Reachability to the Orbit gateway (typically over Orbit/WireGuard)
+- Gateway CORS allowing the app origin for the selected `app` hostname (`window.location.hostname`)
+- When CSP is enabled, `connect-src` must allow the configured gateway URL (default `https://gateway.orbit`) so EventSource and lifecycle fetch are not blocked
+
 ## Available Collectors
 
 ### ProfilerCollector

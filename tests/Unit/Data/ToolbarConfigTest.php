@@ -5,8 +5,11 @@ use NckRtl\Toolbar\Collectors\LaravelCollector;
 use NckRtl\Toolbar\Collectors\PhpCollector;
 use NckRtl\Toolbar\Data\Configurations\LaravelConfig;
 use NckRtl\Toolbar\Data\Configurations\PhpConfig;
+use NckRtl\Toolbar\Data\Layout\GroupConfig;
 use NckRtl\Toolbar\Data\Layout\LayoutConfig;
 use NckRtl\Toolbar\Data\ToolbarConfig;
+use NckRtl\Toolbar\Data\Tools\OrbitTool;
+use NckRtl\Toolbar\Enums\Layout\Section;
 use NckRtl\Toolbar\Observers\QueryObserver;
 use NckRtl\Toolbar\Observers\RequestObserver;
 use NckRtl\Toolbar\Toolbar;
@@ -277,4 +280,49 @@ it('has default observers on initialization', function () {
     $config = new ToolbarConfig;
 
     expect($config->observers)->not->toBeEmpty();
+});
+
+it('does not include OrbitTool in the default layout', function () {
+    $config = new ToolbarConfig;
+    $layout = $config->layout->toArray();
+
+    $rightTools = collect($layout['sections']['right'] ?? [])
+        ->flatMap(fn (array $group) => array_keys($group['tools'] ?? []))
+        ->all();
+
+    $allToolKeys = collect($layout['sections'] ?? [])
+        ->flatten(1)
+        ->flatMap(fn (array $group) => array_keys($group['tools'] ?? []))
+        ->all();
+
+    expect($rightTools)->not->toContain('Orbit')
+        ->and($allToolKeys)->not->toContain('Orbit');
+});
+
+it('can explicitly add OrbitTool with serialized component and gateway_url', function () {
+    $config = new ToolbarConfig;
+
+    $config->layout(function (LayoutConfig $layout): void {
+        $layout->addGroup(
+            (new GroupConfig(priority: 10))->setTools(
+                new OrbitTool(gateway_url: 'https://gateway.orbit.custom'),
+            )->section(Section::RIGHT)
+        );
+    });
+
+    $layout = $config->layout->toArray();
+    $rightGroup = $layout['sections']['right'][0] ?? null;
+    $orbitConfig = $rightGroup['tools']['Orbit'] ?? null;
+    $orbitSerialized = is_array($orbitConfig)
+        ? $orbitConfig
+        : (is_object($orbitConfig) && method_exists($orbitConfig, 'toArray')
+            ? $orbitConfig->toArray()
+            : null);
+
+    expect($rightGroup)->not->toBeNull()
+        ->and($rightGroup['tools'])->toHaveKey('Orbit')
+        ->and($orbitSerialized)->toBeArray()
+        ->and($orbitSerialized['gateway_url'])->toBe('https://gateway.orbit.custom')
+        ->and((new OrbitTool)->component())->toBe('Orbit')
+        ->and((new OrbitTool)->gateway_url)->toBe('https://gateway.orbit');
 });

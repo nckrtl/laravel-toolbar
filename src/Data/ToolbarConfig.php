@@ -23,7 +23,6 @@ use NckRtl\Toolbar\Data\Tools\BreakpointIndicatorTool;
 use NckRtl\Toolbar\Data\Tools\DatabaseTool;
 use NckRtl\Toolbar\Data\Tools\MemoryUsageTool;
 use NckRtl\Toolbar\Data\Tools\ModelsTool;
-use NckRtl\Toolbar\Data\Tools\ProcessesTool;
 use NckRtl\Toolbar\Data\Tools\RequestsTool;
 use NckRtl\Toolbar\Data\Tools\RequestTool;
 use NckRtl\Toolbar\Data\Tools\TechStackTool;
@@ -103,11 +102,6 @@ class ToolbarConfig extends Data
                     )->section(Section::CENTER)
                 )
                 // ->addGroup(
-                //     (new GroupConfig(priority: 10))->setTools(
-                //         new ProcessesTool,
-                //     )->section(Section::RIGHT)
-                // )
-                // )->addGroup(
                 //     (new GroupConfig(priority: 20))->setTools(
                 //         new TechStackTool,
                 //     )->section(Section::CENTER)

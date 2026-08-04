@@ -236,6 +236,9 @@ declare namespace NckRtl.Toolbar.Data.Tools {
     };
     export type MemoryUsageTool = {};
     export type ModelsTool = {};
+    export type OrbitTool = {
+        gateway_url: string;
+    };
     export type RequestTool = {
         show_status: boolean;
         url: boolean;
