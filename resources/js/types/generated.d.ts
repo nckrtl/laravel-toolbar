@@ -236,13 +236,9 @@ declare namespace NckRtl.Toolbar.Data.Tools {
     };
     export type MemoryUsageTool = {};
     export type ModelsTool = {};
-    export type OrbitProcessConfig = {
-        label: string;
-        url: string | null;
-    };
     export type OrbitTool = {
         gateway_url: string;
-        processes: { [key: string]: NckRtl.Toolbar.Data.Tools.OrbitProcessConfig };
+        process_urls: { [key: string]: string };
     };
     export type RequestTool = {
         show_status: boolean;

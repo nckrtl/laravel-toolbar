@@ -171,7 +171,6 @@ The browser talks to the Orbit gateway directly via `@hardimpactdev/orbit-sdk-ty
 ```php
 use NckRtl\Toolbar\Data\Layout\GroupConfig;
 use NckRtl\Toolbar\Data\Layout\LayoutConfig;
-use NckRtl\Toolbar\Data\Tools\OrbitProcessConfig;
 use NckRtl\Toolbar\Data\Tools\OrbitTool;
 use NckRtl\Toolbar\Enums\Layout\Section;
 
@@ -182,11 +181,9 @@ public function update(ToolbarConfig $toolbarConfig): void
             (new GroupConfig(priority: 10))->setTools(
                 new OrbitTool(
                     gateway_url: 'https://gateway.orbit',
-                    // Optional presentation map keyed by live process name (label + optional URL).
-                    processes: [
-                        'frankenphp-hauzer' => new OrbitProcessConfig(label: 'FrankenPHP'),
-                        'horizon' => new OrbitProcessConfig(label: 'Horizon', url: '/horizon'),
-                        'dev' => new OrbitProcessConfig(label: 'Vite'),
+                    // Optional UI links keyed by Orbit process key. Labels come from Orbit.
+                    process_urls: [
+                        'horizon-hauzer' => '/horizon',
                     ],
                 ),
             )->section(Section::RIGHT)

@@ -8,7 +8,7 @@
     "src": "resources/fonts/JetBrainsMono[wght].ttf"
   },
   "resources/js/toolbar.prod.ts": {
-    "file": "assets/toolbar.prod-dL_h1HgS.js",
+    "file": "assets/toolbar.prod-UdacaOuC.js",
     "name": "toolbar.prod",
     "src": "resources/js/toolbar.prod.ts",
     "isEntry": true,

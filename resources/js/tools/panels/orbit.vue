@@ -11,14 +11,12 @@ const props = defineProps({
     config: { type: Object, required: false },
 });
 
-const { processes, error, loading, pendingByName, subscribe, runAction } = useOrbitProcesses();
+const { processes, error, loading, pendingByKey, subscribe, runAction } = useOrbitProcesses();
 
 const menuOpen = ref(false);
 const menuRoot = ref(null);
 
-const processConfig = (name) => props.config?.processes?.[name] ?? null;
-const processLabel = (name) => processConfig(name)?.label ?? name;
-const processUrl = (name) => processConfig(name)?.url ?? null;
+const processUrl = (key) => props.config?.process_urls?.[key] ?? null;
 
 let unsubscribe = null;
 
@@ -53,20 +51,20 @@ const statusDotClass = (status) => {
     }
 };
 
-const isPending = (name) => Boolean(pendingByName.value[name]);
+const isPending = (key) => Boolean(pendingByKey.value[key]);
 
 const isStartDisabled = (process) =>
-    isPending(process.name) ||
+    isPending(process.key) ||
     process.status === 'running' ||
     process.status === 'starting' ||
     process.status === 'restarting' ||
     process.status === 'stopping';
 
 const isStopDisabled = (process) =>
-    isPending(process.name) || process.status === 'stopped' || process.status === 'stopping';
+    isPending(process.key) || process.status === 'stopped' || process.status === 'stopping';
 
 const isRestartDisabled = (process) =>
-    isPending(process.name) ||
+    isPending(process.key) ||
     process.status === 'starting' ||
     process.status === 'stopping' ||
     process.status === 'restarting';
@@ -82,13 +80,13 @@ const stopAllTargets = computed(() =>
 );
 
 const isStartAllPending = computed(() =>
-    processes.value.some((process) => pendingByName.value[process.name] === 'start'),
+    processes.value.some((process) => pendingByKey.value[process.key] === 'start'),
 );
 const isRestartAllPending = computed(() =>
-    processes.value.some((process) => pendingByName.value[process.name] === 'restart'),
+    processes.value.some((process) => pendingByKey.value[process.key] === 'restart'),
 );
 const isStopAllPending = computed(() =>
-    processes.value.some((process) => pendingByName.value[process.name] === 'stop'),
+    processes.value.some((process) => pendingByKey.value[process.key] === 'stop'),
 );
 
 const isAnyBulkPending = computed(
@@ -100,7 +98,7 @@ const canRestartAll = computed(() => restartAllTargets.value.length > 0);
 const canStopAll = computed(() => stopAllTargets.value.length > 0);
 
 const handleAction = async (action, process) => {
-    await runAction(action, process.name, props.config?.gateway_url);
+    await runAction(action, process.key, props.config?.gateway_url);
 };
 
 const closeMenu = () => {
@@ -144,7 +142,7 @@ const handleBulkAction = async (action) => {
     }
 
     await Promise.all(
-        targets.map((process) => runAction(action, process.name, props.config?.gateway_url)),
+        targets.map((process) => runAction(action, process.key, props.config?.gateway_url)),
     );
 };
 </script>
@@ -257,7 +255,7 @@ const handleBulkAction = async (action) => {
                     </DataListItem>
                 </template>
 
-                <DataListItem v-for="process in processes" :key="process.name" align="start">
+                <DataListItem v-for="process in processes" :key="process.key" align="start">
                     <template #label>
                         <div class="flex items-center gap-1.5 normal-case">
                             <span
@@ -267,21 +265,21 @@ const handleBulkAction = async (action) => {
                                 role="img"
                             />
                             <a
-                                v-if="processUrl(process.name)"
-                                :href="processUrl(process.name)"
+                                v-if="processUrl(process.key)"
+                                :href="processUrl(process.key)"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 class="text-white/80 transition-colors hover:text-white"
-                                :title="processLabel(process.name)"
+                                :title="process.label"
                             >
-                                {{ processLabel(process.name) }}
+                                {{ process.label }}
                             </a>
                             <span
                                 v-else
                                 class="text-white/80"
-                                :title="processLabel(process.name)"
+                                :title="process.label"
                             >
-                                {{ processLabel(process.name) }}
+                                {{ process.label }}
                             </span>
                         </div>
                     </template>
@@ -292,11 +290,11 @@ const handleBulkAction = async (action) => {
                                 class="rounded p-0.5 text-white/55 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/55"
                                 :class="{
                                     'animate-pulse text-white':
-                                        pendingByName[process.name] === 'start',
+                                        pendingByKey[process.key] === 'start',
                                 }"
                                 :disabled="isStartDisabled(process)"
-                                :title="`Start ${processLabel(process.name)}`"
-                                :aria-label="`Start ${processLabel(process.name)}`"
+                                :title="`Start ${process.label}`"
+                                :aria-label="`Start ${process.label}`"
                                 @click="handleAction('start', process)"
                             >
                                 <PlayIcon class="size-3.5" />
@@ -306,11 +304,11 @@ const handleBulkAction = async (action) => {
                                 class="rounded p-0.5 text-white/55 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/55"
                                 :class="{
                                     'animate-pulse text-white':
-                                        pendingByName[process.name] === 'restart',
+                                        pendingByKey[process.key] === 'restart',
                                 }"
                                 :disabled="isRestartDisabled(process)"
-                                :title="`Restart ${processLabel(process.name)}`"
-                                :aria-label="`Restart ${processLabel(process.name)}`"
+                                :title="`Restart ${process.label}`"
+                                :aria-label="`Restart ${process.label}`"
                                 @click="handleAction('restart', process)"
                             >
                                 <ArrowPathIcon class="size-3.5" />
@@ -320,11 +318,11 @@ const handleBulkAction = async (action) => {
                                 class="rounded p-0.5 text-white/55 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/55"
                                 :class="{
                                     'animate-pulse text-white':
-                                        pendingByName[process.name] === 'stop',
+                                        pendingByKey[process.key] === 'stop',
                                 }"
                                 :disabled="isStopDisabled(process)"
-                                :title="`Stop ${processLabel(process.name)}`"
-                                :aria-label="`Stop ${processLabel(process.name)}`"
+                                :title="`Stop ${process.label}`"
+                                :aria-label="`Stop ${process.label}`"
                                 @click="handleAction('stop', process)"
                             >
                                 <StopIcon class="size-3.5" />

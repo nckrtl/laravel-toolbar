@@ -12,7 +12,8 @@ import {
 export type OrbitProcessStatus = ProcessRuntimeStatus;
 
 export type OrbitProcess = {
-    name: string;
+    key: string;
+    label: string;
     status: OrbitProcessStatus;
     node?: string | null;
     command?: string | null;
@@ -27,7 +28,7 @@ const CLIENT_HEADER = "laravel-toolbar";
 const processes: Ref<OrbitProcess[]> = ref([]);
 const error: Ref<string | null> = ref(null);
 const loading: Ref<boolean> = ref(false);
-const pendingByName: Ref<Record<string, OrbitLifecycleAction | undefined>> = ref({});
+const pendingByKey: Ref<Record<string, OrbitLifecycleAction | undefined>> = ref({});
 
 let client: OrbitGatewayClient | null = null;
 let activeGatewayUrl = DEFAULT_GATEWAY_URL;
@@ -95,7 +96,8 @@ function formatApiError(apiError: unknown): string {
 
 function mapStreamProcess(process: ProcessStreamProcess): OrbitProcess {
     return {
-        name: process.name,
+        key: process.key,
+        label: process.label,
         status: process.status,
         node: process.node,
         command: process.command,
@@ -110,13 +112,14 @@ function applySnapshot(list: ProcessStreamProcess[]): void {
 }
 
 function applyUpdate(update: ProcessStreamUpdate): void {
-    const index = processes.value.findIndex((process) => process.name === update.name);
+    const index = processes.value.findIndex((process) => process.key === update.key);
 
     if (index === -1) {
         processes.value = [
             ...processes.value,
             {
-                name: update.name,
+                key: update.key,
+                label: update.label,
                 status: update.status,
                 node: update.node,
                 command: null,
@@ -130,6 +133,7 @@ function applyUpdate(update: ProcessStreamUpdate): void {
     const next = [...processes.value];
     next[index] = {
         ...current,
+        label: update.label || current.label,
         status: update.status,
         node: update.node ?? current.node,
         runtime_unit: update.unit_name ?? current.runtime_unit,
@@ -212,24 +216,28 @@ export function subscribeOrbitProcesses(gatewayUrl?: string | null): () => void 
             closeStream();
             processes.value = [];
             error.value = null;
-            pendingByName.value = {};
+            pendingByKey.value = {};
             loading.value = false;
         }
     };
 }
 
+/**
+ * Run a lifecycle action for a durable Orbit process key.
+ * Gateway request body still uses the server parameter `name` (= process key).
+ */
 export async function runOrbitLifecycleAction(
     action: OrbitLifecycleAction,
-    name: string,
+    key: string,
     gatewayUrl?: string | null,
 ): Promise<void> {
-    if (!name || pendingByName.value[name]) {
+    if (!key || pendingByKey.value[key]) {
         return;
     }
 
-    pendingByName.value = {
-        ...pendingByName.value,
-        [name]: action,
+    pendingByKey.value = {
+        ...pendingByKey.value,
+        [key]: action,
     };
     // Clear a prior action/stream error for this new request; do not touch status.
     error.value = null;
@@ -240,7 +248,7 @@ export async function runOrbitLifecycleAction(
         const orbit = ensureClient(activeGatewayUrl);
         const body = {
             app: resolveAppHostname(),
-            name,
+            name: key,
         };
 
         let apiError: unknown;
@@ -261,12 +269,12 @@ export async function runOrbitLifecycleAction(
         const message =
             caught instanceof Error && caught.message
                 ? caught.message
-                : `Failed to ${action} ${name}`;
+                : `Failed to ${action} ${key}`;
         error.value = message;
     } finally {
-        const next = { ...pendingByName.value };
-        delete next[name];
-        pendingByName.value = next;
+        const next = { ...pendingByKey.value };
+        delete next[key];
+        pendingByKey.value = next;
     }
 }
 
@@ -274,13 +282,13 @@ export function useOrbitProcesses(): {
     processes: Ref<OrbitProcess[]>;
     error: Ref<string | null>;
     loading: Ref<boolean>;
-    pendingByName: Ref<Record<string, OrbitLifecycleAction | undefined>>;
+    pendingByKey: Ref<Record<string, OrbitLifecycleAction | undefined>>;
     runningCount: ComputedRef<number>;
     totalCount: ComputedRef<number>;
     subscribe: (gatewayUrl?: string | null) => () => void;
     runAction: (
         action: OrbitLifecycleAction,
-        name: string,
+        key: string,
         gatewayUrl?: string | null,
     ) => Promise<void>;
 } {
@@ -293,7 +301,7 @@ export function useOrbitProcesses(): {
         processes,
         error,
         loading,
-        pendingByName,
+        pendingByKey,
         runningCount,
         totalCount,
         subscribe: subscribeOrbitProcesses,

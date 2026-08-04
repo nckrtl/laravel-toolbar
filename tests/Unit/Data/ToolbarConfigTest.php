@@ -8,7 +8,6 @@ use NckRtl\Toolbar\Data\Configurations\PhpConfig;
 use NckRtl\Toolbar\Data\Layout\GroupConfig;
 use NckRtl\Toolbar\Data\Layout\LayoutConfig;
 use NckRtl\Toolbar\Data\ToolbarConfig;
-use NckRtl\Toolbar\Data\Tools\OrbitProcessConfig;
 use NckRtl\Toolbar\Data\Tools\OrbitTool;
 use NckRtl\Toolbar\Enums\Layout\Section;
 use NckRtl\Toolbar\Observers\QueryObserver;
@@ -328,42 +327,27 @@ it('can explicitly add OrbitTool with serialized component and gateway_url', fun
         ->and((new OrbitTool)->gateway_url)->toBe('https://gateway.orbit');
 });
 
-it('serializes OrbitTool process presentation config keyed by live process name', function () {
+it('serializes OrbitTool process_urls keyed by Orbit process key', function () {
     $tool = new OrbitTool(
         gateway_url: 'https://gateway.orbit.custom',
-        processes: [
-            'frankenphp-hauzer' => new OrbitProcessConfig(label: 'FrankenPHP'),
-            'horizon' => new OrbitProcessConfig(label: 'Horizon', url: '/horizon'),
-            'dev' => new OrbitProcessConfig(label: 'Vite'),
+        process_urls: [
+            'horizon-hauzer' => '/horizon',
         ],
     );
 
     $serialized = $tool->toArray();
 
-    expect($tool->processes)->toHaveCount(3)
-        ->and($tool->processes['horizon'])->toBeInstanceOf(OrbitProcessConfig::class)
-        ->and($tool->processes['horizon']->label)->toBe('Horizon')
-        ->and($tool->processes['horizon']->url)->toBe('/horizon')
-        ->and($tool->processes['frankenphp-hauzer']->label)->toBe('FrankenPHP')
-        ->and($tool->processes['frankenphp-hauzer']->url)->toBeNull()
-        ->and($serialized['processes'])->toBe([
-            'frankenphp-hauzer' => [
-                'label' => 'FrankenPHP',
-                'url' => null,
-            ],
-            'horizon' => [
-                'label' => 'Horizon',
-                'url' => '/horizon',
-            ],
-            'dev' => [
-                'label' => 'Vite',
-                'url' => null,
-            ],
+    expect($tool->process_urls)->toBe([
+        'horizon-hauzer' => '/horizon',
+    ])
+        ->and($serialized['process_urls'])->toBe([
+            'horizon-hauzer' => '/horizon',
         ])
-        ->and((new OrbitTool)->processes)->toBe([]);
+        ->and($serialized)->not->toHaveKey('processes')
+        ->and((new OrbitTool)->process_urls)->toBe([]);
 });
 
-it('includes OrbitTool process config when nested in layout serialization', function () {
+it('includes OrbitTool process_urls when nested in layout serialization', function () {
     $config = new ToolbarConfig;
 
     $config->layout(function (LayoutConfig $layout): void {
@@ -371,8 +355,8 @@ it('includes OrbitTool process config when nested in layout serialization', func
             (new GroupConfig(priority: 10))->setTools(
                 new OrbitTool(
                     gateway_url: 'https://gateway.orbit',
-                    processes: [
-                        'horizon' => new OrbitProcessConfig(label: 'Horizon', url: '/horizon'),
+                    process_urls: [
+                        'horizon-hauzer' => '/horizon',
                     ],
                 ),
             )->section(Section::RIGHT)
@@ -388,6 +372,6 @@ it('includes OrbitTool process config when nested in layout serialization', func
             : null);
 
     expect($orbitSerialized)->toBeArray()
-        ->and($orbitSerialized['processes']['horizon']['label'])->toBe('Horizon')
-        ->and($orbitSerialized['processes']['horizon']['url'])->toBe('/horizon');
+        ->and($orbitSerialized['process_urls']['horizon-hauzer'])->toBe('/horizon')
+        ->and($orbitSerialized)->not->toHaveKey('processes');
 });
