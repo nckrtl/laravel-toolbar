@@ -3,6 +3,9 @@ import vue from "@vitejs/plugin-vue";
 import laravel from "laravel-vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { run } from "vite-plugin-run";
+import { isolateVueRuntime } from "./vite.plugins/isolateVueRuntime";
+
+const isProd = process.env.NODE_ENV === "production";
 
 export default defineConfig({
     staged: {
@@ -20,10 +23,9 @@ export default defineConfig({
         tailwindcss(),
         vue(),
         laravel({
-            input:
-                process.env.NODE_ENV === "production"
-                    ? "resources/js/toolbar.prod.ts"
-                    : "resources/js/toolbar.dev.ts",
+            input: isProd
+                ? "resources/js/toolbar.prod.ts"
+                : "resources/js/toolbar.dev.ts",
             publicDirectory: "./",
             refresh: ["src/**/*.php"],
             detectTls: true,
@@ -33,5 +35,7 @@ export default defineConfig({
             run: ["php", "vendor/bin/testbench", "typescript:transform"],
             pattern: ["src/Data/**/*.php"],
         }),
+        // Production only: rewrite Vue shared registry keys before content hash.
+        ...(isProd ? [isolateVueRuntime()] : []),
     ],
 });

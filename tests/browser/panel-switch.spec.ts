@@ -19,7 +19,11 @@ import {
  * Covers Models→Database nested table survival, full six-tool cycle, host dual-runtime,
  * and compact bootstrap + async request payload hydration.
  */
-const hostMatrix: HostVueVariant[] = ['none', 'package'];
+const hostMatrix: HostVueVariant[] = ['none', 'package', 'bundled'];
+
+function hostNeedsReactivity(hostVue: HostVueVariant): boolean {
+    return hostVue === 'package' || hostVue === 'bundled';
+}
 
 for (const hostVue of hostMatrix) {
     test.describe(`production bundle (hostVue=${hostVue})`, () => {
@@ -36,9 +40,15 @@ for (const hostVue of hostMatrix) {
                 bootstrap: 'full',
             });
 
-            if (hostVue === 'package') {
+            if (hostNeedsReactivity(hostVue)) {
                 await assertHostRootMounted(page);
             }
+
+            // Bundled host must not leave toolbar tools as empty comment shells.
+            const chrome = await inspectPanel(page);
+            expect(chrome.toolRootCount).toBe(6);
+            expect(chrome.blankToolCount).toBe(0);
+            expect(chrome.toolbarText.length).toBeGreaterThan(0);
 
             const models = await inspectPanel(page);
             expect(models.pin).toBe('models');
@@ -62,7 +72,7 @@ for (const hostVue of hostMatrix) {
             expect(database.text).toContain(String(QUERY_COUNT));
             expect(database.text).toContain(`${DATABASE_SUMMARY_MS}`);
 
-            if (hostVue === 'package') {
+            if (hostNeedsReactivity(hostVue)) {
                 await assertHostRemainsReactive(page);
             }
 
@@ -82,9 +92,13 @@ for (const hostVue of hostMatrix) {
                 bootstrap: 'full',
             });
 
-            if (hostVue === 'package') {
+            if (hostNeedsReactivity(hostVue)) {
                 await assertHostRootMounted(page);
             }
+
+            const chrome = await inspectPanel(page);
+            expect(chrome.toolRootCount).toBe(6);
+            expect(chrome.blankToolCount).toBe(0);
 
             const cases: Array<{
                 tool: Parameters<typeof clickToolbarTool>[1];
@@ -114,8 +128,9 @@ for (const hostVue of hostMatrix) {
                     assert: (state) => {
                         expect(state.hasPanel).toBe(true);
                         expect(state.hasTimingsBar).toBe(true);
-                        expect(state.text).toContain('Bootstrapping');
-                        expect(state.text).toContain('Routing');
+                        // CSS may uppercase labels via text-transform (bundled delayed-CSS path).
+                        expect(state.text).toMatch(/Bootstrapping/i);
+                        expect(state.text).toMatch(/Routing/i);
                     },
                 },
                 {
@@ -123,8 +138,8 @@ for (const hostVue of hostMatrix) {
                     assert: (state) => {
                         expect(state.hasPanel).toBe(true);
                         expect(state.hasMemoryBar).toBe(true);
-                        expect(state.text).toContain('Bootstrapping');
-                        expect(state.text).toContain('Routing');
+                        expect(state.text).toMatch(/Bootstrapping/i);
+                        expect(state.text).toMatch(/Routing/i);
                     },
                 },
                 {
@@ -168,7 +183,7 @@ for (const hostVue of hostMatrix) {
             expect(state.hasScrollable).toBe(true);
             expect(state.rowCount).toBe(QUERY_COUNT);
 
-            if (hostVue === 'package') {
+            if (hostNeedsReactivity(hostVue)) {
                 await assertHostRemainsReactive(page);
             }
 
@@ -188,9 +203,12 @@ for (const hostVue of hostMatrix) {
                 bootstrap: 'compact',
             });
 
-            if (hostVue === 'package') {
+            if (hostNeedsReactivity(hostVue)) {
                 await assertHostRootMounted(page);
             }
+
+            const chrome = await inspectPanel(page);
+            expect(chrome.blankToolCount).toBe(0);
 
             // After hydration, Models panel should have full nested table.
             const models = await inspectPanel(page);
@@ -211,7 +229,7 @@ for (const hostVue of hostMatrix) {
             expect(database.text).toContain('select * from "tasks" where "id" = 0');
             expect(database.text).toContain(String(QUERY_COUNT));
 
-            if (hostVue === 'package') {
+            if (hostNeedsReactivity(hostVue)) {
                 await assertHostRemainsReactive(page);
             }
 

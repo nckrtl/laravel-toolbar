@@ -34,6 +34,7 @@ testbench.yaml
 /playwright-report
 /blob-report
 /playwright/.cache
+/tests/browser/fixtures/dist-host
 
 .env
 hot

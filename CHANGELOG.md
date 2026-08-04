@@ -6,6 +6,7 @@ All notable changes to `laravel-toolbar` will be documented in this file.
 
 ### Fixed
 
+- Dual Vite/Inertia Vue runtimes no longer share `globalThis.__VUE_INSTANCE_SETTERS__`, which blanked toolbar tools with slot TypeErrors (`r is not a function` / `t.default is not a function`). Production builds rewrite setter keys in a `renderChunk` plugin so the asset hash and manifest invalidate; browser fixtures cover toolbar-first + delayed-CSS host interleaving, compact hydration, and panel switches.
 - Large Inertia navigations now send bounded toolbar metadata instead of copying the full collected profile into `X-Toolbar`; full request data remains available through request history.
 
 ## v0.3.1 - 2026-07-19

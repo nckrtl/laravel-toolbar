@@ -11,7 +11,7 @@
         "prepare": "vp config",
         "generate-types": "php vendor/bin/testbench typescript:transform",
         "test:ui": "vitest run",
-        "test:browser": "playwright test",
+        "test:browser": "node tests/browser/build-host-vue.mjs && playwright test",
         "test:frontend": "npm run test:ui && npm run build && npm run test:browser"
     },
     "dependencies": {

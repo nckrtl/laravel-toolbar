@@ -24,33 +24,60 @@ export const DEFAULT_TOOL_ORDER = [
 
 export type DefaultToolId = (typeof DEFAULT_TOOL_ORDER)[number];
 
-export type HostVueVariant = 'none' | 'package';
+/**
+ * - none: no host Vue
+ * - package: vue.global.prod.js (does not register INSTANCE_SETTERS — weaker dual-runtime).
+ *   Host mounts before the toolbar (legacy dual-global shape).
+ * - bundled: Vite IIFE host with esm-bundler Vue (registers INSTANCE_SETTERS like Inertia apps).
+ *   Production order: toolbar classic script first (Laravel near </body>), then host second
+ *   (Vite type=module is deferred, so it runs after classic scripts).
+ */
+export type HostVueVariant = 'none' | 'package' | 'bundled';
 
 export type ErrorCapture = {
     errors: string[];
     assertClean: () => void;
 };
 
-export function resolveProductionToolbarAsset(): string {
+type ManifestEntry = { file?: string; css?: string[] };
+
+function readProductionManifest(): Record<string, ManifestEntry> {
     const manifestPath = path.join(ROOT, 'build/manifest.json');
     if (!fs.existsSync(manifestPath)) {
         throw new Error('Missing build/manifest.json. Run `npm run build` before browser tests.');
     }
 
-    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as Record<
-        string,
-        { file?: string }
-    >;
-    const entry = manifest['resources/js/toolbar.prod.ts'];
+    return JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as Record<string, ManifestEntry>;
+}
+
+function resolveToolbarProdEntry(): ManifestEntry {
+    const entry = readProductionManifest()['resources/js/toolbar.prod.ts'];
     if (!entry?.file) {
         throw new Error('toolbar.prod.ts entry missing from build/manifest.json');
     }
+    return entry;
+}
 
-    const assetPath = path.join(ROOT, 'build', entry.file);
+export function resolveProductionToolbarAsset(): string {
+    const entry = resolveToolbarProdEntry();
+    const assetPath = path.join(ROOT, 'build', entry.file!);
     if (!fs.existsSync(assetPath)) {
         throw new Error(`Built toolbar asset not found: ${assetPath}`);
     }
+    return assetPath;
+}
 
+/** Production CSS companion to toolbar.prod (used for delayed-CSS race fixtures). */
+export function resolveProductionToolbarCssAsset(): string {
+    const entry = resolveToolbarProdEntry();
+    const cssRel = entry.css?.[0];
+    if (!cssRel) {
+        throw new Error('toolbar.prod.css missing from build/manifest.json');
+    }
+    const assetPath = path.join(ROOT, 'build', cssRel);
+    if (!fs.existsSync(assetPath)) {
+        throw new Error(`Built toolbar CSS not found: ${assetPath}`);
+    }
     return assetPath;
 }
 
@@ -82,7 +109,11 @@ export function installErrorCapture(page: Page): ErrorCapture {
     };
 }
 
-async function mountHostVueApp(page: Page): Promise<void> {
+function resolveBundledHostAsset(): string {
+    return path.join(ROOT, 'tests/browser/fixtures/dist-host/host-vue-bundled.js');
+}
+
+async function mountHostVueGlobal(page: Page): Promise<void> {
     const hostScript = path.join(ROOT, 'node_modules/vue/dist/vue.global.prod.js');
     if (!fs.existsSync(hostScript)) {
         throw new Error(`Host Vue global missing at ${hostScript}`);
@@ -109,7 +140,47 @@ async function mountHostVueApp(page: Page): Promise<void> {
 
         (window as any).__HOST_VUE_VERSION__ = Vue.version;
         (window as any).__HOST_STATE__ = hostState;
+        (window as any).__HOST_HAS_INSTANCE_SETTERS__ =
+            typeof (globalThis as any).__VUE_INSTANCE_SETTERS__ !== 'undefined';
     });
+}
+
+/**
+ * Host app built with Vite lib mode so Vue ships as esm-bundler (INSTANCE_SETTERS).
+ * Injected after the classic toolbar script to mirror deferred type=module host apps.
+ */
+async function mountHostVueBundled(page: Page): Promise<void> {
+    const hostScript = resolveBundledHostAsset();
+    if (!fs.existsSync(hostScript)) {
+        throw new Error(
+            `Bundled host missing at ${hostScript}. Run: node tests/browser/build-host-vue.mjs`,
+        );
+    }
+
+    // Sequential classic inject after toolbar ≈ deferred module after classic toolbar script.
+    // (Host fixture is IIFE, but registration order matches production: toolbar then host.)
+    await page.addScriptTag({ path: hostScript });
+    await page.waitForFunction(() => Boolean(document.querySelector('#app .host-root')), null, {
+        timeout: 5_000,
+    });
+
+    await page.evaluate(() => {
+        const order = ((window as any).__SCRIPT_ORDER__ ??= []) as string[];
+        if (!order.includes('host')) {
+            order.push('host');
+        }
+    });
+}
+
+async function mountHostVueApp(page: Page, variant: HostVueVariant): Promise<void> {
+    if (variant === 'package') {
+        await mountHostVueGlobal(page);
+        return;
+    }
+    if (variant === 'bundled') {
+        await mountHostVueBundled(page);
+        return;
+    }
 }
 
 export async function assertHostRootMounted(page: Page): Promise<void> {
@@ -162,7 +233,15 @@ export async function assertHostRemainsReactive(page: Page): Promise<void> {
 
 /**
  * Mount the production toolbar bundle in a real browser page.
- * Optionally mounts a host Vue app first (Inertia/Vue dual-runtime shape).
+ *
+ * Script / race order by hostVue:
+ * - package: host vue.global first, then classic toolbar (weaker dual-runtime)
+ * - bundled (default interleaveHostDuringCss): live Servauto race —
+ *   1. classic toolbar script runs (Vue runtime registers, starts loadProductionCSS)
+ *   2. CSS response held pending (no Vue mount yet)
+ *   3. separately bundled host module mounts and registers INSTANCE_SETTERS
+ *   4. CSS released → toolbar Vue mounts amid/after host registration
+ *   5. optional compact async hydration + panel work
  *
  * Uses an http origin so localStorage works for the pinned-panel bootstrap path.
  */
@@ -174,11 +253,18 @@ export async function mountProductionToolbar(
         animations?: boolean;
         /** full = complete inline payload; compact = layout/history only + async hydrate */
         bootstrap?: 'full' | 'compact';
+        /**
+         * Hold toolbar CSS until after the bundled host mounts (production race).
+         * Defaults to true when hostVue === 'bundled'.
+         */
+        interleaveHostDuringCss?: boolean;
     },
 ): Promise<void> {
     const hostVue = options?.hostVue ?? 'none';
     const pin = options?.pin ?? 'models';
     const bootstrap = options?.bootstrap ?? 'full';
+    const interleaveHostDuringCss =
+        options?.interleaveHostDuringCss ?? hostVue === 'bundled';
     const fullPayload = buildSyntheticToolbarPayload({
         animations: options?.animations ?? true,
     });
@@ -216,6 +302,27 @@ export async function mountProductionToolbar(
         });
     }
 
+    // Delayed CSS barrier for the dual-runtime race (toolbar await loadProductionCSS).
+    let releaseCss: (() => void) | null = null;
+    const cssGate =
+        interleaveHostDuringCss && hostVue === 'bundled'
+            ? new Promise<void>((resolve) => {
+                  releaseCss = resolve;
+              })
+            : null;
+
+    if (cssGate) {
+        const cssBody = fs.readFileSync(resolveProductionToolbarCssAsset(), 'utf8');
+        await page.route('**/toolbar-css-fixture.css', async (route) => {
+            await cssGate;
+            await route.fulfill({
+                status: 200,
+                contentType: 'text/css',
+                body: cssBody,
+            });
+        });
+    }
+
     await page.goto('http://127.0.0.1/toolbar-browser-fixture');
 
     if (pin) {
@@ -228,30 +335,99 @@ export async function mountProductionToolbar(
         });
     }
 
-    await page.evaluate((data) => {
-        (window as any).__LARAVEL_TOOLBAR_DATA__ = data;
-        (window as any).__LARAVEL_TOOLBAR_CSS_URL__ = '';
-        (window as any).__LARAVEL_TOOLBAR_ASSET_VERSION__ = 'browser-test';
-    }, bootstrapPayload);
+    const cssUrl = cssGate ? 'http://127.0.0.1/toolbar-css-fixture.css' : '';
 
+    await page.evaluate(
+        ({ data, cssUrl: url }) => {
+            (window as any).__LARAVEL_TOOLBAR_DATA__ = data;
+            (window as any).__LARAVEL_TOOLBAR_CSS_URL__ = url;
+            (window as any).__LARAVEL_TOOLBAR_ASSET_VERSION__ = 'browser-test';
+            (window as any).__SCRIPT_ORDER__ = [];
+        },
+        { data: bootstrapPayload, cssUrl },
+    );
+
+    // package only: host-first weaker dual-runtime (vue.global has no INSTANCE_SETTERS).
     if (hostVue === 'package') {
-        await mountHostVueApp(page);
+        await mountHostVueApp(page, 'package');
         await assertHostRootMounted(page);
     }
 
-    await page.addScriptTag({ path: toolbarAsset });
+    if (cssGate && hostVue === 'bundled') {
+        // Live race: classic toolbar script starts, parks on delayed CSS, host boots mid-await.
+        const cssRequest = page.waitForRequest('**/toolbar-css-fixture.css', {
+            timeout: 15_000,
+        });
 
-    await page.waitForFunction(() => {
-        const host = document.getElementById('laravel-toolbar-shadow-host');
-        const root = host?.shadowRoot;
-        return Boolean(root?.getElementById('toolbar'));
-    }, null, { timeout: 15_000 });
+        await page.addScriptTag({ path: toolbarAsset });
+        await cssRequest;
+
+        // Toolbar Vue must NOT be mounted yet — still awaiting CSS.
+        const mountedTooEarly = await page.evaluate(() => {
+            const root = document.getElementById('laravel-toolbar-shadow-host')?.shadowRoot;
+            return Boolean(root?.getElementById('toolbar'));
+        });
+        if (mountedTooEarly) {
+            throw new Error(
+                'Toolbar mounted before CSS release — delayed-CSS race fixture is invalid',
+            );
+        }
+
+        await page.evaluate(() => {
+            const order = ((window as any).__SCRIPT_ORDER__ ??= []) as string[];
+            if (!order.includes('toolbar-script')) {
+                order.push('toolbar-script');
+            }
+        });
+
+        // Host module registers INSTANCE_SETTERS while toolbar CSS is still pending.
+        await mountHostVueBundled(page);
+        await assertHostRootMounted(page);
+
+        // Release CSS → toolbar continues mountToolbar → mountVueApp.
+        releaseCss?.();
+
+        await page.waitForFunction(() => {
+            const host = document.getElementById('laravel-toolbar-shadow-host');
+            const root = host?.shadowRoot;
+            return Boolean(root?.getElementById('toolbar'));
+        }, null, { timeout: 15_000 });
+
+        await page.evaluate(() => {
+            const order = ((window as any).__SCRIPT_ORDER__ ??= []) as string[];
+            if (!order.includes('toolbar-mounted')) {
+                order.push('toolbar-mounted');
+            }
+        });
+    } else {
+        // Classic path: no delayed CSS (none / package / bundled with interleave off).
+        await page.addScriptTag({ path: toolbarAsset });
+
+        await page.waitForFunction(() => {
+            const host = document.getElementById('laravel-toolbar-shadow-host');
+            const root = host?.shadowRoot;
+            return Boolean(root?.getElementById('toolbar'));
+        }, null, { timeout: 15_000 });
+
+        await page.evaluate(() => {
+            const order = ((window as any).__SCRIPT_ORDER__ ??= []) as string[];
+            if (!order.includes('toolbar-mounted')) {
+                order.push('toolbar-mounted');
+            }
+        });
+
+        if (hostVue === 'bundled') {
+            await mountHostVueBundled(page);
+            await assertHostRootMounted(page);
+        }
+    }
 
     if (hostVue === 'package') {
         await assertHostRootMounted(page);
     }
 
     if (bootstrap === 'compact') {
+        // Wait for async hydration AFTER both runtimes are live.
         await waitForHydratedQueries(page, QUERY_COUNT);
     }
 }
@@ -287,10 +463,22 @@ export async function inspectPanel(page: Page) {
         const requestsDataRowCount =
             requestsTable?.querySelectorAll('tbody tr[data-request-id]').length ?? 0;
         const hostRoot = document.querySelector('#app .host-root') as HTMLElement | null;
+        const toolbar = root?.getElementById('toolbar');
+        // Tool roots sit after the absolute chrome background in each group.
+        const toolRoots = toolbar
+            ? [...(toolbar.querySelectorAll('.relative.flex.items-center.overflow-hidden') ?? [])]
+                  .flatMap((group) => [...group.children].slice(1))
+            : [];
+        const blankToolCount = toolRoots.filter((el) => {
+            const text = (el.textContent ?? '').replace(/\s+/g, '');
+            // Vue failed components collapse to comment nodes → empty text.
+            return text.length === 0;
+        }).length;
 
         return {
             pin: localStorage.getItem('toolbar-pinned-tool'),
             hostVueVersion: (window as any).__HOST_VUE_VERSION__ ?? null,
+            hostHasInstanceSetters: Boolean((window as any).__HOST_HAS_INSTANCE_SETTERS__),
             hostRootPresent: Boolean(hostRoot),
             hostRootText: hostRoot?.innerText ?? '',
             hostTick: document.querySelector('#app .host-tick')?.textContent ?? null,
@@ -305,6 +493,9 @@ export async function inspectPanel(page: Page) {
             requestsDataRowCount,
             hasTimingsBar: Boolean(root?.querySelector('.timings-bar')),
             hasMemoryBar: Boolean(root?.querySelector('.memory-bar')),
+            toolRootCount: toolRoots.length,
+            blankToolCount,
+            toolbarText: (toolbar?.innerText ?? '').slice(0, 400),
         };
     });
 }
