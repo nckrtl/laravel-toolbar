@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use NckRtl\Toolbar\Toolbar;
 
@@ -132,8 +133,65 @@ it('resets request history for inertia get responses in header payloads', functi
         'status_code' => 200,
         'response_type' => 'Inertia',
     ]);
-    expect($data['response']['status_code'])->toBe(200);
     expect($data)->not->toHaveKey('history_row');
+    expect($data)->not->toHaveKey('request');
+    expect($data)->not->toHaveKey('response');
+    expect($data)->not->toHaveKey('queries');
+    expect($data)->not->toHaveKey('profiler');
+    expect($data)->not->toHaveKey('layout');
+});
+
+it('keeps large inertia get x-toolbar headers compact and free of full profile data', function () {
+    $largeProp = str_repeat('A', 1_800_000);
+
+    Route::get('/request-history-inertia-large', function () use ($largeProp) {
+        return response()->json([
+            'component' => 'Tasks/Index',
+            'props' => [
+                'payload' => $largeProp,
+            ],
+            'url' => '/request-history-inertia-large',
+            'version' => '1',
+        ])->header('X-Inertia', 'true');
+    })->name('request.history.inertia.large');
+
+    $response = $this->get('/request-history-inertia-large', [
+        'X-Inertia' => 'true',
+        'X-Requested-With' => 'XMLHttpRequest',
+        'Accept' => 'text/html, application/xhtml+xml',
+    ]);
+
+    $header = $response->headers->get('x-toolbar');
+
+    expect($header)->toBeString()->not->toBeEmpty();
+    expect(strlen($header))->toBeLessThan(16_384);
+
+    $data = decodeRequestHistoryHeaderPayload($header);
+
+    expect($data['request_id'])->not->toBeEmpty();
+    expect($data['selected_request_id'])->toBe($data['request_id']);
+    expect($data['request_history'])->toHaveCount(1);
+    expect($data['request_history'][0])->toMatchArray([
+        'id' => $data['request_id'],
+        'is_xhr' => false,
+        'method' => 'GET',
+        'uri' => '/request-history-inertia-large',
+        'name' => 'request.history.inertia.large',
+        'status_code' => 200,
+        'response_type' => 'Inertia',
+    ]);
+    expect($data)->not->toHaveKey('history_row');
+    expect($data)->not->toHaveKey('request');
+    expect($data)->not->toHaveKey('response');
+    expect($data)->not->toHaveKey('queries');
+    expect($data)->not->toHaveKey('profiler');
+    expect($data)->not->toHaveKey('layout');
+    expect(json_encode($data))->not->toContain($largeProp);
+
+    $cached = Cache::get('laravel-toolbar-request-data-'.$data['request_id']);
+
+    expect($cached)->toBeArray();
+    expect(data_get($cached, 'request.view_data.payload'))->toBe($largeProp);
 });
 
 it('keeps inertia validation style responses as compact async history rows', function () {

@@ -153,6 +153,105 @@ describe('useRequestHistory', () => {
         expect(data.value.request?.uri).toBe('/second');
     });
 
+    it('resets history from compact replacement and loads full payload from cache endpoint', async () => {
+        setToolbarData(
+            makeToolbarData({
+                request_id: 'request-1',
+                selected_request_id: 'request-1',
+                request_history: [
+                    makeHistoryRow('request-1', {
+                        uri: '/dashboard',
+                    }),
+                    makeHistoryRow('request-async', {
+                        is_xhr: true,
+                        uri: '/api/notifications',
+                    }),
+                ],
+                request: makeRequest({
+                    uri: '/dashboard',
+                    route_name: 'dashboard',
+                }),
+            }),
+        );
+
+        global.fetch = vi.fn(async () => {
+            return new Response(
+                JSON.stringify({
+                    summary: {
+                        request: {
+                            route_name: 'tasks.index',
+                        },
+                    },
+                    raw: makeToolbarData({
+                        request_id: 'request-2',
+                        selected_request_id: 'request-2',
+                        request_history: [
+                            makeHistoryRow('request-2', {
+                                is_xhr: false,
+                                uri: '/tasks',
+                                name: 'tasks.index',
+                                response_type: 'Inertia',
+                            }),
+                        ],
+                        request: makeRequest({
+                            uri: '/tasks',
+                            route_name: 'tasks.index',
+                            is_inertia: true,
+                        }),
+                        response: makeResponse(200, '1.8 MB'),
+                    }),
+                }),
+                {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                },
+            );
+        }) as typeof fetch;
+
+        const { activeRequestId, data, requestHistory, selectedRequestId } = useRequestHistory();
+
+        window.dispatchEvent(
+            new CustomEvent('laravel-toolbar:update', {
+                detail: {
+                    data: {
+                        request_id: 'request-2',
+                        selected_request_id: 'request-2',
+                        request_history: [
+                            makeHistoryRow('request-2', {
+                                is_xhr: false,
+                                uri: '/tasks',
+                                name: 'tasks.index',
+                                response_type: 'Inertia',
+                            }),
+                        ],
+                    },
+                },
+            }),
+        );
+
+        expect(requestHistory.value.map((row) => row.id)).toEqual(['request-2']);
+        expect(selectedRequestId.value).toBe('request-2');
+        expect(activeRequestId.value).toBe('request-2');
+
+        await vi.waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+            expect(data.value.request?.uri).toBe('/tasks');
+        });
+
+        expect(global.fetch).toHaveBeenCalledWith('/_toolbar/requests/request-2', {
+            headers: {
+                Accept: 'application/json',
+                'X-Laravel-Toolbar-Internal': 'true',
+            },
+        });
+        expect(selectedRequestId.value).toBe('request-2');
+        expect(requestHistory.value.map((row) => row.id)).toEqual(['request-2']);
+        expect(data.value.request?.route_name).toBe('tasks.index');
+        expect(data.value.response?.status_code).toBe(200);
+    });
+
     it('filters explicit internal and debug rows from request history', () => {
         setToolbarData(
             makeToolbarData({

@@ -94,6 +94,10 @@ const resolveSelectedRequestId = (
     return finalPageRequest?.id ?? lastHistoryRow?.id ?? getPayloadRequestId(payload);
 };
 
+const isCompletePayload = (payload: ToolbarData): boolean => {
+    return Boolean(payload.request && payload.response);
+};
+
 const decoratePayload = (payload: ToolbarData, requestId: string | null): ToolbarData => {
     return {
         ...baseToolbarData,
@@ -122,29 +126,36 @@ const replaceToolbarState = (payload: ToolbarData): void => {
     const history = normalizeHistory(payload);
     const resolvedSelectedRequestId = resolveSelectedRequestId(payload, history);
     const nextCache = new Map<string, ToolbarData>();
+    const payloadIsComplete = isCompletePayload(payload);
 
     requestHistory.value = history;
     selectedRequestId.value = resolvedSelectedRequestId;
     previewRequestId.value = null;
     pendingPayloads.clear();
 
-    if (resolvedSelectedRequestId) {
-        nextCache.set(resolvedSelectedRequestId, {
-            ...payload,
-            request_id: resolvedSelectedRequestId,
-        });
-    }
+    if (payloadIsComplete) {
+        if (resolvedSelectedRequestId) {
+            nextCache.set(resolvedSelectedRequestId, {
+                ...payload,
+                request_id: resolvedSelectedRequestId,
+            });
+        }
 
-    const payloadRequestId = getPayloadRequestId(payload);
+        const payloadRequestId = getPayloadRequestId(payload);
 
-    if (payloadRequestId && payloadRequestId !== resolvedSelectedRequestId) {
-        nextCache.set(payloadRequestId, {
-            ...payload,
-            request_id: payloadRequestId,
-        });
+        if (payloadRequestId && payloadRequestId !== resolvedSelectedRequestId) {
+            nextCache.set(payloadRequestId, {
+                ...payload,
+                request_id: payloadRequestId,
+            });
+        }
     }
 
     payloadCache.value = nextCache;
+
+    if (!payloadIsComplete && resolvedSelectedRequestId) {
+        void ensureRequestPayload(resolvedSelectedRequestId);
+    }
 };
 
 const upsertHistoryRow = (historyRow: RequestHistoryRow): void => {
@@ -217,7 +228,7 @@ const loadRequestPayload = async (requestId: string): Promise<ToolbarData> => {
 export const ensureRequestPayload = (requestId: string): Promise<ToolbarData> => {
     const cachedPayload = payloadCache.value.get(requestId);
 
-    if (cachedPayload) {
+    if (cachedPayload && isCompletePayload(cachedPayload)) {
         return Promise.resolve(cachedPayload);
     }
 

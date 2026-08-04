@@ -286,7 +286,7 @@ class ToolbarInjector
             if ($chainId === null) {
                 if ($headerOnly) {
                     return $this->shouldResetHeaderHistory($historyRow)
-                        ? $this->replacementHeaderPayload($data, $requestId, $history)
+                        ? $this->replacementHeaderPayload($requestId, $history)
                         : $this->compactHeaderPayload($requestId, $historyRow);
                 }
 
@@ -321,7 +321,7 @@ class ToolbarInjector
             }
 
             return $this->shouldResetHeaderHistory($historyRow)
-                ? $this->replacementHeaderPayload($data, $requestId, $history)
+                ? $this->replacementHeaderPayload($requestId, $history)
                 : $this->compactHeaderPayload($requestId, $historyRow);
         }
 
@@ -429,13 +429,20 @@ class ToolbarInjector
         ];
     }
 
-    protected function replacementHeaderPayload(array $data, string $requestId, array $history): array
+    /**
+     * Bounded header payload used when the browser should replace request history.
+     * Full profiles stay in cache and are fetched via /_toolbar/requests/{requestId}.
+     *
+     * @param  array<int, array<string, mixed>>  $history
+     * @return array{request_id: string, selected_request_id: string, request_history: array<int, array<string, mixed>>}
+     */
+    protected function replacementHeaderPayload(string $requestId, array $history): array
     {
-        $data['request_id'] = $requestId;
-        $data['selected_request_id'] = $requestId;
-        $data['request_history'] = $history;
-
-        return $data;
+        return [
+            'request_id' => $requestId,
+            'selected_request_id' => $requestId,
+            'request_history' => $history,
+        ];
     }
 
     protected function shouldResetHeaderHistory(array $historyRow): bool
