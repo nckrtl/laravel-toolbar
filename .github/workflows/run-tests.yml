@@ -53,22 +53,23 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         include:
           # Pest 5 needs symfony/process ^8.1, only satisfied by Laravel 13.
+          # Use 5.* / 4.* (not caret) so PowerShell does not strip ^ into exact 4.0.
           - laravel: "13.*"
             testbench: "11.*"
-            pest: "^5.0"
-            pest_plugin_arch: "^5.0"
-            pest_plugin_laravel: "^5.0"
+            pest: "5.*"
+            pest_plugin_arch: "5.*"
+            pest_plugin_laravel: "5.*"
           # Keep Laravel 11/12 package compatibility coverage on Pest 4 overrides.
           - laravel: "12.*"
             testbench: "10.*"
-            pest: "^4.0"
-            pest_plugin_arch: "^4.0"
-            pest_plugin_laravel: "^4.0"
+            pest: "4.*"
+            pest_plugin_arch: "4.*"
+            pest_plugin_laravel: "4.*"
           - laravel: "11.*"
             testbench: "9.*"
-            pest: "^4.0"
-            pest_plugin_arch: "^4.0"
-            pest_plugin_laravel: "^4.0"
+            pest: "4.*"
+            pest_plugin_arch: "4.*"
+            pest_plugin_laravel: "4.*"
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -80,7 +81,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
 
       - name: Setup problem matchers
@@ -90,7 +91,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "pestphp/pest:${{ matrix.pest }}" "pestphp/pest-plugin-arch:${{ matrix.pest_plugin_arch }}" "pestphp/pest-plugin-laravel:${{ matrix.pest_plugin_laravel }}" --no-interaction --no-update
+          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
+          composer require --dev "orchestra/testbench:${{ matrix.testbench }}" "pestphp/pest:${{ matrix.pest }}" "pestphp/pest-plugin-arch:${{ matrix.pest_plugin_arch }}" "pestphp/pest-plugin-laravel:${{ matrix.pest_plugin_laravel }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies

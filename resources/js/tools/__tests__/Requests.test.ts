@@ -174,17 +174,19 @@ describe("Requests tool", () => {
         expect(panel.text()).toContain("2");
 
         await panel.find('[data-request-id="request-1"]').trigger("mouseenter");
-        await flush();
 
-        expect(global.fetch).toHaveBeenCalledTimes(1);
-        expect(activeToolbarData.value.request?.uri).toBe("/posts");
-        expect(activeToolbarData.value.response?.status_code).toBe(302);
+        await vi.waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+            expect(activeToolbarData.value.request?.uri).toBe("/posts");
+            expect(activeToolbarData.value.response?.status_code).toBe(302);
+        });
 
         await panel.find(".requests-table").trigger("mouseleave");
-        await flush();
 
-        expect(activeToolbarData.value.request?.uri).toBe("/dashboard");
-        expect(activeToolbarData.value.response?.status_code).toBe(200);
+        await vi.waitFor(() => {
+            expect(activeToolbarData.value.request?.uri).toBe("/dashboard");
+            expect(activeToolbarData.value.response?.status_code).toBe(200);
+        });
 
         await panel.find('[data-request-id="request-1"]').trigger("click");
         await flush();
@@ -192,9 +194,10 @@ describe("Requests tool", () => {
         expect(global.fetch).toHaveBeenCalledTimes(1);
 
         await panel.find(".requests-table").trigger("mouseleave");
-        await flush();
 
-        expect(activeToolbarData.value.request?.uri).toBe("/posts");
-        expect(activeToolbarData.value.response?.status_code).toBe(302);
+        await vi.waitFor(() => {
+            expect(activeToolbarData.value.request?.uri).toBe("/posts");
+            expect(activeToolbarData.value.response?.status_code).toBe(302);
+        });
     });
 });
