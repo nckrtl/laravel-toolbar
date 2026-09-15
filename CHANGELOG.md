@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-toolbar` will be documented in this file.
 
+## v0.3.6 - 2026-09-15
+
+Adds Laravel MCP 1.0 support while retaining compatibility with MCP 0.5–0.7. Existing toolbar:mcp clients continue to work. Laravel MCP 1.0 needs Laravel 11.45.3+, 12.41.1+, or 13.x.
+
+Validation: 379 PHP tests pass locally on MCP 1.0; all 12 PHP CI matrix combinations pass. Added protocol compatibility tests cover legacy initialization, modern discovery, and mismatched headers.
+
+Known validation limitations: pre-existing PHPStan errors and an unchanged frontend negative fixture that expects a minifier-dependent Lodash collision. The production frontend bundle is unchanged by this release's MCP compatibility change.
+
+See PR #19 and https://github.com/laravel/mcp/blob/v1.0.0/UPGRADE.md.
+
 ## Unreleased
 
 ### Fixed
