@@ -30,6 +30,12 @@ See it in action at [toolbar.nckrtl.com](https://toolbar.nckrtl.com), where you 
 - PHP 8.4+
 - Laravel 11.x, 12.x, or 13.x
 
+Laravel MCP 1.0 is supported alongside the existing 0.5–0.7 releases. Existing
+`toolbar:mcp` client configuration continues to work with the legacy `initialize`
+handshake. For MCP 1.0, use Laravel 11.45.3+, 12.41.1+, or 13.x. See the
+[Laravel MCP upgrade guide](https://github.com/laravel/mcp/blob/v1.0.0/UPGRADE.md)
+for custom client protocol, header, and session changes.
+
 ## Installation
 
 Install the package via Composer:
