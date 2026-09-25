@@ -16,6 +16,8 @@ See PR #19 and https://github.com/laravel/mcp/blob/v1.0.0/UPGRADE.md.
 
 ### Fixed
 
+- BreakpointIndicator no longer throws `Cannot read properties of undefined (reading '0')` when the host page exposes no CSS `--breakpoint-*` variables (empty breakpoints map on mount).
+
 - Production toolbar classic script is IIFE-wrapped before content hashing so minified top-level bindings stay lexical. Host apps that assign Lodash to `window._` no longer overwrite Vue `withCtx` (which returned Lodash wrappers and broke `renderSlot` with `r is not a function`, blank tools/panels). Browser fixtures use a parser-time host ES module that clobbers `window._`, prove the unwrapped bundle fails post-host slot switches, and assert all six tools with nested panel content after host boot.
 - Large Inertia navigations now send bounded toolbar metadata instead of copying the full collected profile into `X-Toolbar`; full request data remains available through request history.
 
