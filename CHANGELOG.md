@@ -2,6 +2,17 @@
 
 All notable changes to `laravel-toolbar` will be documented in this file.
 
+## v0.3.7 - 2026-10-02
+
+Adds Inertia prop metadata, follow-up request marks and a hosted mode for apps that embed your pages.
+
+- `inertia.props`: per top-level prop, whether it is shared, its Inertia type (always, defer, optional, merge, scroll, once) and the line that defines it. It comes from the DevTools data of inertia-laravel 3.3+ (enabled by default in `local`). Deferred props that the first response leaves out are listed as not loaded. Older Inertia versions get the shared prop keys. Also `inertia.render_source` and `inertia.component_path`.
+- History rows get `follow_up`: `redirect` for the next hop of a redirect, `partial` for a partial reload.
+- Fix: partial reloads (such as deferred props) now join the page's request history instead of replacing it.
+- Hosted mode: when `window.__LARAVEL_TOOLBAR_HOST__` is set before the page loads, the toolbar draws no UI and only reports requests through the `laravel-toolbar:update` event. T3 Code's browser uses this to draw the toolbar natively.
+
+Validation: 383 PHP tests and 52 JS tests pass. Known limitations, unchanged: pre-existing PHPStan errors (optional Inertia SSR classes) and the pre-commit `vp check` hook cannot load `vite.config.ts`.
+
 ## v0.3.6 - 2026-09-15
 
 Adds Laravel MCP 1.0 support while retaining compatibility with MCP 0.5–0.7. Existing toolbar:mcp clients continue to work. Laravel MCP 1.0 needs Laravel 11.45.3+, 12.41.1+, or 13.x.
