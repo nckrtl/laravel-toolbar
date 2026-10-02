@@ -98,6 +98,7 @@ it('tracks redirect chains for inertia header payloads and only exposes the curr
     expect($firstPayload['request_id'])->not->toBeEmpty();
     expect($firstPayload['history_row']['id'])->toBe($firstPayload['request_id']);
     expect($firstPayload['history_row']['status_code'])->toBe(302);
+    expect($firstPayload['history_row']['follow_up'])->toBeNull();
     expect($firstPayload)->not->toHaveKey('redirect_chain');
     expect($firstPayload)->not->toHaveKey('request_history');
 
@@ -135,6 +136,7 @@ it('tracks redirect chains for inertia header payloads and only exposes the curr
         'method' => 'GET',
         'uri' => '/inertia-dashboard',
         'status_code' => 200,
+        'follow_up' => 'redirect',
     ]);
     expect($terminalPayload)->not->toHaveKey('redirect_chain');
     expect($terminalPayload)->not->toHaveKey('request_history');
@@ -182,6 +184,7 @@ it('adds every redirect hop to the final html request_history payload', function
     ]);
     expect($data['request_history'][0]['id'])->not->toBeEmpty();
     expect($data['request_history'][1]['id'])->not->toBeEmpty();
+    expect(array_column($data['request_history'], 'follow_up'))->toBe([null, 'redirect', 'redirect']);
     expect($data['response']['status_code'])->toBe(200);
     expect($data)->not->toHaveKey('redirect_chain');
 });
@@ -270,4 +273,26 @@ it('clears profiled redirect chain state on terminal profiled responses', functi
     expect($laterPayload['request_history'])->toHaveCount(1);
     expect($laterPayload['request_history'][0]['uri'])->toBe('/profiled-redirect-later');
     expect($laterPayload)->not->toHaveKey('redirect_chain');
+});
+
+it('does not mark a request as a redirect hop when its chain is already closed', function () {
+    Route::get('/stale-redirect', fn () => redirect('/stale-end'));
+    Route::get('/stale-end', fn () => response('<html><body>Done</body></html>'));
+
+    $first = $this->get('/stale-redirect');
+    $chainCookie = $first->getCookie(RedirectChainStore::COOKIE_NAME, false);
+
+    // The chain ends, but the browser aborts that response and keeps the cookie.
+    $this->withUnencryptedCookie(RedirectChainStore::COOKIE_NAME, $chainCookie->getValue())->get('/stale-end');
+
+    $again = $this
+        ->withUnencryptedCookie(RedirectChainStore::COOKIE_NAME, $chainCookie->getValue())
+        ->get('/stale-redirect');
+    $next = $this
+        ->withUnencryptedCookie(RedirectChainStore::COOKIE_NAME, $again->getCookie(RedirectChainStore::COOKIE_NAME, false)->getValue())
+        ->get('/stale-end');
+
+    $data = decodeToolbarPayload($next->getContent());
+
+    expect(array_column($data['request_history'], 'follow_up'))->toBe([null, 'redirect']);
 });

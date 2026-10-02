@@ -48,6 +48,7 @@ it('builds a request history row from collected payload data', function () {
         'size' => '0B',
         'duration' => '18.40ms',
         'response_type' => 'Inertia Redirect',
+        'follow_up' => null,
     ]);
 });
 
@@ -80,6 +81,7 @@ it('builds a request history row from the request and response fallback path', f
         'size' => '2 B',
         'duration' => null,
         'response_type' => 'JSON',
+        'follow_up' => null,
     ]);
 });
 
@@ -201,4 +203,17 @@ it('classifies html, redirect, client error, server error, and other response ty
     expect($clientErrorRow['response_type'])->toBe('Client Error');
     expect($serverErrorRow['response_type'])->toBe('Server Error');
     expect($otherRow['response_type'])->toBe('Other');
+});
+
+it('marks partial reloads as follow-up requests', function () {
+    $request = Request::create('/dashboard', 'GET');
+    $request->headers->set('X-Inertia', 'true');
+    $request->headers->set('X-Inertia-Partial-Component', 'Dashboard');
+    $request->headers->set('X-Inertia-Partial-Data', 'stats');
+
+    $row = (new RequestHistoryRowFactory)->fromRequest($request, response('{}'), 'request-789');
+
+    expect($row['follow_up'])->toBe('partial');
+    // It stays on the page, so it joins the page's history instead of replacing it.
+    expect($row['is_xhr'])->toBeTrue();
 });

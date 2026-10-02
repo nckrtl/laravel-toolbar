@@ -1,4 +1,5 @@
 import { setupInterceptors } from '@/core/interceptors';
+import { log } from '@/core/utils/logger';
 
 export type MountFunction = () => Promise<void>;
 
@@ -12,6 +13,14 @@ let toolbarPageUpdateListenerBound = false;
  * Import the appropriate mount function (dev or prod) and call this
  */
 export async function initToolbar(mountFn: MountFunction): Promise<void> {
+    // Hosted mode: an embedding app (such as T3 Code's browser) sets this before the page
+    // loads and draws the toolbar itself. The interceptors above still report every request
+    // through `laravel-toolbar:update`; only the toolbar UI stays unmounted.
+    if (window.__LARAVEL_TOOLBAR_HOST__) {
+        log(`Hosted by ${window.__LARAVEL_TOOLBAR_HOST__}; not mounting the toolbar UI`);
+        return;
+    }
+
     if (!toolbarPageUpdateListenerBound) {
         window.addEventListener('laravel-toolbar:html-updated', () => {
             void mountFn();

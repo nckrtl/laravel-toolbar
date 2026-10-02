@@ -104,6 +104,10 @@ class ToolbarInjector
             ],
         );
 
+        if ($this->continuesRedirectChain($request)) {
+            $summary['history_row']['follow_up'] = 'redirect';
+        }
+
         if (isset($response->headers)) {
             $response->headers->set(
                 'X-Toolbar-Summary',
@@ -270,6 +274,10 @@ class ToolbarInjector
         try {
             $store = app(RedirectChainStore::class);
 
+            if ($this->continuesRedirectChain($request)) {
+                $historyRow['follow_up'] = 'redirect';
+            }
+
             if ($this->isTrackedRedirectResponse($response)) {
                 $chainId = $store->currentChainId($request) ?? $store->createChainId();
 
@@ -367,11 +375,32 @@ class ToolbarInjector
             $historyRow = app(RequestHistoryRowFactory::class)
                 ->fromRequest($request, $response, $snapshotRequestId);
 
+            if ($this->continuesRedirectChain($request)) {
+                $historyRow['follow_up'] = 'redirect';
+            }
+
             $store->append($chainId, $historyRow);
 
             $response->headers->setCookie($store->makeChainCookie($chainId));
         } catch (\Throwable $e) {
             report($e);
+        }
+    }
+
+    /**
+     * Whether this request is the next hop of a redirect. The chain must still hold earlier
+     * hops: a browser that aborts a chain's last response keeps a cookie for a chain the
+     * server already closed.
+     */
+    protected function continuesRedirectChain(Request $request): bool
+    {
+        try {
+            $store = app(RedirectChainStore::class);
+            $chainId = $store->currentChainId($request);
+
+            return $chainId !== null && $store->load($chainId) !== [];
+        } catch (\Throwable) {
+            return false;
         }
     }
 
@@ -591,6 +620,9 @@ class ToolbarInjector
             window.__LARAVEL_TOOLBAR_ASSET_VERSION__ = "{$assetVersion}";
 
             (function() {
+                // Hosted mode: an embedding app (such as T3 Code's browser) draws the toolbar.
+                if (window.__LARAVEL_TOOLBAR_HOST__) return;
+
                 var cached = sessionStorage.getItem('laravel-toolbar-html-cache');
                 var cachedCss = sessionStorage.getItem('laravel-toolbar-css-cache');
                 var cachedVersion = sessionStorage.getItem('laravel-toolbar-asset-version');

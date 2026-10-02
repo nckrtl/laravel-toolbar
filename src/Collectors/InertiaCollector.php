@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\File;
 use NckRtl\Toolbar\CollectorManager;
 use NckRtl\Toolbar\Data\Configurations\InertiaConfig;
 use NckRtl\Toolbar\Data\InertiaData;
+use NckRtl\Toolbar\Support\InertiaPropMetadata;
 
 class InertiaCollector extends Collector implements CollectorInterface
 {
@@ -31,8 +32,13 @@ class InertiaCollector extends Collector implements CollectorInterface
 
     public function collectData(CollectorManager $collectorManager): ?InertiaData
     {
+        $metadata = InertiaPropMetadata::forRequest(request());
+
         return new InertiaData(
             version: $this->getVersion(),
+            props: $metadata['props'] ?? null,
+            render_source: $metadata['render_source'] ?? null,
+            component_path: $metadata['component_path'] ?? null,
         );
     }
 

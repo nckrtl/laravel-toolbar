@@ -23,6 +23,8 @@ export interface RequestHistoryRow {
     status_code: number | null;
     size: string | null;
     duration: string | number | null;
+    /** `redirect`: the next hop of a redirect; `partial`: a partial reload of the page. */
+    follow_up?: 'redirect' | 'partial' | null;
 }
 
 export interface ToolbarData {
@@ -68,6 +70,8 @@ declare global {
         __LARAVEL_TOOLBAR_ASSET_VERSION__: string;
         __TOOLBAR_SHADOW_PRECREATED__?: ShadowRoot;
         __TOOLBAR_STYLESHEET__?: CSSStyleSheet;
+        /** Set by an app that embeds the page and draws the toolbar itself (hosted mode). */
+        __LARAVEL_TOOLBAR_HOST__?: string;
     }
 
     interface WindowEventMap {

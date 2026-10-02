@@ -14,6 +14,9 @@ declare namespace NckRtl.Toolbar.Data {
     };
     export type InertiaData = {
         version: string | null;
+        props: { [key: string]: any } | null;
+        render_source: { [key: string]: any } | null;
+        component_path: string | null;
     };
     export type LaravelData = {
         version: string | null;

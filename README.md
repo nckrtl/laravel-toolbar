@@ -331,6 +331,11 @@ For Inertia.js requests (detected via `X-Inertia` header), toolbar data is sent 
 ### API Routes
 The toolbar automatically excludes AJAX requests and non-HTML responses to avoid interfering with your API endpoints.
 
+### Hosted mode
+An app that embeds your pages and draws the toolbar itself (such as T3 Code's browser) sets `window.__LARAVEL_TOOLBAR_HOST__` before the page loads. The toolbar then draws no UI, but still reports every request through the `laravel-toolbar:update` window event.
+
+With inertia-laravel 3.3+ and its DevTools enabled (the default in `local`), the toolbar data includes per-prop metadata under `inertia.props`: shared or page prop, the Inertia prop type (always, defer, optional, merge, scroll, once) and the source line that defines it.
+
 ## Development vs Production
 
 The toolbar includes built-in safety features:

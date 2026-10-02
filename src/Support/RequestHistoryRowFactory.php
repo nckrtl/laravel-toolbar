@@ -33,6 +33,7 @@ final class RequestHistoryRowFactory
             'size' => $this->resolveSize(data_get($payload, 'response.size')),
             'duration' => $this->resolveDuration($payload),
             'response_type' => $responseType,
+            'follow_up' => $this->resolveFollowUp($request),
         ];
     }
 
@@ -59,7 +60,17 @@ final class RequestHistoryRowFactory
             'size' => $this->resolveResponseSize($response),
             'duration' => null,
             'response_type' => $responseType,
+            'follow_up' => $this->resolveFollowUp($request),
         ];
+    }
+
+    /**
+     * A partial reload (deferred props, `router.reload({ only })`) follows the page it
+     * reloads. A redirect's next hop is marked when the redirect chain is recorded.
+     */
+    private function resolveFollowUp(Request $request): ?string
+    {
+        return $request->header('X-Inertia-Partial-Component') ? 'partial' : null;
     }
 
     private function resolveRequestId(array $payload): string
@@ -188,6 +199,11 @@ final class RequestHistoryRowFactory
 
     private function shouldResetInertiaHistory(Request $request, ?string $responseType): bool
     {
+        // A partial reload (deferred props, `router.reload({ only })`) stays on the page.
+        if ($request->header('X-Inertia-Partial-Component')) {
+            return false;
+        }
+
         if ($request->isMethod('GET')) {
             return true;
         }
