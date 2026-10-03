@@ -53,6 +53,11 @@ declare namespace NckRtl.Toolbar.Data {
         version: string;
         memory_limit: string;
         max_execution_time: string;
+        sapi: string | null;
+        settings: { [key: string]: any } | null;
+        opcache: { [key: string]: any } | null;
+        extensions: { [key: string]: any } | null;
+        fpm: { [key: string]: any } | null;
     };
     export type ProfileMarkerData = {
         label: string;
