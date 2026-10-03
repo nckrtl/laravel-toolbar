@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-toolbar` will be documented in this file.
 
+## v0.3.8 - 2026-10-03
+
+Richer PHP data for the PHP tool.
+
+- `php` now also reports the SAPI, request and upload limits (`post_max_size`, `upload_max_filesize`, `max_file_uploads`, `max_input_vars`, `max_input_time`, `default_socket_timeout`), error settings, OPcache settings and usage (hit rate, memory, cached scripts), and the loaded extensions.
+- Under PHP-FPM, `php.fpm` holds the pool's live status (active, idle and total workers, listen queue, max children reached, slow requests, accepted connections, uptime) and its process manager settings (`pm`, `pm.max_children`, spare servers, `pm.max_requests`, idle and request timeouts, listen socket), read once per worker from the pool file next to the loaded php.ini. Outside PHP-FPM it is null.
+
+Validation: 384 PHP tests pass; verified under PHP-FPM 8.5 on an Orbit pool. Known limitations, unchanged: pre-existing PHPStan errors (optional Inertia SSR classes) and the pre-commit `vp check` hook cannot load `vite.config.ts`.
+
 ## v0.3.7 - 2026-10-02
 
 Adds Inertia prop metadata, follow-up request marks and a hosted mode for apps that embed your pages.
